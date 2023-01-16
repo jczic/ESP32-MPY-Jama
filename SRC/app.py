@@ -915,6 +915,8 @@ class Application :
                     for item in items :
                         if fieldErr(items, item, str) :
                             return 'Invalid or empty argument item "%s" of "%s" in args configuration structure.' % (item, arg)
+                    if fieldErr(args[arg], 'value', str, True) :
+                        return 'The value of arg "%s" is not of type "str".' % arg
                 args[arg]['type'] = t.__name__
         return None
 

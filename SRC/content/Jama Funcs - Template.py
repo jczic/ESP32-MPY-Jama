@@ -16,13 +16,12 @@ dict(
         name        = 'My template of Jama Funcs',              # Name is mandatory
         version     = [1, 0, 0],                                # Version is mandatory (list of 3 int)
         description =                                           # Description is mandatory
-                      '''                                   
-                      This template is a guide to developing Jama Funcs in MicroPython for your ESP32 device.\
-                      You just have a "dict" to place in your code file with the 2 commented lines above and below.\
-                      You can create user inputs of several types (str, int, float, bool, list, dict) in order to retrieve them at runtime via the "args" class.
-                      Use a "list" type to propose a choice between all the GPIO pins of the ESP32.
-                      Also, use the "dict" type to propose a multiple choice via the "items" sub-tree.
-                      You will be able to write your test scripts very quickly!
+                      ''' This template is a guide to developing Jama Funcs in MicroPython for your ESP32 device.\
+                          You just have a "dict" to place in your code file with the 2 commented lines above and below.\
+                          You can create user inputs of several types (str, int, float, bool, list, dict) in order to retrieve them at runtime via the "args" class.
+                          Use a "list" type to propose a choice between all the GPIO pins of the ESP32.
+                          Also, use the "dict" type to propose a multiple choice via the "items" sub-tree.
+                          You will be able to write your test scripts very quickly!
                       ''',
         author      = 'John Smith',                             # Author is mandatory
         mail        = 'john.smith@super-micropython-coders.io', # Mail is not mandatory
@@ -34,7 +33,7 @@ dict(
         # ----------------------------------------------------------------------
         my_first_arg_id    = dict( label    = 'Enter a text below:',
                                    type     = str,
-                                   value    = "Test..."), # This default value is not mandatory
+                                   value    = "Test..."),  # This default value is not mandatory
         # ----------------------------------------------------------------------
         my_second_arg_id   = dict( label    = 'Enter an integer number below:',
                                    type     = int ),
@@ -42,11 +41,11 @@ dict(
         # ----------------------------------------------------------------------
         my_third_arg_id    = dict( label    = 'Choose a GPIO pin below:',
                                    type     = list,
-                                   optional = True ),     # User can choose "No pin"
+                                   optional = True ),      # User can choose "No pin"
         # ----------------------------------------------------------------------
         my_fourth_arg_id   = dict( label    = 'Enter a float number below:',
                                    type     = float,
-                                   value    = 123.456 ),  # This default value is not mandatory
+                                   value    = 123.456 ),   # This default value is not mandatory
         # ----------------------------------------------------------------------
         my_fifth_arg_id    = dict( label    = 'Choose a boolean value via the button below:',
                                    type     = bool ),
@@ -56,7 +55,8 @@ dict(
                                    type     = dict,
                                    items    = dict( option1_id = "Select this first option",
                                                     option2_id = "Select this second option",
-                                                    option3_id = "Select this third option" )
+                                                    option3_id = "Select this third option" ),
+                                   value    = 'option2_id' # This default value is not mandatory
                                  )
         # ----------------------------------------------------------------------
     )

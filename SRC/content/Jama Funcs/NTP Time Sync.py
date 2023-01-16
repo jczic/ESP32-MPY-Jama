@@ -8,9 +8,8 @@ dict(
     info = dict(
         name        = 'NTP Time Sync',
         version     = [1, 0, 0],
-        description = '''
-                      This tool synchronizes the UTC date and time from an NTP server.
-                      You can choose the NTP server host to connect to.
+        description = ''' This tool synchronizes the UTC date and time from an NTP server.
+                          You can choose the NTP server host to connect to.
                       ''',
         author      = 'JC`zic',
         mail        = 'jczic.bos@gmail.com',

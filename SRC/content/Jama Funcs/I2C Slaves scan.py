@@ -8,9 +8,8 @@ dict(
     info = dict(
         name        = 'I2C Slaves scan',
         version     = [1, 0, 0],
-        description = '''
-                      Initializes an I2C bus on two GPIOs and scans it to find all the addresses of I2C slaves.
-                      You can choose the bus identifier, the SCL and SDA GPIO as well as the frequency in MHz.
+        description = ''' Initializes an I2C bus on two GPIO and scans it to find all the addresses of I2C slaves.
+                          You can choose the bus identifier, the SCL and SDA GPIO as well as the frequency in MHz.
                       ''',
         author      = 'JC`zic',
         mail        = 'jczic.bos@gmail.com',
@@ -21,8 +20,8 @@ dict(
 
         bus     = dict( label    = 'I2C bus:',
                         type     = dict,
-                        items    = dict( bus0 = "Bus 0",
-                                         bus1 = "Bus 1" ) ),
+                        items    = { '0' : 'Bus 0',
+                                     '1' : 'Bus 1' } ),
 
         sclPin  = dict( label    = 'I2C SCL GPIO:',
                         type     = list ),
@@ -46,7 +45,7 @@ from machine import I2C, Pin
 
 if args.freqMHz > 0 and args.freqMHz <= 500 :
     try :
-        i2c = I2C( (1 if args.bus == 'bus1' else 0),
+        i2c = I2C( int(args.bus),
                    scl  = Pin(args.sclPin),
                    sda  = Pin(args.sdaPin),
                    freq = args.freqMHz * 1000 )

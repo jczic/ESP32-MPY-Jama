@@ -784,6 +784,8 @@ function openJamaFuncsConfig(config) {
                         optElm.text  = items[item];
                         fieldElm.appendChild(optElm);
                     }
+                    if (config.args[arg].value)
+                        fieldElm.value = config.args[arg].value;
                 }
                 if (fieldElm) {
                     fieldElm.classList.add("exec-jama-funcs-args-field");
