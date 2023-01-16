@@ -1096,6 +1096,34 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    def GetInternetOk(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            return self._exeCodeREPL( 'import network\n'                                               +
+                                      'if network.WLAN(network.STA_IF).isconnected() :\n'              +
+                                      '  import socket\n'                                              +
+                                      '  __s = socket.socket()\n'                                      +
+                                      '  try :\n'                                                      +
+                                      '    __s.connect(socket.getaddrinfo("google.com", 80)[0][-1])\n' +
+                                      '    __s.close()\n'                                              +
+                                      '    print(True)\n'                                              +
+                                      '  except :\n'                                                   +
+                                      '    print(False)\n'                                             +
+                                      '  del __s\n'                                                    +
+                                      'else :\n'                                                       +
+                                      '  print(False)\n'                                               ,
+                                      timeoutSec = 3 )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+
+
+    # ---------------------------------------------------------------------------
+
     def GetMemInfo(self, gcCollect=False) :
         if not self._isConnected :
             self._raiseConnectionError()
@@ -1222,8 +1250,6 @@ class ESP32Controller :
             self._endProcess()
             self._threadStartReading()
 
-
-
     # ---------------------------------------------------------------------------
 
     def SetFreq(self, freq) :
@@ -1300,16 +1326,20 @@ class ESP32Controller :
         try :
             try :
                 self._exeCodeREPL('import mip', timeoutSec=3)
-                manager = 'mip'
+                module = 'mip'
             except :
                 self._exeCodeREPL('import upip', timeoutSec=3)
-                manager = 'PyPI'
+                module = 'upip'
+            try :
+                r = self._exeCodeREPL('%s.install(%s)' % (module, repr(packageName)), timeoutSec=0)
+            except Exception as ex :
+                if self._onTerminalRecv :
+                    self._onTerminalRecv(self, 'Unable to install package (is Wi-Fi/Internet connected?)\n\n')
+                raise ex
+            if r and self._onTerminalRecv :
+                self._onTerminalRecv(self, str(r) + '\n')
         finally :
             self._endProcess()
             self._threadStartReading()
-        if manager == 'mip' :
-            self.ExecProgram('mip.install(%s)' % repr(packageName))
-        elif manager == 'PyPI' :
-            self.ExecProgram('upip.install(%s)' % repr(packageName))
 
 # ===============================================================================

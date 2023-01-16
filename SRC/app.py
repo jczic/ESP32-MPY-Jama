@@ -180,6 +180,8 @@ class Application :
                 self._execCodeStop()
             elif cmd == 'GET-FLASH-ROOT-PATH' :
                 self._sendFlashRootPath()
+            elif cmd == 'GET-PINS-LIST' :
+                self._sendPinsList()
             elif cmd == 'GET-LIST-DIR' :
                 self._sendListDir(arg)
             elif cmd == 'CREATE-DIR' :
@@ -560,9 +562,7 @@ class Application :
     def _sendPinsList(self) :
         if self._ableToUseDevice() :
             try :
-                pins = list( self.esp32Ctrl.GetPinsState().keys() )
-                pins.sort()
-                self._wsSendCmd('PINS-LIST', pins)
+                self._wsSendCmd('PINS-LIST', self.esp32Ctrl.GetPinsState())
             except :
                 self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
 
@@ -604,8 +604,8 @@ class Application :
                               dns     = wifiSTACnf['dns']
                           ),
                           wifiAP = dict(
-                              active = self.esp32Ctrl.GetWiFiActive(ap=True),
-                              mac    = self.esp32Ctrl.GetWiFiMacAddr(ap=True),
+                              active  = self.esp32Ctrl.GetWiFiActive(ap=True),
+                              mac     = self.esp32Ctrl.GetWiFiMacAddr(ap=True),
                               ssid    = wifiAPCnf['ssid'],
                               ip      = wifiAPCnf['ip'],
                               mask    = wifiAPCnf['mask'],
@@ -613,9 +613,10 @@ class Application :
                               dns     = wifiAPCnf['dns']
                           ),
                           ble = dict(
-                              active = self.esp32Ctrl.GetBLEActive(),
-                              mac    = self.esp32Ctrl.GetBLEMacAddr()
-                          )
+                              active  = self.esp32Ctrl.GetBLEActive(),
+                              mac     = self.esp32Ctrl.GetBLEMacAddr()
+                          ),
+                          internetOK = self.esp32Ctrl.GetInternetOk()
                 )
                 if (not silence) :
                     self._wsSendCmd('HIDE-WAIT')
@@ -1089,8 +1090,11 @@ class Application :
     def _installPackage(self, packageName) :
         if self._ableToUseDevice() :
             try :
+                self._wsSendCmd('SHOW-WAIT', 'Attempts to download and install "%s" package...' % packageName)
                 self.esp32Ctrl.InstallPackage(packageName)
+                self._wsSendCmd('HIDE-WAIT')
             except :
+                self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('SHOW-ERROR', 'Unable to install "%s" package.' % packageName)
 
     # ------------------------------------------------------------------------

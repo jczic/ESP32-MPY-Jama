@@ -157,22 +157,25 @@ function showError(text) {
 }
 
 function showPage(id) {
-    var pages = getElmsByClass("page-container");
-    for (var i = 0; i < pages.length; i++) {
-        var page = pages[i];
-        if (page.id == id) {
-            show(page.id);
-            page.scrollTop = 0;
+    var actPage = getActivePage();
+    if (!actPage || actPage.id != id) {
+        var pages = getElmsByClass("page-container");
+        for (var i = 0; i < pages.length; i++) {
+            var page = pages[i];
+            if (page.id == id) {
+                show(page.id);
+                page.scrollTop = 0;
+            }
+            else
+                hide(page.id);
         }
-        else
-            hide(page.id);
     }
 }
 
 function getActivePage() {
     var pages = getElmsByClass("page-container");
     for (var i = 0; i < pages.length; i++)
-        if (pages[i].style.display != "none")
+        if (pages[i].style.display == "block")
             return pages[i];
     return null;
 }
@@ -613,6 +616,31 @@ function setFlashRootPath(path) {
 
 function setPinsList(pList) {
     pinsList = pList;
+    var actPage = getActivePage();
+    if (actPage && actPage.id == "page-system-info") {
+        rmElmChildren("sysnfo-pins-left");
+        rmElmChildren("sysnfo-pins-right");
+        var listLeftElm  = getElmById("sysnfo-pins-left");
+        var listRightElm = getElmById("sysnfo-pins-right");
+        var right        = false;
+        for (var pin in pinsList) {
+            var s     = (pinsList[pin] ? "up" : "down");
+            var picto = newElm("div", null, ["list-item-picto1", "list-item-picto-pin-"+s]);
+            var text  = newElm("div", null, ["list-item-text-float"]);
+            text.innerHTML   = "GPIO-<b>" + pin + "</b> " + s;
+            text.style.float = "none";
+            if (right) {
+                listRightElm.appendChild(picto);
+                listRightElm.appendChild(text);
+            }
+            else {
+                listLeftElm.appendChild(picto);
+                listLeftElm.appendChild(text);
+            }
+            right = !right;
+        }
+        wsSendCmd("GET-PINS-LIST", null);
+    }    
 }
 
 function deviceReset() {
@@ -735,9 +763,8 @@ function openJamaFuncsConfig(config) {
                     optElm.value = "";
                     optElm.text  = "No GPIO";
                     fieldElm.appendChild(optElm);
-                    for (var i in pinsList) {
+                    for (var pin in pinsList) {
                         var optElm   = newElm("option", null, null);
-                        var pin      = pinsList[i];
                         optElm.value = pin;
                         optElm.text  = "GPIO-" + pin;
                         fieldElm.appendChild(optElm);
@@ -883,14 +910,17 @@ function addNewCodeEditorElm(code) {
         mode              : "python",
         theme             : "lucario",
         lineNumbers       : true,
-        tabSize           : 4,
         indentUnit        : 4,
+        tabSize           : 4,
+        indentWithTabs    : true,
         matchBrackets     : true,
         autoCloseBrackets : true,
         openDialog        : true,
         searchCursor      : true,
         search            : true,
         scrollbarStyle    : "overlay",
+        extraKeys         : { "Ctrl-F" : "findPersistent",
+                              "Cmd-F"  : "findPersistent" },
         value             : code
     } );
     codeMirror.setSize("100%", "100%");
@@ -1090,28 +1120,10 @@ function setSystemInfo(o) {
     getElmById("label-sysnfo-implem").innerText     = o.os.implem;
     setTextTag("label-sysnfo-spiram", (o.os.spiram ? "Yes" : "No"), o.os.spiram);
     getElmById("label-sysnfo-mpyver").innerText     = o.os.mpyver;
-    rmElmChildren("sysnfo-pins-left");
-    rmElmChildren("sysnfo-pins-right");
-    var listLeftElm  = getElmById("sysnfo-pins-left");
-    var listRightElm = getElmById("sysnfo-pins-right");
-    var right        = false;
-    for (var pin in o.pins) {
-        var s     = (o.pins[pin] ? "up" : "down");
-        var picto = newElm("div", null, ["list-item-picto1", "list-item-picto-pin-"+s]);
-        var text  = newElm("div", null, ["list-item-text-float"]);
-        text.innerHTML   = "GPIO-<b>" + pin + "</b> " + s;
-        text.style.float = "none";
-        if (right) {
-            listRightElm.appendChild(picto);
-            listRightElm.appendChild(text);
-        }
-        else {
-            listLeftElm.appendChild(picto);
-            listLeftElm.appendChild(text);
-        }
-        right = !right;
-    }
+    
     showPage("page-system-info");
+    
+    setPinsList(o.pins);
 }
 
 function setNetworksInfo(o) {
@@ -1132,6 +1144,8 @@ function setNetworksInfo(o) {
     getElmById("label-netnfo-wl-ap-mask").innerText     = o.wifiAP.mask;
     getElmById("label-netnfo-wl-ap-gateway").innerText  = o.wifiAP.gateway;
     getElmById("label-netnfo-wl-ap-dns").innerText      = o.wifiAP.dns;
+
+    setTextTag("label-netnfo-internet-ok", (o.internetOK ? "Yes" : "No"), o.internetOK);
     
     setTextTag("label-netnfo-ble-active", (o.ble.active ? "Yes" : "No"), o.ble.active);
     if (o.ble.active) showInline("close-IF-BLE"); else hide("close-IF-BLE");
@@ -1859,8 +1873,9 @@ window.addEventListener( "load", function() {
                             function(name) {
                                 name = name.trim();
                                 if (name != "") {
-                                    writeTextInTerminal("Attempts to download and install " + name + " package...\n", "LightSkyBlue");
+                                    writeTextInTerminal("Installation of '" + name + "' package:\n", "LightSkyBlue");
                                     wsSendCmd("INSTALL-PACKAGE", name);
+                                    wsSendCmd("GET-LIST-DIR", browsePath);
                                 }
                             } );
         }
