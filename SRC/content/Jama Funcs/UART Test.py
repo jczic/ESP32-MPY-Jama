@@ -64,13 +64,13 @@ dict(
                           items    = { '1' : '1 bit',
                                        '2' : '2 bits' } ),
 
-        txPin     = dict( label    = 'TX pin:',
+        txPin     = dict( label    = 'TX GPIO:',
                           type     = list ),
 
-        rxPin     = dict( label    = 'RX pin:',
+        rxPin     = dict( label    = 'RX GPIO:',
                           type     = list ),
 
-        cmd       = dict( label    = 'Test command:',
+        cmd       = dict( label    = 'Custom command to send:',
                           type     = str )
 
     )
