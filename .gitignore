@@ -1,0 +1,18 @@
+# Mac
+.DS_Store?
+ehthumbs.db
+*.DS_Store
+._*
+
+# Win
+[Dd]esktop.ini
+Thumbs.db
+.Spotlight-V100
+.Trashes
+$RECYCLE.BIN/
+*.lnk
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
