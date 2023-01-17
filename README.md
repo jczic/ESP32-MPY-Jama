@@ -2,7 +2,7 @@
 
 <br />
 
-### ESP32 MPY-Jama is a powerful tool that enables you to seamlessly connect to your Espressif ESP32 microcontrollers using MicroPython, offering an integrated development environment (IDE), interactive command line (REPL), file manager and dashboards for monitoring and visualizing the microcontroller's parameters in real-time, as well as advanced functionalities for an efficient development on MacOS &amp; Windows.
+### ESP32 MPY-Jama, a powerful tool that connects easily to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, REPL, file manager, real-time parameter monitoring and advanced features for efficient development on MacOS &amp; Windows.
 
 <br />
 
