@@ -1,8 +1,8 @@
-# <img src="/img/logo.png" width="45" valign="bottom">  ESP32 MPY-Jama, the new dev tool for your favorite MCU
+# <img src="/img/logo.png" width="45" valign="bottom">  ESP32 MPY-Jama, the dev tool for your favorite MCU
 
 <br />
 
-### ESP32 MPY-Jama, a powerful tool that connects easily to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, REPL, file manager, real-time parameter monitoring and advanced features for efficient development on MacOS &amp; Windows.
+### <p align="justify">A powerful tool that easily connects to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, file manager, REPL, real-time dashboards and advanced features for efficient development on MacOS & Windows.</p>
 
 <br />
 
@@ -31,8 +31,8 @@
 
 ### :cyclone: &nbsp;Connect to a Wi-Fi and create an access point in 2 clicks.
 <p align="center">
-    <img src="/img/screen-wifi-sta.png" height="320">          
-    <img src="/img/screen-wifi-ap.png" height="320">
+    <img src="/img/screen-wifi-sta.png" height="280">          
+    <img src="/img/screen-wifi-ap.png" height="280">
 </p>
 
 ---
