@@ -1,4 +1,4 @@
-# <img src="/img/logo.png" width="45" valign="bottom">  ESP32 MPY-Jama v1.0.2
+# <img src="/img/logo.png" width="45" valign="bottom">  ESP32 MPY-Jama, the new dev tool for your favorite MCU
 
 <br />
 
