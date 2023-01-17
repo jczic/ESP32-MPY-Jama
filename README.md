@@ -1,12 +1,24 @@
 # <img src="/img/logo.png" width="45" valign="bottom">  ESP32 MPY-Jama v1.0.2
-### ESP32 MPY-Jama is a light UX IDE with REPL, files manager, Jama Funcs and more, for MicroPython on Espressif ESP32 (MacOS &amp; Windows).
 
----
+<br />
 
-#### Download it for Windows 64-bits or for MacOS Universal2 on Intel x86_64 and on arm64 (Mac M1/M2):
+### ESP32 MPY-Jama, a powerful tool that connects easily to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, REPL, file manager, real-time parameter monitoring and advanced features for efficient development on MacOS &amp; Windows.
 
-       [<img src="/img/btn-download-mac.png" width="300">](https://github.com/jczic/ESP32-MPY-Jama/raw/master/v1.0.2/ESP32%20MPY-Jama%20(v1.0.2-macos-universal2).dmg)             
-[<img src="/img/btn-download-win.png" width="300">](https://github.com/jczic/ESP32-MPY-Jama/raw/master/v1.0.2/ESP32%20MPY-Jama%20(v1.0.2-windows).zip)
+<br />
+
+<p align="center">
+    <img src="/img/screen-ide.png" width="700">
+</p>
+
+<h4>
+    <p align="center">
+        MacOS on arm64 / MacOS on Intel x86_64 / Windows 64-bits
+    </p>
+</h4>
+<p align="center">
+    <a href="https://github.com/jczic/ESP32-MPY-Jama/raw/master/v1.0.2/ESP32%20MPY-Jama%20(v1.0.2-macos-universal2).dmg"><img src="/img/btn-download-mac.png" width="250"></a>             
+    <a href="https://github.com/jczic/ESP32-MPY-Jama/raw/master/v1.0.2/ESP32%20MPY-Jama%20(v1.0.2-windows).zip"><img src="/img/btn-download-win.png" width="250"></a>
+</p>
 
 ---
 
