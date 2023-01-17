@@ -1,4 +1,4 @@
-# ESP32-MPY-Jama v1.0.2
+# ESP32 MPY-Jama v1.0.2
 ESP32 MPY-Jama is a light UX IDE with REPL, files manager, Jama Funcs and more, for MicroPython on Espressif ESP32 (MacOS &amp; Windows).
 <br />
 <br />
