@@ -22,6 +22,35 @@
 
 ---
 
+### :cyclone: &nbsp;Access information dashboards instantly.
+<p align="center">
+    <img src="/img/screen-networks.png" width="700">
+</p>
+
+---
+
+### :cyclone: &nbsp;Connect to a Wi-Fi and create an access point in 2 clicks.
+<p align="center">
+    <img src="/img/screen-wifi-sta.png" height="320">          
+    <img src="/img/screen-wifi-ap.png" height="320">
+</p>
+
+---
+
+### :cyclone: &nbsp;Install a new firmware on the flash very easily.
+<p align="center">
+    <img src="/img/screen-esptool.png" width="700">
+</p>
+
+---
+
+### :cyclone: &nbsp;Create, import and run mini-applications with customizable parameters.
+<p align="center">
+    <img src="/img/screen-jama-funcs.png" width="700">
+</p>
+
+---
+
 <a name="author"></a>
 ## :wink: &nbsp;Author
 
