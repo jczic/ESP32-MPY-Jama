@@ -1,4 +1,3 @@
-<br />
 
 # <img src="/img/logo.png" width="45" valign="bottom">  ESP32 MPY-Jama, the dev tool for your favorite MCU
 
