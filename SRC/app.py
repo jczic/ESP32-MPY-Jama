@@ -248,6 +248,7 @@ class Application :
         self._ws                   = webSocket
         webSocket.RecvTextCallback = self._wsRecvTextCallback
         webSocket.ClosedCallback   = self._wsClosedCallback
+        self._wsSendCmd('VERSION', 'v' + conf.APPLICATION_STR_VERSION)
         if self._splashScr :
             self._splashScr.destroy()
             self._splashScr = None

@@ -6,10 +6,13 @@
 #                                               #
 # =============================================*/
 
-const PRC_NONE      = 0;
-const PRC_TRANSFER  = 1;
-const PRC_EXEC_CODE = 2;
-const PRC_EXEC_JAMA = 3;
+const GITHUB_REPOSITORY_URL   = "https://github.com/jczic/ESP32-MPY-Jama";
+const GITHUB_LAST_RELEASE_URL = "https://api.github.com/repos/jczic/ESP32-MPY-Jama/releases/latest";
+
+const PRC_NONE                = 0;
+const PRC_TRANSFER            = 1;
+const PRC_EXEC_CODE           = 2;
+const PRC_EXEC_JAMA           = 3;
 
 var websocket                 = null;
 var wsConnected               = false;
@@ -17,6 +20,8 @@ var toastTimeout              = null;
 var boxDialogFunc             = null;
 var boxDialogGenericParentElm = null;
 var canCloseWindow            = true;
+
+var version                   = "";
 
 var connectionState           = false;
 var processing                = PRC_NONE;
@@ -199,6 +204,9 @@ function onWSMessage(evt)
     var o = JSON.parse(evt.data);
     switch (o.CMD)
     {
+        case "VERSION" :
+            setVersion(o.ARG);
+            break;
         case "SHOW-ALERT" :
             toastInfo(o.ARG);
             break;
@@ -529,6 +537,11 @@ function eraseFlashClick(e) {
                         if (yes)
                             wsSendCmd("ERASE-FLASH", getElmById("select-esptool-port").value);
                     } );
+}
+
+function setVersion(ver) {
+    version = ver;
+    setTimeout(checkUpdate, 7000);
 }
 
 function setSerialPorts(list) {
@@ -1271,9 +1284,9 @@ function importModules(modules) {
                    } );
 }
 
-function setEsptoolPage(version) {
-    if (version) {
-        getElmById("esptool-version").innerText = "v" + version;
+function setEsptoolPage(ver) {
+    if (ver) {
+        getElmById("esptool-version").innerText = "v" + ver;
         showPage("page-esptool");
     }
     else
@@ -1765,6 +1778,26 @@ window.addEventListener( "resize", function() {
     refreshTabCodeScrollBtns();
 } )
 
+function checkUpdate() {
+    try {
+        var req = new XMLHttpRequest();
+        req.onload = function() {
+            try {
+                var lastVer = JSON.parse(this.responseText).tag_name;
+                if (lastVer != version)
+                    boxDialogYesNo( "Update?",
+                                    "A new version (" + lastVer + ") is available!\nDo you want to download it?",
+                                    function(yes) {
+                                        if (yes)
+                                            wsSendCmd("OPEN-URL", GITHUB_REPOSITORY_URL);
+                                    } );
+            } catch (ex) { }
+        }
+        req.open("get", GITHUB_LAST_RELEASE_URL, true);
+        req.send();
+    } catch (ex) { }
+}
+
 window.addEventListener( "load", function() {
 
     if (!connectWS())
@@ -1809,7 +1842,7 @@ window.addEventListener( "load", function() {
     
     getElmById("menubar-logo").addEventListener("click", function(e) {
         e.preventDefault();
-        wsSendCmd("OPEN-URL", "https://github.com/jczic");
+        wsSendCmd("OPEN-URL", GITHUB_REPOSITORY_URL);
     } );
 
     getElmById("JCzic").addEventListener("click", function(e) {
