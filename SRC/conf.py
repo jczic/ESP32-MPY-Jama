@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright © 2022 Jean-Christophe Bos (jczic.bos@gmail.com)
+Copyright © 2023 Jean-Christophe Bos (jczic.bos@gmail.com)
 """
 
 import os
@@ -13,7 +13,7 @@ from   pathlib import Path
 # ============================================================================
 
 APPLICATION_TITLE                = 'ESP32 MPY-Jama'
-APPLICATION_STR_VERSION          = '1.0.2'
+APPLICATION_STR_VERSION          = '1.0.3'
 
 APPLICATION_BUNDLE_NAME          = 'ESP32 MPY-Jama'
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright © 2022 Jean-Christophe Bos (jczic.bos@gmail.com)
+Copyright © 2023 Jean-Christophe Bos (jczic.bos@gmail.com)
 """
 
 import os

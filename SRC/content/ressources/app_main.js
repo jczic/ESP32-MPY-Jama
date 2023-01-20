@@ -1,7 +1,7 @@
 
 /*============================================= #
 #                                               #
-# Copyright © 2022 JC`zic (Jean-Christophe Bos) #
+# Copyright © 2023 JC`zic (Jean-Christophe Bos) #
 #             jczic.bos@gmail.com               #
 #                                               #
 # =============================================*/
