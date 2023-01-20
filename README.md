@@ -20,8 +20,8 @@
     </p>
 </h4>
 <p align="center">
-    <a href="https://github.com/jczic/ESP32-MPY-Jama/raw/master/v1.0.2/ESP32%20MPY-Jama%20(v1.0.3-macos-universal2).dmg"><img src="/img/btn-download-mac.png" width="250"></a>             
-    <a href="https://github.com/jczic/ESP32-MPY-Jama/raw/master/v1.0.2/ESP32%20MPY-Jama%20(v1.0.3-windows).zip"><img src="/img/btn-download-win.png" width="250"></a>
+    <a href="https://github.com/jczic/ESP32-MPY-Jama/raw/master/v1.0.3/ESP32%20MPY-Jama%20(v1.0.3-macos-universal2).dmg"><img src="/img/btn-download-mac.png" width="250"></a>             
+    <a href="https://github.com/jczic/ESP32-MPY-Jama/raw/master/v1.0.3/ESP32%20MPY-Jama%20(v1.0.3-windows).zip"><img src="/img/btn-download-win.png" width="250"></a>
 </p>
 
 ---
