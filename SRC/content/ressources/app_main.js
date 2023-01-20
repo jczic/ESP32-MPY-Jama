@@ -28,6 +28,9 @@ var pinsList                  = [ ]
 var flashRootPath             = "";
 var browsePath                = "";
 
+var codeMirrorTerm            = null;
+var codeMirrorJamaTerm        = null;
+
 var cmdHistory                = [ ];
 var cmdHistoryNav             = [""];
 var cmdHistoryIdx             = 0;
@@ -490,15 +493,29 @@ function boxDialogProgressClose() {
     closeBoxDialog(box);
 }
 
-function writeTextInTerminal(text, color) {
-    var ctnr    = getElmById( processing == PRC_EXEC_JAMA ? "elm-jama-func-terminal-container" : "terminal-container" );
-    var term    = getElmById( processing == PRC_EXEC_JAMA ? "jama-func-terminal"               : "terminal-repl" );
-    var textElm = newElm("span");
-    if (color)
-        textElm.style.color = color;
-    textElm.innerText = text.replaceAll("  ", "  ");
-    term.appendChild(textElm);
+function clearTerminal(cmTerm) {
+    cmTerm._addLineBefore = null;
+    cmTerm.setValue("");
+    cmTerm.refresh();
+}
+
+function writeTextInTerminal(text, colorClass) {
+    var ctnr   = getElmById( processing == PRC_EXEC_JAMA ? "elm-jama-func-terminal-container" : "terminal-container" );
+    var cm     = ( processing == PRC_EXEC_JAMA ? codeMirrorJamaTerm : codeMirrorTerm );
+    var doc    = cm.getDoc();
+    var lCount = doc.lineCount();
+    text = text.replaceAll("\r", "");
+    if (cm._addLineBefore)
+        text = "\n" + text;
+    cm._addLineBefore = text.endsWith("\n");
+    if (cm._addLineBefore)
+        text = text.substring(0, text.length-1);
+    doc.replaceRange(text, { line: Infinity });
+    if (colorClass)
+        for (var i = lCount; i < doc.lineCount(); i++)
+            doc.addLineClass(i, "text", colorClass);
     ctnr.scrollTop = ctnr.scrollHeight;
+    cm.refresh();
 }
 
 function writeFirmwareClick(e) {
@@ -554,8 +571,8 @@ function execCodeBegin() {
         if (processing == PRC_EXEC_JAMA) {
             var name = execJamaFuncConfig.info.name;
             var ver  = String(execJamaFuncConfig.info.version).replaceAll(",", ".");
-            rmElmChildren("jama-func-terminal");
-            writeTextInTerminal("\n* Jama Func started.\n\n", "SeaGreen");
+            clearTerminal(codeMirrorJamaTerm);
+            writeTextInTerminal("\n* Jama Func started.\n\n", "terminal-SeaGreen");
             boxDialogGeneric( "Jama Func's execution",
                               name + " (v" + ver + ")",
                               "elm-jama-func-terminal-container",
@@ -582,11 +599,11 @@ function execCodeRecv(text) {
 }
 
 function execCodeError(error) {
-    writeTextInTerminal(error + "\n", "IndianRed");
+    writeTextInTerminal(error + "\n", "terminal-IndianRed");
 }
 
 function execCodeStopped() {
-    writeTextInTerminal("\n* The program has been interrupted!\n", "IndianRed");
+    writeTextInTerminal("\n* The program has been interrupted!\n", "terminal-IndianRed");
 }
 
 function execCodeEnd(normalFinished) {
@@ -597,10 +614,10 @@ function execCodeEnd(normalFinished) {
             if (execJamaStopTimeout != null)
                 clearInterval(execJamaStopTimeout);
             if (normalFinished)
-                writeTextInTerminal("\n* Jama Func finished.\n", "SeaGreen");
+                writeTextInTerminal("\n* Jama Func finished.\n", "terminal-SeaGreen");
         }
-        processing = PRC_NONE;
         writeTextInTerminal("\n");
+        processing = PRC_NONE;
         refreshExecAndStopBtns();
         hide("img-processing");
         show("terminal-bar");
@@ -644,7 +661,7 @@ function setPinsList(pList) {
 }
 
 function deviceReset() {
-    writeTextInTerminal("\n* ESP32 has been reset!\n", "IndianRed");
+    writeTextInTerminal("\n* ESP32 has been reset!\n", "terminal-IndianRed");
     var actPage = getActivePage();
     if (actPage)
         if (actPage.id == "page-networks-info")
@@ -1227,7 +1244,9 @@ function sysInfoChanged() {
 }
 
 function terminalFocusClick(e) {
-    getElmById("terminal-input-cmd").focus();
+    var doc = codeMirrorTerm.getDoc();
+    if (!doc.somethingSelected())
+        getElmById("terminal-input-cmd").focus();
 }
 
 function refreshJamaFuncs() {
@@ -1339,6 +1358,8 @@ function showIDE() {
     termCtnr.classList.remove("terminal-container-maxi");
     termCtnr.classList.add("terminal-container-mini");
     termCtnr.scrollTop = termCtnr.scrollHeight;
+    codeMirrorTerm.refresh();
+    getElmById("terminal-input-cmd").focus();
     var selTabData = getElmById("tab-code-selected")["tabData"];
     var codeMirror = selTabData["codeEditor"]["codeMirror"];
     codeMirror.refresh();
@@ -1352,6 +1373,7 @@ function showREPL() {
     var ctnr = getElmById("terminal-container");
     ctnr.classList.remove("terminal-container-mini");
     ctnr.classList.add("terminal-container-maxi");
+    codeMirrorTerm.refresh();
     getElmById("terminal-input-cmd").focus();
     refreshExecAndStopBtns();
 }
@@ -1459,13 +1481,13 @@ function closeWirelessInterfaceClick(e, interface) {
 function setConnectionState(connected) {
     if (connected == null) {
         connected = false
-        writeTextInTerminal("Welcome to ESP32 MicroPython REPL terminal.\n\n", "SeaGreen");
+        writeTextInTerminal("\nWelcome to ESP32 MicroPython REPL terminal.\n\n", "terminal-SeaGreen");
     }
     else
         if (connected)
-            writeTextInTerminal("* Device connected.\n\n", "SeaGreen");
+            writeTextInTerminal("* Device connected.\n\n", "terminal-SeaGreen");
         else
-            writeTextInTerminal("* Device disconnected.\n", "IndianRed");
+            writeTextInTerminal("* Device disconnected.\n", "terminal-IndianRed");
     connectionState = connected;
     getElmById("btn-connection").value = (connected ? "Disconnect" : "  Connect") + " device";
     setTextTag("label-connection", "DEVICE " + (connected ? "CONNECTED" : "NOT CONNECTED"), connected);
@@ -1534,7 +1556,7 @@ function btnListFilesExecuteClick(e) {
         var elm = getElmById("list-files-selected");
         if (elm != null) {
             var filepath = browsePath + "/" + elm["filenameCB"];
-            writeTextInTerminal("Attempts to execute file " + filepath + "...\n", "LightSkyBlue");
+            writeTextInTerminal("Attempts to execute file " + filepath + "...\n", "terminal-LightSkyBlue");
             wsSendCmd("EXEC-PY-FILE", filepath);
         }
     }
@@ -1748,6 +1770,32 @@ window.addEventListener( "load", function() {
     if (!connectWS())
         return;
 
+    codeMirrorTerm = CodeMirror( getElmById("terminal-repl"), {
+        mode              : null,
+        theme             : "repl",
+        readOnly          : true,
+        lineNumbers       : false,
+        matchBrackets     : false,
+        openDialog        : false,
+        searchCursor      : false,
+        search            : false,
+        scrollbarStyle    : "overlay"
+    } );
+    codeMirrorTerm.setSize("100%", "fit-content");
+
+    codeMirrorJamaTerm = CodeMirror( getElmById("jama-func-terminal"), {
+        mode              : null,
+        theme             : "repl",
+        readOnly          : true,
+        lineNumbers       : false,
+        matchBrackets     : false,
+        openDialog        : false,
+        searchCursor      : false,
+        search            : false,
+        scrollbarStyle    : "overlay"
+    } );
+    codeMirrorJamaTerm.setSize("100%", "fit-content");
+
     setConnectionState(null);
     setSwitchButton(getElmById("switch-btn-menu"));
 
@@ -1783,8 +1831,7 @@ window.addEventListener( "load", function() {
                 var input   = getElmById("terminal-input-cmd");
                 var code    = input.value.trim();
                 input.value = "";
-                writeTextInTerminal("MicroPython >>> ", "LightSteelBlue");
-                writeTextInTerminal(code + "\n\n");
+                writeTextInTerminal("MicroPython >>> " + code + "\n\n", "terminal-LightSteelBlue");
                 if (code.length > 0) {
                     input.blur();
                     cmdHistory.push(code);
@@ -1875,7 +1922,7 @@ window.addEventListener( "load", function() {
                             function(name) {
                                 name = name.trim();
                                 if (name != "") {
-                                    writeTextInTerminal("Installation of '" + name + "' package:\n", "LightSkyBlue");
+                                    writeTextInTerminal("Installation of '" + name + "' package:\n", "terminal-LightSkyBlue");
                                     wsSendCmd("INSTALL-PACKAGE", name);
                                     wsSendCmd("GET-LIST-DIR", browsePath);
                                 }

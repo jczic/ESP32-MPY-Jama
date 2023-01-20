@@ -396,8 +396,8 @@ input[type=button].browse-button-actif {
     50%  { top: 3px;  right: 185px; opacity: 0.00; }
     100% { top: 20px; right: 250px; opacity: 0.00; }
 }
-  
-  #hand-click {
+
+#hand-click {
     position: absolute;
     top: 20px;
     right: 250px;
@@ -991,7 +991,7 @@ select {
 }
 
 .terminal {
-    padding: 10px;
+    padding: 6px;
     background-color: #19242F;
     font: 10px monospace;
     text-align: left;
@@ -1004,6 +1004,22 @@ select {
     padding-bottom: 0;
 }
 
+.terminal-LightSkyBlue {
+    color :LightSkyBlue !important;
+}
+
+.terminal-LightSteelBlue {
+    color: LightSteelBlue !important;
+}
+
+.terminal-SeaGreen {
+    color: SeaGreen !important;
+}
+
+.terminal-IndianRed {
+    color: IndianRed !important;
+}
+
 #terminal-bar {
     position: relative;
     padding: 10px;
@@ -1012,7 +1028,7 @@ select {
 
 #terminal-enter-cmd {
     position: absolute;
-    top: 0;
+    top: -4px;
     height: 14px;
     background-color: #19242F;
     font: 10px monospace;
@@ -1025,7 +1041,7 @@ select {
     display: block;
     position: absolute;
     width: auto;
-    top: 0;
+    top: -4px;
     left: 116px;
     right: 0;
     height: 14px;
