@@ -55,6 +55,31 @@
 
 ---
 
+<a name="build and run"></a>
+## :link: &nbsp;Build &amp; Run
+
+  **Required and special thanks to**
+
+  - pyWebView ([View on GitHub](https://github.com/r0x0r/pywebview))
+    ```console
+    foo@bar:~$ python -m pip install pywebview
+    ```
+
+  - pySerial ([View on GitHub](https://github.com/pyserial/pyserial))
+    ```console
+    foo@bar:~$ python -m pip install pyserial
+    ```
+
+  **Run**
+  
+  - Just use python:
+
+    ```console
+    foo@bar:~$ python SRC/app.py
+    ```
+
+---
+
 <a name="author"></a>
 ## :wink: &nbsp;Author
 
