@@ -1,3 +1,8 @@
+![Release](https://img.shields.io/github/v/release/jczic/ESP32-MPY-Jama?include_prereleases&color=success)
+![Windows 64bits](https://img.shields.io/badge/Windows_64bits-Ok-green.svg)
+![MacOS ARM64](https://img.shields.io/badge/MacOS_ARM64-Ok-green.svg)
+![MacOS Intel x86_64](https://img.shields.io/badge/MacOS_Intel_x86__64-Ok-green.svg)
+![License](https://img.shields.io/github/license/jczic/ESP32-MPY-Jama?color=yellow)
 
 # <img src="/img/logo.png" width="45" valign="bottom">  ESP32 MPY-Jama, the dev tool for your favorite MCU
 
