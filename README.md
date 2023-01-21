@@ -26,6 +26,40 @@
 
 ---
 
+### :cyclone: &nbsp;Linux version instructions
+
+There is no out of the box running AppImage or binary version, but you may get it to run on Ubuntu 22 (or similar distribution) following the instructions bel
+ow.
+
+## Installation
+
+```bash
+# clone the repository:
+git clone https://github.com/jczic/ESP32-MPY-Jama
+
+# install python modules requirements:
+sudo apt install libcairo2-dev libgirepository1.0-dev python3-pyqt5 python3-pyqt5.qtwebengine python3-pyqt5.qtwebchannel libqt5webkit5-dev
+
+# initialize python venv:
+cd ESP32-MPY-Jama
+python3 -m venv venv
+
+. venv/bin/activate
+
+pip3 install wheel setuptools
+pip3 install pyserial pywebview[qt] pycairo PyGObject
+```
+
+## Start
+
+```bash
+cd ESP32-MPY-Jama
+. venv/bin/activate
+python3 src/app.py
+```
+
+---
+
 ### :cyclone: &nbsp;Access information dashboards instantly.
 <p align="center">
     <img src="/img/screen-networks.png" width="700">
