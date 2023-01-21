@@ -172,9 +172,9 @@ if conf.IS_MACOS :
     esptoolFilename = macOSPaths.GetFilePathFromFilename('esptool.py')
     if esptoolFilename :
         _esptool = [ esptoolFilename ]
-elif conf.IS_LINUX == 'LINUX' :
+elif conf.IS_LINUX :
     esptoolFilename = linuxPaths.GetFilePathFromFilename('esptool.py')
     if esptoolFilename :
         _esptool = [ esptoolFilename ]
-elif conf.IS_WIN32 == 'WIN32' :
+elif conf.IS_WIN32 :
     _setEsptoolWin32()
