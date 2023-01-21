@@ -1812,7 +1812,7 @@ window.addEventListener( "load", function() {
         openDialog        : false,
         searchCursor      : false,
         search            : false,
-        scrollbarStyle    : "overlay"
+        lineWrapping      : true
     } );
     codeMirrorTerm.setSize("100%", "fit-content");
 
@@ -1825,7 +1825,7 @@ window.addEventListener( "load", function() {
         openDialog        : false,
         searchCursor      : false,
         search            : false,
-        scrollbarStyle    : "overlay"
+        lineWrapping      : true
     } );
     codeMirrorJamaTerm.setSize("100%", "fit-content");
 

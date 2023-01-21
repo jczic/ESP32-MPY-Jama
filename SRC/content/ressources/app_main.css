@@ -249,7 +249,7 @@ input[type=button].menu-button {
     position: absolute;
     top: 20px;
     width: 100%;
-    bottom: 80px;
+    bottom: 103px;
     overflow-x: hidden;
     overflow-y: auto;
 }
