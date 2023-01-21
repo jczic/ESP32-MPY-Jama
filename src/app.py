@@ -10,7 +10,6 @@
 
 from   microWebSrv     import MicroWebSrv
 from   esp32Controller import *
-from   time            import sleep
 from   random          import random
 from   queue           import SimpleQueue
 from   hashlib         import sha256
