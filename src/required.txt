@@ -1,0 +1,2 @@
+python -m pip install pywebview
+python -m pip install pyserial

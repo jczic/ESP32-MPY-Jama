@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<!--=========================================== #
+#                                               #
+# Copyright © 2023 JC`zic (Jean-Christophe Bos) #
+#             jczic.bos@gmail.com               #
+#                                               #
+# ============================================-->
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta http-equiv="Content-Type"  content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma"        content="no-cache" />
+    <meta http-equiv="Expires"       content="0" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+    
+    <title>ESP32 MPY-Jama</title>
+
+</head>
+
+<body>
+
+	<div id="menubar">
+        <div id="menubar-logo">
+            <div id="logo"></div>
+        </div>
+        <div id="menubar-title">
+            ESP32 MPY-Jama
+        </div>
+        <input type="button" id="btn-connection" onclick="btnConnectionClick(this);" />
+    </div>
+
+    <div id="menu-panel-container">
+
+        <div id="switch-bar">
+            <input type="button" id="switch-btn-menu"   class="switch-button" value="Menu"   onclick="btnSwitchClick(this);" />
+            <input type="button" id="switch-btn-browse" class="switch-button" value="Browse" onclick="btnSwitchClick(this);" />
+        </div>
+
+        <div id="menu-panel-btns" class="menu-panel">
+            <input type="button" id="menu-btn-ide"             class="menu-button" value="Code editor (IDE)"  onclick="btnIDEClick(this);" />
+            <input type="button" id="menu-btn-jama-funcs"      class="menu-button" value="Jama Funcs"         onclick="btnJamaFuncsClick(this);" />
+            <input type="button" id="menu-btn-terminal"        class="menu-button" value="REPL terminal"      onclick="btnTerminalClick(this);" />
+            <input type="button" id="menu-btn-sys-info"        class="menu-button" value="System info"        onclick="btnSysInfoClick(this);" />
+            <input type="button" id="menu-btn-net-info"        class="menu-button" value="Networks info"      onclick="btnNetworksInfoClick(this);" />
+            <input type="button" id="menu-btn-wifi-sta"        class="menu-button" value="Wi-Fi connection"   onclick="btnWiFiSTAClick(this);" />
+            <input type="button" id="menu-btn-wifi-ap"         class="menu-button" value="Wi-Fi access point" onclick="btnWiFiAPClick(this);" />
+            <input type="button" id="menu-btn-reset"           class="menu-button" value="Hard reset"         onclick="btnHardResetClick(this);" />
+            <input type="button" id="menu-btn-firmware"        class="menu-button" value="Firmware tools"     onclick="btnFirmwareToolsClick(this);" />
+        </div>
+
+        <div id="menu-panel-browse" class="menu-panel">
+            <div id="browse-current-dir"></div>
+            <div id="browse-list-files"></div>
+            <div id="list-files-model" class="list-files hide">
+                <div class="list-files-picto"></div>
+                <div class="list-files-text"></div>
+            </div>
+            <div id="panel-browse-buttons">
+                <input type="button" id="list-files-btn-open"     class="browse-button" value="Open"     onclick="btnListFilesOpenClick(this);" />
+                <input type="button" id="list-files-btn-execute"  class="browse-button" value="Execute"  onclick="btnListFilesExecuteClick(this);" />
+                <input type="button" id="list-files-btn-download" class="browse-button" value="Download" onclick="btnListFilesDownloadClick(this);" />
+                <input type="button" id="list-files-btn-upload"   class="browse-button" value="Upload"   onclick="btnListFilesUploadClick(this);" />
+                <input type="button" id="list-files-btn-rename"   class="browse-button" value="Rename"   onclick="btnListFilesRenameClick(this);" />
+                <input type="button" id="list-files-btn-remove"   class="browse-button" value="Remove"   onclick="btnListFilesRemoveClick(this);" />
+                <input type="button" id="list-files-btn-newdir"   class="browse-button browse-button-large" value="Create new folder" onclick="btnListFilesNewDirClick(this);" />
+            </div>
+        </div>
+
+        <div id="menu-panel-connection">
+            <div id="label-connection"></div>
+            <img id="img-processing" src="img/processing.gif" class="hide" />
+            <div id="panel-connection" class="hide">
+                <div id="mem-progress" class="progress-little-outer" title="Total memory of ESP32">
+                    <div class="progress-little-inner"></div>
+                    <div class="progress-little-text"></div>
+                </div>
+                <div id="temp-progress" class="progress-little-outer" title="Temperature into the MCU (ESP32)">
+                    <div class="progress-little-inner"></div>
+                    <div class="progress-little-text"></div>
+                </div>
+                <div id="uptime-progress" class="progress-little-outer" title="Uptime in minutes of ESP32">
+                    <div class="progress-little-inner"></div>
+                    <div class="progress-little-text"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="main-container">
+
+        <div id="logo-esp"></div>
+        <div id="hand-click"></div>
+
+        <div id="page-ide" class="page-container">
+            <div id="ide-code">
+                <div id="code-bar">
+                    <input type="button" id="new-tiny-btn"      class="tiny-btn" title="New code" />
+                    <input type="button" id="save-tiny-btn"     class="tiny-btn" title="Save file" />
+                    <div class="tiny-btn-separator"></div>
+                    <input type="button" id="exec-tiny-btn"     class="tiny-btn" title="Execute code" />
+                    <input type="button" id="stop-tiny-btn"     class="tiny-btn tiny-btn-red" title="Stop code execution" />
+                    <div class="tiny-btn-separator"></div>
+                    <input type="button" id="undo-tiny-btn"     class="tiny-btn" title="Undo" />
+                    <input type="button" id="redo-tiny-btn"     class="tiny-btn" title="Redo" />
+                    <input type="button" id="search-tiny-btn"   class="tiny-btn" title="Search" />
+                    <input type="button" id="gpio-tiny-btn"     class="tiny-btn tiny-btn-right" title="View GPIO" />
+                    <div class="tiny-btn-separator-right"></div>
+                    <input type="button" id="modules-tiny-btn"  class="tiny-btn tiny-btn-right" title="Import modules" />
+                    <input type="button" id="packages-tiny-btn" class="tiny-btn tiny-btn-right" title="Install packages" />
+                </div>
+                <div id="tabs-code-bar">
+                    <div id="tabs-code-container-scroll-btn-left"  class="tabs-code-container-scroll-btn" title="Scroll left">◀</div>
+                    <div id="tabs-code-container-scroll-btn-right" class="tabs-code-container-scroll-btn" title="Scroll right">▶</div>
+                    <div id="tabs-code-container-scroll" class="tabs-code-container-scroll-hide-btns">
+                        <div id="tabs-code-container"></div>
+                        <div id="tab-code-model" class="tab-code hide">
+                            <div class="tab-code-text"></div>
+                            <div class="tab-code-close">X</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="code-editors"></div>
+            </div>
+            <div id="terminal-container" onclick="terminalFocusClick(this);">
+                <div id="terminal-repl" class="terminal"></div>
+                <div id="terminal-bar">
+                    <div id="terminal-enter-cmd">MicroPython >>> </div>
+                    <input id="terminal-input-cmd" type="text" spellcheck="false"/>
+                </div>
+            </div>
+            <input type="button" id="exec-code-stop-btn" class="tiny-btn tiny-btn-red hide" title="Stop execution" />
+        </div>
+
+        <div id="page-jama-funcs" class="page-container">
+            <div class="page">
+                <div id="page-logo-jama-funcs" class="page-logo"></div>
+                <div class="page-title">Jama Funcs on your ESP32 device.</div>
+                <div class="properties-container-large">
+                    Use embedded <b>Jama Funcs</b> to perform configurable functions on your device.<br />
+                    You can also <input type="button" class="button-little-text" value="import" onclick="importJamaFuncsClick(this);" /> or export these specific MicroPython code files.<br />
+                    If you want to develop new ones very easily, use <input type="button" class="button-little-text" value="this template" onclick="saveJamaFuncsTemplateClick(this);"/> as a guide.<br />
+                    <br />
+                    <div id="list-jama-funcs-items"></div>
+                </div>
+            </div>
+        </div>
+        <div id="list-jama-funcs-item-model" class="list-jama-funcs-item hide">
+            <div class="list-jama-funcs-item-picto"></div>
+            <div class="list-jama-funcs-item-name"></div>
+            <div class="list-jama-funcs-item-version"></div>
+            <div class="list-jama-funcs-item-description"></div>
+            <div class="list-jama-funcs-item-left">
+                Author: <span class="list-jama-funcs-item-author"></span><br />
+                <span class="list-jama-funcs-item-mail"></span><br />
+                <a class="list-jama-funcs-item-www" href="#"></a><br />
+            </div>
+            <div class="list-jama-funcs-item-right">
+                <a class="list-jama-funcs-item-export" href="#">Export</a> | 
+                <a class="list-jama-funcs-item-delete" href="#">Remove</a> | 
+                <input type="button" class="list-jama-funcs-item-open button-little-text" value="Open ▶" />
+            </div>
+        </div>
+
+        <div id="page-exec-jama-funcs" class="page-container">
+            <div class="page">
+                <div id="page-logo-jama-funcs" class="page-logo"></div>
+                <div id="exec-jama-funcs-title" class="page-title"></div>
+                <div class="properties-container-large">
+                    <div id="exec-jama-funcs-description"></div>
+                    <div id="exec-jama-funcs-author" class="right"></div><br />
+                    <input type="button" class="button-little-text" value="◀ Back" onclick="btnJamaFuncsClick(this);" /><br />
+                    <br />
+                    <br />
+                    <div class="properties-container-mini">
+                        <div id="exec-jama-funcs-args-title" class="properties-title">Settings</div>
+                        <div id="exec-jama-funcs-args"></div>
+                        <br />
+                        <div class="properties-container-mini">
+                            <input type="button" value="Execute ▶▶" onclick="btnJamaFuncsExecClick(this);" /><br />
+                        </div>
+                        <br />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-system-info" class="page-container">
+            <div class="page">
+                <div id="page-logo-sys-info" class="page-logo"></div>
+                <div class="page-title">Information about the system of your ESP32 device.</div>
+                <div class="properties-container-large">
+                    <div class="properties-title">MCU &amp; MicroPython</div>
+                    <div class="properties-left">
+                        Frequency:<br />
+                        Flash memory size:<br />
+                        Platform:<br />
+                        System:<br />
+                        Release:<br />
+                        Version:<br />
+                        Implementation:<br />
+                        SPI RAM available:<br />
+                        Version of '.mpy':<br />
+                    </div>
+                    <div class="properties-right">
+                        <span id="label-sysnfo-freq"></span> (<a id="change-freq" href="#">change</a>)<br />
+                        <span id="label-sysnfo-flash-size"></span><br />
+                        <span id="label-sysnfo-platform"></span><br />
+                        <span id="label-sysnfo-system"></span><br />
+                        <span id="label-sysnfo-release"></span><br />
+                        <span id="label-sysnfo-version"></span><br />
+                        <span id="label-sysnfo-implem"></span><br />
+                        <span id="label-sysnfo-spiram"></span><br />
+                        <span id="label-sysnfo-mpyver"></span><br />
+                    </div>
+                </div>
+                <div class="properties-container">
+                    <div class="properties-title">Real-time GPIO</div>
+                    <div id="sysnfo-pins-left" class="properties-left">
+                    </div>
+                    <div id="sysnfo-pins-right" class="properties-right">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-networks-info" class="page-container">
+            <div class="page">
+                <div id="page-logo-networks-info" class="page-logo"></div>
+                <div class="page-title">Information about wireless networks of your ESP32 device.</div>
+                <div class="properties-container">
+                    <div class="properties-title">Wi-Fi station interface</div>
+                    <div class="properties-left">
+                        STA active:<br />
+                        MAC address:<br />
+                        SSID:<br />
+                        IP:<br />
+                        Mask:<br />
+                        Gateway:<br />
+                        DNS:<br />
+                    </div>
+                    <div class="properties-right">
+                        <span id="label-netnfo-wl-sta-active"></span>
+                        <span> (<a href="#" onclick="btnWiFiSTAClick(this);">config</a>)</span>
+                        <span id="close-IF-STA"> (<a href="#" onclick="closeWirelessInterfaceClick(this, 'STA');">close</a>)</span><br />
+                        <span id="label-netnfo-wl-sta-mac"></span><br />
+                        <span id="label-netnfo-wl-sta-ssid"></span><br />
+                        <span id="label-netnfo-wl-sta-ip"></span><br />
+                        <span id="label-netnfo-wl-sta-mask"></span><br />
+                        <span id="label-netnfo-wl-sta-gateway"></span><br />
+                        <span id="label-netnfo-wl-sta-dns"></span><br />
+                    </div>
+                </div>
+                <div class="properties-container">
+                    <div class="properties-title">Wi-Fi access point interface</div>
+                    <div class="properties-left">
+                        AP active:<br />
+                        MAC address:<br />
+                        SSID:<br />
+                        IP:<br />
+                        Mask:<br />
+                        Gateway:<br />
+                        DNS:<br />
+                    </div>
+                    <div class="properties-right">
+                        <span id="label-netnfo-wl-ap-active"></span>
+                        <span> (<a href="#" onclick="btnWiFiAPClick(this);">config</a>)</span>
+                        <span id="close-IF-AP"> (<a href="#" onclick="closeWirelessInterfaceClick(this, 'AP');">close</a>)</span><br />
+                        <span id="label-netnfo-wl-ap-mac"></span><br />
+                        <span id="label-netnfo-wl-ap-ssid"></span><br />
+                        <span id="label-netnfo-wl-ap-ip"></span><br />
+                        <span id="label-netnfo-wl-ap-mask"></span><br />
+                        <span id="label-netnfo-wl-ap-gateway"></span><br />
+                        <span id="label-netnfo-wl-ap-dns"></span><br />
+                    </div>
+                </div>
+                <div class="properties-container">
+                    <div class="properties-title">Internet access status</div>
+                    <div class="properties-left">
+                        Reachable:<br />
+                    </div>
+                    <div class="properties-right">
+                        <span id="label-netnfo-internet-ok"></span><br />
+                    </div>
+                </div>
+                <div class="properties-container">
+                    <div class="properties-title">Bluetooth interface</div>
+                    <div class="properties-left">
+                        BLE active:<br />
+                        MAC address:<br />
+                    </div>
+                    <div class="properties-right">
+                        <span id="label-netnfo-ble-active"></span><span id="close-IF-BLE"> (<a href="#" onclick="closeWirelessInterfaceClick(this, 'BLE');">close</a>)</span><br />
+                        <span id="label-netnfo-ble-mac"></span><br />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-no-esptool" class="page-container">
+            <div class="page">
+                <div id="page-logo-no-esptool" class="page-logo"></div>
+                <div class="page-title">Unable to find Espressif esptool on your system...</div>
+                <div class="properties-container-large">
+                    You need esptool to use the firmware tools with your ESP32.<br />
+                    The latest stable release can be installed as follow.<br />
+                    <br />
+                    From PyPI via pip:<br />
+                    <div class="code">$ pip install esptool</div><br />
+                    or:<br />
+                    <div class="code">$ python -m pip install esptool</div><br />
+                    <br />
+                    From Homebrew Formulae via brew:<br />
+                    <div class="code">$ brew install esptool</div><br />
+                    <br />
+                    For detailed instructions, see <a id="openweb-esptool-installation" href="#">Installation and Dependencies</a>.<br />
+                </div>
+            </div>
+        </div>
+
+        <div id="page-esptool" class="page-container">
+            <div class="page">
+                <div id="page-logo-esptool" class="page-logo"></div>
+                <div class="page-title">Firmware tools for your ESP32 device.</div>
+                <div class="properties-container-large">
+                    Espressif esptool <span id="esptool-version"></span> is available on your system.</br>
+                    Make sure that your device is booted in download flash mode.<br />
+                    Press boot+reset buttons on your board or shunt the GPIO 0 to ground.<br />
+                    <br />
+                    Select the USB/serial port to which your ESP32 device is connected:<br />
+                    <select id="select-esptool-port"></select><br />
+                    <br />
+                    <br />
+                    <input type="button" value="Erase flash memory" onclick="eraseFlashClick(this);" />
+                    Erase flash memory to clean the entire flash chip before writing a new firmware.<br />
+                    All sectors of flash (not just the writing areas) will be erased.</br>
+                    <br />
+                    <input type="button" value="Upload firmware image" onclick="writeFirmwareClick(this);" />
+                    Write a new firmware image to the chip's flash memory.<br />
+                    For more informations about this, see the <a id="openweb-esptool-commands" href="#">basic esptool commands</a>.<br />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast-info">
+    </div>
+
+    <div id="footer">
+        © Created by <span id="JCzic" title="🎵">JC`zic</span>
+    </div>
+
+    <div id="protect-layer" class="hide"></div>
+
+    <div id="box-dialog-alert" class="center-container hide">
+        <div class="box-dialog-window">
+            <div class="box-dialog-title"></div>
+            <br />
+            <div class="box-dialog-text"></div>
+            <div class="box-dialog-btn-panel">
+                <input type="button" class="box-dialog-btn" value="Ok" onclick="boxDialogCloseClick(this);" />
+            </div>
+        </div>
+    </div>
+
+    <div id="box-dialog-yesno" class="center-container hide">
+        <div class="box-dialog-window">
+            <div class="box-dialog-title"></div>
+            <br />
+            <div class="box-dialog-text"></div>
+            <div class="box-dialog-btn-panel">
+                <input type="button" class="box-dialog-btn" value="No"  onclick="boxDialogYesNoClick(this, false);" />
+                <input type="button" class="box-dialog-btn" value="Yes" onclick="boxDialogYesNoClick(this, true);" />
+            </div>
+        </div>
+    </div>
+
+    <div id="box-dialog-query" class="center-container hide">
+        <div class="box-dialog-window">
+            <div class="box-dialog-title"></div>
+            <div class="box-dialog-text"></div>
+            <input class="box-dialog-input" spellcheck="false" />
+            <div class="box-dialog-btn-panel">
+                <input type="button" class="box-dialog-btn" value="Cancel" onclick="boxDialogCloseClick(this);" />
+                <input type="button" class="box-dialog-btn" value="Ok"     onclick="boxDialogQueryOkClick(this);" />
+            </div>
+        </div>
+    </div>
+
+    <div id="box-dialog-generic" class="center-container hide">
+        <div class="box-dialog-window">
+            <div class="box-dialog-title"></div>
+            <div class="box-dialog-text box-dialog-title-text"></div>
+            <div class="box-dialog-object"></div>
+            <div class="box-dialog-btn-panel">
+                <input type="button" id="box-dialog-generic-btn-cancel" class="box-dialog-btn" value="Cancel" onclick="boxDialogGenericClick(this, false);" />
+                <input type="button" id="box-dialog-generic-btn-ok"     class="box-dialog-btn" value="..."    onclick="boxDialogGenericClick(this, true);" />
+            </div>
+        </div>
+    </div>
+
+    <div id="box-dialog-list" class="center-container hide">
+        <div class="box-dialog-window">
+            <div class="box-dialog-title"></div>
+            <div class="box-dialog-text box-dialog-title-text"></div>
+            <div id="box-dialog-list-items"></div>
+            <div class="box-dialog-btn-panel">
+                <input type="button" class="box-dialog-btn" value="Cancel" onclick="boxDialogCloseClick(this);" />
+            </div>
+        </div>
+    </div>
+    <div id="list-item-model" class="list-item hide">
+        <div class="list-item-picto1"></div>
+        <div class="list-item-text"></div>
+        <div class="list-item-picto2"></div>
+    </div>
+
+    <div id="box-dialog-wait" class="center-container hide">
+        <div class="box-dialog-window">
+            <br /><br />
+            <img src="img/wait.gif" /><br />
+            <div class="box-dialog-text"></div>
+        </div>
+    </div>
+
+    <div id="box-dialog-progress" class="center-container hide">
+        <div class="box-dialog-window">
+            <div class="box-dialog-text"></div>
+            <div class="progress-outer">
+                <div class="progress-inner"></div>
+                <div class="progress-text"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="elm-AP-setup" class="hide">
+        <div class="elm-AP-setup-text">Enter the network name (SSID):</div>
+        <input id="elm-AP-ssid" class="elm-AP-setup-input" placeholder="ESP32" spellcheck="false" />
+        <div class="elm-AP-setup-text">Select the type of authentication:</div>
+        <select id="elm-AP-auth" class="elm-AP-setup-input" onchange="elmAPAuthChange(this);">
+            <option value="">No authentication (OPEN)</option>
+            <option value="WPA-PSK">WPA-PSK</option>
+            <option value="WPA2-PSK">WPA2-PSK</option>
+            <option value="WPA/WPA2-PSK">WPA/WPA2-PSK</option>
+        </select>
+        <div id="elm-AP-key-container">
+            <div class="elm-AP-setup-text">Enter the protection key (8 characters minimum):</div>
+            <input id="elm-AP-key" class="elm-AP-setup-input" type="password" spellcheck="false" />
+        </div>
+        <div class="elm-AP-setup-text">Enter the maximum number of client connections (0-10):</div>
+        <input type="number" id="elm-AP-maxclients" class="elm-AP-setup-input" spellcheck="false" />
+    </div>
+
+    <div id="elm-jama-func-terminal-container" class="hide">
+        <div id="jama-func-terminal" class="terminal"></div>
+        <input type="button" id="jama-func-stop-btn" class="tiny-btn tiny-btn-red" title="Stop Jama Func" />
+    </div>
+
+    <div id="elm-GPIO-info" class="hide"></div>
+
+</body>
+
+<script>
+
+    function loadCSSStyles(filename) {
+        var head  = document.getElementsByTagName('HEAD')[0];
+        var link  = document.createElement('link');
+        link.rel  = 'stylesheet';
+        link.type = 'text/css';
+        link.href = filename + '?x=' + Math.random();
+        head.appendChild(link);
+    }
+
+    function loadJavascript(filename) {
+        var body   = document.getElementsByTagName('BODY')[0];
+        var script = document.createElement('script');
+        script.type  = 'text/javascript';
+        script.async = false;
+        script.src   = filename + '?x=' + Math.random();
+        body.appendChild(script);
+    }
+
+    loadCSSStyles ("codemirror/lib/codemirror.css");
+    loadCSSStyles ("codemirror/theme/lucario.css");
+    loadCSSStyles ("codemirror/theme/repl.css");
+    loadCSSStyles ("codemirror/addon/dialog/dialog.css");
+    loadCSSStyles ("codemirror/addon/scroll/simplescrollbars.css");
+    
+    loadJavascript("codemirror/lib/codemirror.js");
+    loadJavascript("codemirror/addon/edit/matchbrackets.js");
+    loadJavascript("codemirror/addon/edit/closebrackets.js");
+    loadJavascript("codemirror/addon/dialog/dialog.js");
+    loadJavascript("codemirror/addon/search/searchcursor.js");
+    loadJavascript("codemirror/addon/search/search.js");
+    loadJavascript("codemirror/addon/scroll/simplescrollbars.js");
+    loadJavascript("codemirror/mode/python/python.js");
+
+    loadCSSStyles ("app_main.css");
+    loadJavascript("app_main.js");
+
+</script>
+
+</html>
