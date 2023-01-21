@@ -4,20 +4,15 @@
 Copyright © 2023 Jean-Christophe Bos (jczic.bos@gmail.com)
 """
 
-
 import subprocess
-import sys
-
 import conf
 
-if (conf.IS_MACOS) :
+if conf.IS_MACOS :
     import macOSPaths
-elif (conf.IS_LINUX):
+elif conf.IS_LINUX :
     import linuxPaths
 
-_platform = sys.platform.upper()
-_esptool  = [ ]
-_shell    = (_platform == 'WIN32')
+_esptool = [ ]
 
 class LaunchEsptoolException(Exception) :
     pass
@@ -31,7 +26,7 @@ def GetVersion() :
             proc   = subprocess.Popen( launch,
                                        stdout = subprocess.PIPE,
                                        stderr = subprocess.PIPE,
-                                       shell  = _shell )
+                                       shell  = conf.IS_WIN32 )
             lines = proc.stdout.readlines()
             try :
                 version = lines[1].decode()
@@ -52,7 +47,7 @@ def CheckFirmwareImg(file) :
             proc   = subprocess.Popen( launch,
                                        stdout = subprocess.PIPE,
                                        stderr = subprocess.PIPE,
-                                       shell  = _shell )
+                                       shell  = conf.IS_WIN32 )
             for line in proc.stdout.readlines() :
                 line = str(line)
                 if line.find('Validation Hash') >= 0 and line.find('(valid)') > 0 :
@@ -80,7 +75,7 @@ def WriteFirmwareImg( imgFile,
             proc = subprocess.Popen( launch,
                                      stdout = subprocess.PIPE,
                                      stderr = subprocess.PIPE,
-                                     shell  = _shell )
+                                     shell  = conf.IS_WIN32 )
             x    = ''
             port = ''
             while True :
@@ -131,7 +126,7 @@ def EraseFlash( chip               = 'auto',
             proc = subprocess.Popen( launch,
                                      stdout = subprocess.PIPE,
                                      stderr = subprocess.PIPE,
-                                     shell  = _shell )
+                                     shell  = conf.IS_WIN32 )
             x    = ''
             port = ''
             while True :
@@ -173,13 +168,13 @@ def _setEsptoolWin32() :
 
 # ------------------------------------------------------------------------
 
-if _platform == 'DARWIN' :
+if conf.IS_MACOS :
     esptoolFilename = macOSPaths.GetFilePathFromFilename('esptool.py')
     if esptoolFilename :
         _esptool = [ esptoolFilename ]
-elif _platform == 'LINUX' :
+elif conf.IS_LINUX == 'LINUX' :
     esptoolFilename = linuxPaths.GetFilePathFromFilename('esptool.py')
     if esptoolFilename :
         _esptool = [ esptoolFilename ]
-elif _platform == 'WIN32' :
+elif conf.IS_WIN32 == 'WIN32' :
     _setEsptoolWin32()
