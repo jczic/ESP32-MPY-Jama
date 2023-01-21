@@ -4,9 +4,16 @@
 Copyright © 2023 Jean-Christophe Bos (jczic.bos@gmail.com)
 """
 
-import macOSPaths
+
 import subprocess
 import sys
+
+import conf
+
+if (conf.IS_MACOS) :
+    import macOSPaths
+elif (conf.IS_LINUX):
+    import linuxPaths
 
 _platform = sys.platform.upper()
 _esptool  = [ ]
@@ -168,6 +175,10 @@ def _setEsptoolWin32() :
 
 if _platform == 'DARWIN' :
     esptoolFilename = macOSPaths.GetFilePathFromFilename('esptool.py')
+    if esptoolFilename :
+        _esptool = [ esptoolFilename ]
+elif _platform == 'LINUX' :
+    esptoolFilename = linuxPaths.GetFilePathFromFilename('esptool.py')
     if esptoolFilename :
         _esptool = [ esptoolFilename ]
 elif _platform == 'WIN32' :

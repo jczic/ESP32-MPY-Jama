@@ -18,6 +18,7 @@ APPLICATION_STR_VERSION          = '1.0.3'
 APPLICATION_BUNDLE_NAME          = 'ESP32 MPY-Jama'
 
 IS_MACOS                         = (sys.platform.upper() == 'DARWIN')
+IS_LINUX                         = (sys.platform.upper() == 'LINUX')
 IS_WIN32                         = (sys.platform.upper() == 'WIN32')
 IS_IN_BUNDLE                     = ( getattr(sys, "frozen", False) and \
                                      hasattr(sys, '_MEIPASS') )
@@ -31,6 +32,8 @@ HTML_APP_MAIN_FILENAME           = 'app_main.html'
 
 if IS_MACOS :
     DIRECTORY_FILES              = Path('~/Library/Application Support').expanduser() / APPLICATION_BUNDLE_NAME
+elif IS_LINUX :
+    DIRECTORY_FILES              = Path('~/.config/') / APPLICATION_BUNDLE_NAME
 elif IS_WIN32 :
     DIRECTORY_FILES              = Path('~/AppData/Local').expanduser() / APPLICATION_BUNDLE_NAME
 DIRECTORY_CONTENT_JAMA_FUNCS     = Path('Jama Funcs')

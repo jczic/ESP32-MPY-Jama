@@ -61,7 +61,7 @@ class Application :
                                                height     = 680,
                                                resizable  = True,
                                                min_size   = (640, 580),
-                                               hidden     = not conf.IS_WIN32,
+                                               hidden     = not (conf.IS_WIN32 | conf.IS_LINUX),
                                                minimized  = conf.IS_WIN32 )
         self._mainWin.events.closing += self._onMainWinClosing
         self._mainWin.events.closed  += self._onMainWinClosed
