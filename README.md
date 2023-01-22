@@ -19,44 +19,17 @@
         MacOS on arm64 / MacOS on Intel x86_64 / Windows 64-bits
     </p>
 </h4>
+
 <p align="center">
     <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.0.3/ESP32.MPY-Jama.v1.0.3-macos-universal2.dmg"><img src="/img/btn-download-mac.png" width="250"></a>             
     <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.0.3/ESP32.MPY-Jama.v1.0.3-windows.exe"><img src="/img/btn-download-win.png" width="250"></a>
 </p>
 
----
-
-### :cyclone: &nbsp;Linux version instructions
-
-There is no out of the box running AppImage or binary version, but you may get it to run on Ubuntu 22 (or similar distribution) following the instructions bel
-ow.
-
-## Installation
-
-```bash
-# clone the repository:
-git clone https://github.com/jczic/ESP32-MPY-Jama
-
-# install python modules requirements:
-sudo apt install libcairo2-dev libgirepository1.0-dev python3-pyqt5 python3-pyqt5.qtwebengine python3-pyqt5.qtwebchannel libqt5webkit5-dev
-
-# initialize python venv:
-cd ESP32-MPY-Jama
-python3 -m venv venv
-
-. venv/bin/activate
-
-pip3 install wheel setuptools
-pip3 install pyserial pywebview[qt] pycairo PyGObject
-```
-
-## Start
-
-```bash
-cd ESP32-MPY-Jama
-. venv/bin/activate
-python3 src/app.py
-```
+<h5>
+    <p align="center">
+        To make it work under Linux :penguin: <a href="#linux">click here</a>!
+    </p>
+</h5>
 
 ---
 
@@ -90,27 +63,63 @@ python3 src/app.py
 ---
 
 <a name="build and run"></a>
-## :link: &nbsp;Build &amp; Run
+## :rocket: &nbsp;Build &amp; Run
 
-  **Required and special thanks to**
+### Required and special thanks to
 
-  - pyWebView ([View on GitHub](https://github.com/r0x0r/pywebview))
+  - pyWebView ([Check out on GitHub](https://github.com/r0x0r/pywebview))
     ```console
-    foo@bar:~$ python -m pip install pywebview
+    python -m pip install pywebview
     ```
 
-  - pySerial ([View on GitHub](https://github.com/pyserial/pyserial))
+  - pySerial ([Check out on GitHub](https://github.com/pyserial/pyserial))
     ```console
-    foo@bar:~$ python -m pip install pyserial
+    python -m pip install pyserial
     ```
 
-  **Run**
+### Run
   
-  - Just use python:
+  - Just use python
 
     ```console
-    foo@bar:~$ python SRC/app.py
+    python SRC/app.py
     ```
+
+---
+
+<a name="linux"></a>
+
+## :penguin: &nbsp;Linux version instructions
+
+There is no out of the box running AppImage or binary version, but you may get it to run on Ubuntu 22 (or similar distribution) following the instructions bel
+ow.
+
+### Installation
+
+```bash
+# clone the repository:
+git clone https://github.com/jczic/ESP32-MPY-Jama
+
+# install python modules requirements:
+sudo apt install libcairo2-dev libgirepository1.0-dev python3-pyqt5 python3-pyqt5.qtwebengine python3-pyqt5.qtwebchannel libqt5webkit5-dev
+
+# initialize python venv:
+cd ESP32-MPY-Jama
+python3 -m venv venv
+
+. venv/bin/activate
+
+pip3 install wheel setuptools
+pip3 install pyserial pywebview[qt] pycairo PyGObject
+```
+
+### Start
+
+```bash
+cd ESP32-MPY-Jama
+. venv/bin/activate
+python3 src/app.py
+```
 
 ---
 
