@@ -135,6 +135,7 @@ pyinstaller -F -n esp32-mpy-jama --add-binary src/content:content src/app.py
 ```
 
 When pyinstaller finishes you should end up with a "esp32-mpy-jama" executable in the "dist" subfolder.
+
 ---
 
 <a name="author"></a>
@@ -147,6 +148,14 @@ When pyinstaller finishes you should end up with a "esp32-mpy-jama" executable i
   - Music:  *[SoundCloud](https://soundcloud.com/jczic/sets/electro-pulse)*
             *[Spotify](https://open.spotify.com/album/5fUd57GcAIcdUn9NX3fviG)*
             *[YouTube](https://www.youtube.com/playlist?list=PL9CsGuMbcLaU02VKS7jtR6LaDNpq7MZEq)*
+---
+
+<a name="thanks"></a>
+## :+1: &nbsp;Special thanks to 
+
+  - **[rdagger](https://github.com/rdagger)** > [www.rototron.info](https://www.rototron.info)
+  - **[happenpappen](https://github.com/happenpappen)** > [www.stop.pe](https://stop.pe)
+
 ---
 
 <a name="license"></a>
