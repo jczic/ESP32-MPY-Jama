@@ -33,7 +33,7 @@ HTML_APP_MAIN_FILENAME           = 'app_main.html'
 if IS_MACOS :
     DIRECTORY_FILES              = Path('~/Library/Application Support').expanduser() / APPLICATION_BUNDLE_NAME
 elif IS_LINUX :
-    DIRECTORY_FILES              = Path('~/.config/') / APPLICATION_BUNDLE_NAME
+    DIRECTORY_FILES              = Path('~/.config/').expanduser() / APPLICATION_BUNDLE_NAME
 elif IS_WIN32 :
     DIRECTORY_FILES              = Path('~/AppData/Local').expanduser() / APPLICATION_BUNDLE_NAME
 DIRECTORY_CONTENT_JAMA_FUNCS     = Path('Jama Funcs')
