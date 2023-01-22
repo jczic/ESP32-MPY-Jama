@@ -28,8 +28,7 @@
 
 ### :cyclone: &nbsp;Linux version instructions
 
-There is no out of the box running AppImage or binary version, but you may get it to run on Ubuntu 22 (or similar distribution) following the instructions bel
-ow.
+This describes how to clone the repository and how to run from source. In the third step you will find instructions how to create a binary from source. All steps have been tested on Ubuntu 22.04, but should work with little changes on similar distributions as well.
 
 ## Installation
 
@@ -50,13 +49,28 @@ pip3 install wheel setuptools
 pip3 install pyserial pywebview[qt] pycairo PyGObject
 ```
 
-## Start
+## Running from source
+
+When you executed all steps listed under "Installation" you may run directly from sources by executing these steps:
 
 ```bash
 cd ESP32-MPY-Jama
 . venv/bin/activate
 python3 src/app.py
 ```
+
+## Building executable
+
+Execute the steps listed under "Installation" and then continue like this:
+
+```bash
+cd ESP32-MPY-Jama
+. venv/bin/activate
+pip3 install pyinstaller
+pyinstaller -F -n esp32-mpy-jama --add-binary src/content:content src/app.py
+```
+
+When pyinstaller finishes you should end up with a "esp32-mpy-jama" executable in the "dist" subfolder.
 
 ---
 
