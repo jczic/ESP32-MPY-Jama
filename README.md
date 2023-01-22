@@ -65,7 +65,7 @@
 <a name="build and run"></a>
 ## :rocket: &nbsp;Build &amp; Run
 
-### Required and special thanks to
+### Required
 
   - pyWebView ([Check out on GitHub](https://github.com/r0x0r/pywebview))
     ```console
