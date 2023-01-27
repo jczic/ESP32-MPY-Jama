@@ -6,7 +6,7 @@ dict(
     timeout         = 2,
     
     info = dict(
-        name        = 'I2C Slaves scan',
+        name        = 'I2C Slaves Scan',
         version     = [1, 0, 0],
         description = ''' Initializes an I2C bus on two GPIO and scans it to find all the addresses of I2C slaves.
                           You can choose the bus identifier, the SCL and SDA GPIO as well as the frequency in MHz.
