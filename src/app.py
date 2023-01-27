@@ -594,6 +594,12 @@ class Application :
             try :
                 wifiSTACnf = self.esp32Ctrl.GetWiFiConfig(ap=False)
                 wifiAPCnf  = self.esp32Ctrl.GetWiFiConfig(ap=True)
+                try :
+                    bleActive = self.esp32Ctrl.GetBLEActive()
+                    bleMAC    = self.esp32Ctrl.GetBLEMacAddr()
+                except :
+                    bleActive = False
+                    bleMAC    = 'Not available'
                 o = dict( wifiSTA = dict(
                               active  = self.esp32Ctrl.GetWiFiActive(ap=False),
                               mac     = self.esp32Ctrl.GetWiFiMacAddr(ap=False),
@@ -613,8 +619,8 @@ class Application :
                               dns     = wifiAPCnf['dns']
                           ),
                           ble = dict(
-                              active  = self.esp32Ctrl.GetBLEActive(),
-                              mac     = self.esp32Ctrl.GetBLEMacAddr()
+                              active  = bleActive,
+                              mac     = bleMAC
                           ),
                           internetOK = self.esp32Ctrl.GetInternetOk()
                 )
