@@ -57,7 +57,8 @@
 
 ### :cyclone: &nbsp;Create, import and run mini-applications with customizable parameters.
 <p align="center">
-    <img src="/img/screen-jama-funcs.png" width="700">
+    <img src="/img/screen-jama-funcs.png" width="700"><br />
+    You are welcome to share your own Jama Funcs if you want :)
 </p>
 
 ---
