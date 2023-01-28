@@ -170,6 +170,7 @@ class ESP32Controller :
                                  xonxoff   = True,
                                  exclusive = True )
             self._isConnected = True
+            self.InterruptProgram()
             self._switchToRawMode()
             self._onSerialConnError = onSerialConnError
         except :
@@ -187,7 +188,7 @@ class ESP32Controller :
     # ---------------------------------------------------------------------------
 
     def __del__(self) :
-        self.Close()
+        self.Close(True)
 
     # ---------------------------------------------------------------------------
 
@@ -360,7 +361,7 @@ class ESP32Controller :
             raise self._raiseConnectionError()
         try :
             with self._lockWrite :
-                self._repl.write(b'\x03\r\n\x04')
+                self._repl.write(b'\x03\r\n')
         except :
             self._raiseConnectionError()
         maxTime = (time() + self.KILL_AFTER_INTERRUPT_SEC)
@@ -467,6 +468,7 @@ class ESP32Controller :
             self._endProcess()
             if not kill :
                 try :
+                    self.InterruptProgram()
                     self._switchToNormalMode()
                 except :
                     pass
