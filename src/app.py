@@ -1128,15 +1128,20 @@ class Application :
         if self.esp32Ctrl and self.esp32Ctrl.IsConnected() and not self.esp32Ctrl.IsProcessing() :
             try :
                 r = self.esp32Ctrl.ExeCodeREPL(   'import gc\n' \
-                                                + 'from esp32 import raw_temperature\n' \
+                                                + 'try :\n' \
+                                                + '  from esp32 import raw_temperature\n' \
+                                                + '  rawTemp = raw_temperature()\n' \
+                                                + 'except :\n' \
+                                                + '  rawTemp = None\n' \
                                                 + 'from time import ticks_ms\n' \
                                                 + 'gc.collect()\n' \
-                                                + 'print([gc.mem_alloc(), gc.mem_free(), raw_temperature(), ticks_ms()])\n',
+                                                + 'print([gc.mem_alloc(), gc.mem_free(), rawTemp, ticks_ms()])\n',
                                                 timeoutSec = 3 )
                 info = dict( mem    = dict( alloc = r[0],
                                             free  = r[1] ),
                              temp   = dict( fahrenheit = r[2],
-                                            celsius    = round(self._fahrenheit2Celsius(r[2])*10)/10 ),
+                                            celsius    = round(self._fahrenheit2Celsius(r[2])*10)/10 ) \
+                                      if r[2] else None,
                              uptime = round(r[3] / 1000 / 60) )
                 self._wsSendCmd('AUTO-INFO', info)
             except :

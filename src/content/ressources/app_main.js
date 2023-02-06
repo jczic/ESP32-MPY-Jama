@@ -1311,9 +1311,15 @@ function setAutoInfo(info) {
     var progress = getElmById("mem-progress");
     getSubElm(progress, "progress-little-inner").style.width = percent + "%";
     getSubElm(progress, "progress-little-text").innerText    = text;
-    var tempF    = info["temp"]["fahrenheit"];
-    var tempC    = info["temp"]["celsius"];
-    var text     = "TEMP    " + tempC + "°C (" + tempF + "°F)";
+    if (info["temp"]) {
+        var tempF    = info["temp"]["fahrenheit"];
+        var tempC    = info["temp"]["celsius"];
+        var text     = "TEMP    " + tempC + "°C (" + tempF + "°F)";
+    }
+    else {
+        var tempC    = 0;
+        var text     = "TEMP    " + "N/A on your device";
+    }
     var progress = getElmById("temp-progress");
     getSubElm(progress, "progress-little-inner").style.width = tempC + "%";
     getSubElm(progress, "progress-little-text").innerText    = text;
