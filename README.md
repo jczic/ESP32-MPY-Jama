@@ -111,7 +111,7 @@ python3 -m venv venv
 . venv/bin/activate
 
 pip3 install wheel setuptools
-pip3 install pyserial pywebview[qt] pycairo PyGObject
+pip3 install pyserial pywebview[qt] pycairo PyGObject pyinstaller
 ```
 
 ### Running from source
@@ -130,12 +130,10 @@ Execute the steps listed under "Installation" and then continue like this:
 
 ```bash
 cd ESP32-MPY-Jama
-. venv/bin/activate
-pip3 install pyinstaller
-pyinstaller -F -n esp32-mpy-jama --add-binary src/content:content src/app.py
+./create_binary.sh
 ```
 
-When pyinstaller finishes you should end up with a "esp32-mpy-jama" executable in the "dist" subfolder.
+When the script finishes you should end up with a "esp32-mpy-jama" executable in the "dist" subfolder.
 
 ---
 
