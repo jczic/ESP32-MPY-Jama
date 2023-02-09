@@ -21,3 +21,5 @@ $RECYCLE.BIN/
 __pycache__/
 *.py[cod]
 *$py.class
+
+esp32-mpy-jama.spec
