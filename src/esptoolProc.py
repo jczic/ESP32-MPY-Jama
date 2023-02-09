@@ -176,5 +176,9 @@ elif conf.IS_LINUX :
     esptoolFilename = linuxPaths.GetFilePathFromFilename('esptool.py')
     if esptoolFilename :
         _esptool = [ esptoolFilename ]
+    else:
+        esptoolFilename = linuxPaths.GetFilePathFromFilename('esptool')
+        if esptoolFilename :
+            _esptool = [ esptoolFilename ]
 elif conf.IS_WIN32 :
     _setEsptoolWin32()
