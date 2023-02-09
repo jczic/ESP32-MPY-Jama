@@ -102,7 +102,7 @@ eps have been tested on Ubuntu 22.04, but should work with little changes on sim
 git clone https://github.com/jczic/ESP32-MPY-Jama
 
 # install python modules requirements:
-sudo apt install libcairo2-dev libgirepository1.0-dev python3-pyqt5 python3-pyqt5.qtwebengine python3-pyqt5.qtwebchannel libqt5webkit5-dev
+sudo apt install libcairo2-dev libgirepository1.0-dev python3-pyqt5 python3-pyqt5.qtwebengine python3-pyqt5.qtwebchannel libqt5webkit5-dev gir1.2-webkit2-4.0
 
 # initialize python venv:
 cd ESP32-MPY-Jama
