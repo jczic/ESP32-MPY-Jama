@@ -1117,7 +1117,7 @@ class ESP32Controller :
                                       '  del __s\n'                                                    +
                                       'else :\n'                                                       +
                                       '  print(False)\n'                                               ,
-                                      timeoutSec = 3 )
+                                      timeoutSec = 7 )
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -1218,7 +1218,10 @@ class ESP32Controller :
             self._exeCodeREPL('import uos')
             system, __, release, version, implem = self._exeCodeREPL('tuple(uos.uname())')
             self._exeCodeREPL('import sys')
-            mpyVer = self._exeCodeREPL('sys.implementation._mpy')
+            try :
+                mpyVer = self._exeCodeREPL('sys.implementation.mpy')
+            except :
+                mpyVer = self._exeCodeREPL('sys.implementation._mpy')
             return dict( platform = platform,
                          system   = system,
                          release  = release,
