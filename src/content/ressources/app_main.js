@@ -584,8 +584,6 @@ function execCodeBegin() {
         if (processing == PRC_EXEC_JAMA) {
             var name = execJamaFuncConfig.info.name;
             var ver  = String(execJamaFuncConfig.info.version).replaceAll(",", ".");
-            clearTerminal(codeMirrorJamaTerm);
-            writeTextInTerminal("\n* Jama Func started.\n\n", "terminal-SeaGreen");
             boxDialogGeneric( "Jama Func's execution",
                               name + " (v" + ver + ")",
                               "elm-jama-func-terminal-container",
@@ -594,6 +592,11 @@ function execCodeBegin() {
                               "Close" );
             hide("jama-func-stop-btn");
             getElmById("box-dialog-generic-btn-ok").setAttribute("disabled", "true");
+            setTimeout( function() {
+                            clearTerminal(codeMirrorJamaTerm);
+                            writeTextInTerminal("\n* Jama Func started.\n\n", "terminal-SeaGreen");
+                        },
+                        1 );
             var timeoutSec = execJamaFuncConfig.timeout;
             if (!timeoutSec && timeoutSec != 0)
                 timeoutSec = 5;
