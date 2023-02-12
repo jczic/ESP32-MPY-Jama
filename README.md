@@ -58,7 +58,8 @@
 ### :cyclone: &nbsp;Create, import and run mini-applications with customizable parameters.
 <p align="center">
     <img src="/img/screen-jama-funcs.png" width="700"><br />
-    You are welcome to share your own Jama Funcs if you want :)
+    You are welcome to share your own Jama Funcs if you want :)<br />
+    Use <a href="https://github.com/jczic/ESP32-MPY-Jama/blob/ef2cf1cfbc138dd81a4291fe262d21fccb6dc71a/src/content/Jama%20Funcs%20-%20Template.py">this template</a> to make it!
 </p>
 
 ---
