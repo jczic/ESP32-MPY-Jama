@@ -37,6 +37,7 @@ class ESP32Controller :
     # ---------------------------------------------------------------------------
 
     DEFAULT_CODE_FILENAME    = '<TERMINAL>'
+    STDIN_CODE_FILENAME      = '<stdin>'
     KILL_AFTER_INTERRUPT_SEC = 5
 
     # ---------------------------------------------------------------------------
@@ -158,6 +159,7 @@ class ESP32Controller :
         self._threadRunning      = False
         self._threadReading      = False
         self._inProcess          = False
+        self._inCodeFileName     = None
         self._lockProcess        = allocate_lock()
         self._lockWrite          = allocate_lock()
         self._lockRead           = allocate_lock()
@@ -242,6 +244,8 @@ class ESP32Controller :
                                             errFile = errMsg[-3].strip()
                                             errMsg  = errMsg[-2].strip()
                                             if errFile.find(ESP32Controller.DEFAULT_CODE_FILENAME) == -1 :
+                                                if self._inCodeFileName :
+                                                    errFile = errFile.replace(self.STDIN_CODE_FILENAME, '<%s>' % self._inCodeFileName)
                                                 errMsg = errFile + '\r\n' + errMsg
                                         else :
                                             errMsg = err
@@ -305,7 +309,7 @@ class ESP32Controller :
 
    # ---------------------------------------------------------------------------
     
-    def ExecProgram(self, code, codeFilename=None, cbProgress=None, bufSize=2048, protect=False, args={ }) :
+    def ExecProgram(self, code, codeFilename=None, cbProgress=None, bufSize=2048) :
         if not code :
             return
         if not self._isConnected :
@@ -313,25 +317,9 @@ class ESP32Controller :
         self._beginProcess()
         if not codeFilename :
             codeFilename = ESP32Controller.DEFAULT_CODE_FILENAME
-        mode  = ('exec' if code.find('\n') >= 0 else 'single')
-        comp  = 'compile(%s,%s,"%s")' % (repr(code), repr(codeFilename), mode)
-        code  = ('_____vars = dict()\n' if protect else '')
-        gVars = ('_____vars' if protect else 'globals()')
-        lVars = ('_____vars' if protect else 'locals()')
-        if not args :
-            code += 'exec(%s, %s, %s)\n' % (comp, gVars, lVars)
-        else :
-            code += 'class JamaFuncArgs() :\n'
-            for name in args :
-                value = args[name]
-                if isinstance(value, str) :
-                    value = repr(value)
-                code += '  %s = %s\n' % (name, value)
-            code += '%s["args"] = JamaFuncArgs()\n' % ('_____vars' if protect else 'globals()')
-            code += 'exec(%s, %s, %s)\n' % (comp, gVars, lVars)
-            code += 'del JamaFuncArgs\n'
-        if protect :
-            code += 'del _____vars\n'
+        self._inCodeFileName = codeFilename
+        if code.find('\n') == -1 :
+            code = 'exec(compile(%s,%s,"single"))' % (repr(code), repr(codeFilename))
         data = code.encode()
         size = len(data)
         if size :
@@ -1264,7 +1252,11 @@ class ESP32Controller :
         self._beginProcess()
         try :
             self._exeCodeREPL('from machine import freq')
-            self._exeCodeREPL('freq(%s)' % freq)
+            return self._exeCodeREPL( 'try :\n'               +
+                                      '  freq(%s)\n' % freq   +
+                                      '  print(True)\n'       +
+                                      'except ValueError :\n' +
+                                      '  print(False)' )
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -1272,17 +1264,17 @@ class ESP32Controller :
     # ---------------------------------------------------------------------------
 
     def Set80MHzFreq(self) :
-        self.SetFreq(80000000)
+        return self.SetFreq(80000000)
 
     # ---------------------------------------------------------------------------
 
     def Set160MHzFreq(self) :
-        self.SetFreq(160000000)
+        return self.SetFreq(160000000)
 
     # ---------------------------------------------------------------------------
 
     def Set240MHzFreq(self) :
-        self.SetFreq(240000000)
+        return self.SetFreq(240000000)
 
     # ---------------------------------------------------------------------------
 

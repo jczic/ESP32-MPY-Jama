@@ -32,12 +32,13 @@ class Application :
 
     def __init__(self) :
 
-        self._appRunning        = False
-        self._ws                = None
-        self.esp32Ctrl          = None
-        self._wsMsgQueue        = SimpleQueue()
-        self._contentTransfer   = None
-        self._canCloseSoftware  = False
+        self._appRunning         = False
+        self._ws                 = None
+        self.esp32Ctrl           = None
+        self._wsMsgQueue         = SimpleQueue()
+        self._contentTransfer    = None
+        self._cleanAfterJamaFunc = False
+        self._canCloseSoftware   = False
 
         self._webSrv = MicroWebSrv( port    = conf.WEB_SRV_PORT,
                                     bindIP  = conf.WEB_SRV_BIND_IP,
@@ -324,6 +325,7 @@ class Application :
             self._wsSendCmd('SERIAL-CONNECTED', False)
             self._wsSendCmd('SHOW-ALERT', 'Device disconnected from port %s.' % self.esp32Ctrl.GetDevicePort())
             self._wsSendCmd('EXEC-CODE-END', False)
+            self._cleanAfterJamaFunc = False
             self.esp32Ctrl = None
 
     # ------------------------------------------------------------------------
@@ -332,6 +334,7 @@ class Application :
         self._wsSendCmd('SERIAL-CONNECTED', False)
         self._wsSendCmd('SHOW-ERROR', 'You have been disconnected from the device.')
         self._wsSendCmd('EXEC-CODE-END', False)
+        self._cleanAfterJamaFunc = False
         self.esp32Ctrl = None
         
     # ------------------------------------------------------------------------
@@ -362,6 +365,7 @@ class Application :
         self._wsSendCmd('DEVICE-RESET')
         self._wsSendCmd('EXEC-CODE-END', False)
         self._wsSendCmd('SHOW-ALERT', 'The device has been reset!')
+        self._cleanAfterJamaFunc = False
         
     # ------------------------------------------------------------------------
 
@@ -745,6 +749,7 @@ class Application :
                     self._wsSendCmd('HIDE-WAIT')
                     self._wsSendCmd('SHOW-ERROR', 'The device did not respond correctly...\nThe connection had to be closed.\n\n' \
                                                 + 'Your ESP32 may need an electrical reboot.')
+                    self._cleanAfterJamaFunc = False
             except :
                 self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
     
@@ -1031,15 +1036,39 @@ class Application :
     def _execJamaFunc(self, config, values) :
         if self._ableToUseDevice() :
             try :
+                # Checks JAMA args format,
                 json.dumps(values)
+                # Backups and cleans globals var before JAMA code,
+                code = '__gbl = globals()\n'                         + \
+                       '__gblBckUp = __gbl.copy()\n'                 + \
+                       'for __k in __gbl.keys() :\n'                 + \
+                       '  if __k not in ("__gblBckUp", "__gbl") :\n' + \
+                       '    __gbl.pop(__k)\n'                        + \
+                       'if __gbl.get("__k") :\n'                     + \
+                       '  del __k\n'
+                # Adds JAMA args before JAMA code,
+                if values :
+                    code += 'class __jamaArgs() :\n'
+                    for name in values :
+                        value = values[name]
+                        if isinstance(value, str) :
+                            value = repr(value)
+                        code += '  %s = %s\n' % (name, value)
+                    code += '__gbl["args"] = __jamaArgs()\n'
+                    code += 'del __jamaArgs\n'
+                else :
+                    code += '__gbl["args"] = None\n'
+                # Ends clean before JAMA code,
+                code += 'del __gbl\n'
+                self.esp32Ctrl.ExeCodeREPL(code)
+                # Adds JAMA code,
                 filename = config['filename']
                 with open(filename, 'rb') as f :
-                    code = f.read().decode()
+                    code = f.read().decode() + '\n'
                 self.esp32Ctrl.ExecProgram( code         = code,
-                                            codeFilename = '<JAMA-FUNC>',
-                                            cbProgress   = self._execJamaFuncProgress,
-                                            protect      = True,
-                                            args         = values )
+                                            codeFilename = 'JAMA-FUNC',
+                                            cbProgress   = self._execJamaFuncProgress )
+                self._cleanAfterJamaFunc = True
             except :
                 self._wsSendCmd('HIDE-PROGRESS')
                 self._wsSendCmd('EXEC-CODE-END', False)
@@ -1055,6 +1084,26 @@ class Application :
         else :
             self._wsSendCmd('HIDE-PROGRESS')
             self._wsSendCmd('EXEC-CODE-BEGIN')
+
+    # ------------------------------------------------------------------------
+
+    def _cleanAfterExecJamaFunc(self) :
+        if self.esp32Ctrl and self.esp32Ctrl.IsConnected() :
+            # Cleans globals var and restores it backup after JAMA code,
+            code = '__gbl = globals()\n'                           + \
+                    'if __gbl.get("__gblBckUp") :\n'                + \
+                    '  for __k in __gbl.keys() :\n'                 + \
+                    '    if __k not in ("__gblBckUp", "__gbl") :\n' + \
+                    '      __gbl.pop(__k)\n'                        + \
+                    '  if __gbl.get("__k") :\n'                     + \
+                    '    del __k\n'                                 + \
+                    '  __gbl.update(__gblBckUp)\n'                  + \
+                    '  del __gblBckUp\n'                            + \
+                    'del __gbl\n'
+            try :
+                self.esp32Ctrl.ExeCodeREPL(code)
+            except :
+                pass
 
     # ------------------------------------------------------------------------
 
@@ -1112,14 +1161,17 @@ class Application :
         if self._ableToUseDevice() :
             try :
                 if  frequency == 80 :
-                    self.esp32Ctrl.Set80MHzFreq()
+                    r = self.esp32Ctrl.Set80MHzFreq()
                 elif frequency == 160 :
-                    self.esp32Ctrl.Set160MHzFreq()
+                    r = self.esp32Ctrl.Set160MHzFreq()
                 elif frequency == 240 :
-                    self.esp32Ctrl.Set240MHzFreq()
+                    r = self.esp32Ctrl.Set240MHzFreq()
                 else :
                     raise Exception()
-                self._wsSendCmd('SYS-INFO-CHANGED')
+                if r :
+                    self._wsSendCmd('SYS-INFO-CHANGED')
+                else :
+                    self._wsSendCmd('SHOW-ERROR', 'This frequency is not supported by your device.')
             except :
                 self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
 
@@ -1159,6 +1211,10 @@ class Application :
                 while (not self._wsMsgQueue.empty()) :
                     o = self._wsMsgQueue.get()
                     self._wsProcessMessage(o)
+                if self._cleanAfterJamaFunc and self.esp32Ctrl and \
+                   self.esp32Ctrl.IsConnected() and not self.esp32Ctrl.IsProcessing() :
+                    self._cleanAfterJamaFunc = False
+                    self._cleanAfterExecJamaFunc()
             self._sendAutoInfo()
             gc.collect()
 
