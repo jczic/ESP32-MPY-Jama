@@ -22,8 +22,14 @@ dict(
 # === END_CONFIG_PARAMETERS ===
 
 
-from esp32 import hall_sensor
 from time  import sleep
+
+try :
+    from esp32 import hall_sensor
+except :
+    print('Oups, the magnet sensor is not supported by your device.')
+    import sys
+    sys.exit()
 
 msr = 500
 tlr = 25
