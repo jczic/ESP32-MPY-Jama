@@ -831,8 +831,9 @@ dict(
         mail        = 'jczic.bos@gmail.com',
         www         = 'https://github.com/jczic'
     ),
-    
-    args = None
+
+    args = dict( restartBLE = dict( label = 'Restarts the BLE interface if it is already active:',
+                                    type  = bool ) )
 
 )
 
@@ -865,9 +866,12 @@ def _bleIRQ(event, data) :
 ble = bluetooth.BLE()
 
 if ble.active() :
-    print('BLE is already active on the device: end of Jama Func for security.')
-    import sys
-    sys.exit()
+    if args.restartBLE :
+        ble.active(False)
+    else :
+        print('BLE is already active on the device: end of Jama Func for security.')
+        import sys
+        sys.exit()
 
 ble.active(True)
 ble.irq(_bleIRQ)
@@ -893,5 +897,6 @@ for mac in _bleAdv :
 
 print('Ok, %s found.' % len(_bleAdv))
 
+ble.irq(None)
 ble.active(False)
 
