@@ -195,6 +195,12 @@ class ESP32Controller :
     # ---------------------------------------------------------------------------
 
     def _threadProcess(self) :
+
+        def cleanREPLBuffer() :
+            with self._lockWrite :
+                self._repl.write(b'\x02\x01')
+            self._readUntilReady(b'\r\n>', timeoutSec=3, lockRead=False)
+
         self._threadRunning = True
         restarted           = False
         while self._threadRunning :
@@ -228,6 +234,7 @@ class ESP32Controller :
                                     b = b[i+2:]
                                     if r and self._onTerminalRecv :
                                         self._onTerminalRecv(self, r.decode())
+                                    cleanREPLBuffer()
                                     self._endProcess()
                                     if self._onEndOfProgram :
                                         self._onEndOfProgram(self)
@@ -249,6 +256,7 @@ class ESP32Controller :
                                                 errMsg = errFile + '\r\n' + errMsg
                                         else :
                                             errMsg = err
+                                        cleanREPLBuffer()
                                         self._endProcess()
                                         if errMsg.find('KeyboardInterrupt:') >= 0 :
                                             b = b''
@@ -361,24 +369,29 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
-    def _readUntilReady(self, readyBytes, timeoutSec=1) :
+    def _readUntilReady(self, readyBytes, timeoutSec=1, lockRead=True) :
         if not self._isConnected :
             self._raiseConnectionError()
         connError = False
-        with self._lockRead :
-            maxTime = ((time() + timeoutSec) if timeoutSec else None)
-            b       = b''
-            while not maxTime or time() < maxTime :
-                try :
-                    count = self._repl.in_waiting
-                    if count > 0 :
-                        b += self._repl.read(count)
-                        if b.endswith(readyBytes) :
-                            return b.decode()
-                    sleep(0.030)
-                except :
-                    connError = True
-                    break
+        b         = b''
+        if lockRead :
+            self._lockRead.acquire()
+        maxTime = ((time() + timeoutSec) if timeoutSec else None)
+        while not maxTime or time() < maxTime :
+            try :
+                count = self._repl.in_waiting
+                if count > 0 :
+                    b += self._repl.read(count)
+                    if b.endswith(readyBytes) :
+                        if lockRead :
+                            self._lockRead.release()
+                        return b.decode()
+                sleep(0.030)
+            except :
+                connError = True
+                break
+        if lockRead :
+            self._lockRead.release()
         if connError :
             self._raiseConnectionError()
         else :

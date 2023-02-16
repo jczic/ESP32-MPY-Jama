@@ -1091,15 +1091,15 @@ class Application :
         if self.esp32Ctrl and self.esp32Ctrl.IsConnected() :
             # Cleans globals var and restores it backup after JAMA code,
             code = '__gbl = globals()\n'                           + \
-                    'if __gbl.get("__gblBckUp") :\n'                + \
-                    '  for __k in __gbl.keys() :\n'                 + \
-                    '    if __k not in ("__gblBckUp", "__gbl") :\n' + \
-                    '      __gbl.pop(__k)\n'                        + \
-                    '  if __gbl.get("__k") :\n'                     + \
-                    '    del __k\n'                                 + \
-                    '  __gbl.update(__gblBckUp)\n'                  + \
-                    '  del __gblBckUp\n'                            + \
-                    'del __gbl\n'
+                   'if __gbl.get("__gblBckUp") :\n'                + \
+                   '  for __k in __gbl.keys() :\n'                 + \
+                   '    if __k not in ("__gblBckUp", "__gbl") :\n' + \
+                   '      __gbl.pop(__k)\n'                        + \
+                   '  if __gbl.get("__k") :\n'                     + \
+                   '    del __k\n'                                 + \
+                   '  __gbl.update(__gblBckUp)\n'                  + \
+                   '  del __gblBckUp\n'                            + \
+                   'del __gbl\n'
             try :
                 self.esp32Ctrl.ExeCodeREPL(code)
             except :
@@ -1215,6 +1215,7 @@ class Application :
                    self.esp32Ctrl.IsConnected() and not self.esp32Ctrl.IsProcessing() :
                     self._cleanAfterJamaFunc = False
                     self._cleanAfterExecJamaFunc()
+                    continue
             self._sendAutoInfo()
             gc.collect()
 
