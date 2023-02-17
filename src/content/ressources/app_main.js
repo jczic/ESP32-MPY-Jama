@@ -755,7 +755,7 @@ function openJamaFuncsConfig(config) {
         if (config.args && Object.keys(config.args).length > 0) {
             for (var arg in config.args) {
                 var labelElm       = newElm("div", null, ["left"]);
-                labelElm.innerText = config.args[arg].label;
+                labelElm.innerText = "▶️ " + config.args[arg].label;
                 argsElm.appendChild(labelElm);
                 var type     = config.args[arg].type;
                 var value    = config.args[arg].value;
