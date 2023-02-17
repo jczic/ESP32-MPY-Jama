@@ -7,8 +7,12 @@ dict(
     
     info = dict(
         name        = 'BLE iBeacon',
-        version     = [1, 0, 0],
-        description = 'Initializes the Bluetooth Low Energy radio and simulates an Apple iBeacon object.',
+        version     = [2, 0, 0],
+        description = 'Initializes the Bluetooth Low Energy radio and simulates an Apple iBeacon object. ' \
+                    + 'The advertising message broadcasts an UUID corresponding to "B.JAMA-FUNC.TEST" in binary ' \
+                    + 'with the short name "MPY-Jama" while the iBeacon is the response to an active scanner.\n' \
+                    + 'The iBeacon (Apple beacon format) data are:\n' \
+                    + 'Major = 123  /  Minor = 456  /  TX at 1 meter = -55 dB',
         author      = 'JC`zic',
         mail        = 'jczic.bos@gmail.com',
         www         = 'https://github.com/jczic'
@@ -56,13 +60,25 @@ def _getAdvDataPart(dataType, dataValue) :
 
 # ----------------------------------------------------------------------------
 
+def _getAdvCompleteNameData() :
+    boradcastFlagType    = 0x01
+    incomp128bitsUUIDS   = 0x06
+    CompleteNameDataType = 0x09
+    uuidBytes = b'B.JAMA-FUNC.TEST' # 16 bytes or str UUID mandatory
+    data      = _getAdvDataPart(boradcastFlagType,    bytes([incomp128bitsUUIDS])) \
+              + _getAdvDataPart(CompleteNameDataType, 'MPY-Jama'.encode()) \
+              + _getAdvDataPart(incomp128bitsUUIDS,   _getBytesUUID(uuidBytes))
+    return data
+
+# ----------------------------------------------------------------------------
+
 def _getAdvIBeaconData() :
     boradcastFlagType    = 0x01
     manufacturedDataType = 0xFF
-    brEdrNotSupported    = b'\x04'
+    brEdrNotSupported    = 0x04
     uuidBytes = b'B.JAMA-FUNC.TEST' # 16 bytes or str UUID mandatory
     mfData    = _getIBeaconManufacturerData(uuid=uuidBytes)
-    data      = _getAdvDataPart(boradcastFlagType, brEdrNotSupported) \
+    data      = _getAdvDataPart(boradcastFlagType,    bytes([brEdrNotSupported])) \
               + _getAdvDataPart(manufacturedDataType, mfData)
     return data
 
@@ -77,9 +93,10 @@ try :
     try :
         ble.gap_advertise(None)
         ble.gap_advertise( intervalUS,
-                           adv_data    = _getAdvIBeaconData(),
+                           adv_data    = _getAdvCompleteNameData(),
+                           resp_data   = _getAdvIBeaconData(),
                            connectable = False )
-        print('Ok, your device can now be found as an Apple iBeacon.')
+        print('Ok, your device can now be found as an Apple iBeacon or by name.')
     except :
         print('Unable to advertise the iBeacon...')
 except :
