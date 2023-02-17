@@ -498,8 +498,8 @@ class ESP32Controller :
             return None
         if not self._isConnected :
             self._raiseConnectionError()
-        mode = ('exec' if code.find('\n') >= 0 else 'single')
-        code = 'exec(compile(%s,"<string>","%s"))' % (repr(code), mode)
+        if code.find('\n') == -1 :
+            code = 'exec(compile(%s,"<ReplCmd>","single"))' % repr(code)
         try :
             with self._lockWrite :
                 self._repl.write(code.encode() + b'\x04')
