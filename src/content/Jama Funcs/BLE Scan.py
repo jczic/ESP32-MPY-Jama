@@ -890,9 +890,10 @@ for mac in _bleAdv :
     try :
         r = BLEAdvReader(_bleAdv[mac][1])
         for advObj in r.GetAllElements() :
-            print('   - %s: %s' % (type(advObj).__name__, advObj))
+            print('   - %s:\n     %s' % (type(advObj).__name__, advObj))
     except :
         pass
+    print()
     print()
 
 print('Ok, %s found.' % len(_bleAdv))
