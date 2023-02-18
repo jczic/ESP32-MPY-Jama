@@ -1401,6 +1401,8 @@ function showREPL() {
 }
 
 function btnIDEClick(e) {
+    if (connectionState)
+        setSwitchButton(getElmById("switch-btn-browse"));
     showIDE();
 }
 
