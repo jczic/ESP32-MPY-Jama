@@ -14,6 +14,7 @@ from   random          import random
 from   queue           import SimpleQueue
 from   hashlib         import sha256
 from   shutil          import copyfile
+from   pathlib         import Path
 import webview
 import asyncio
 import webbrowser
@@ -440,7 +441,7 @@ class Application :
                                                   file_types     = file_types )
             if r and len(r) == 1 :
                 localFilename  = r[0]
-                remoteFilename = remoteFilePath + localFilename.split('/')[-1]
+                remoteFilename = remoteFilePath + Path(localFilename).name
                 self._sendFile(localFilename, remoteFilename)
 
     # ------------------------------------------------------------------------
