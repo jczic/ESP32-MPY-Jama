@@ -198,7 +198,8 @@ class ESP32Controller :
 
         def cleanREPLBuffer() :
             with self._lockWrite :
-                self._repl.write(b'\x02\x01')
+                self._repl.write(b'\r\x02\r\x01')
+                self._repl.flush()
             self._readUntilReady(b'\r\n>', timeoutSec=3, lockRead=False)
 
         self._threadRunning = True
@@ -273,7 +274,8 @@ class ESP32Controller :
                                 continue
                         if restarted :
                             with self._lockWrite :
-                                self._repl.write(b'\x01')
+                                self._repl.write(b'\r\x01')
+                                self._repl.flush()
                             self._endProcess()
                             if self._onDeviceReset :
                                 self._onDeviceReset(self)
@@ -338,6 +340,7 @@ class ESP32Controller :
                 while True :
                     try :
                         progress += self._repl.write(data[ progress : progress + bufSize ])
+                        self._repl.flush()
                     except :
                         self._raiseConnectionError()
                     if cbProgress :
@@ -346,6 +349,7 @@ class ESP32Controller :
                         try :
                             while self._repl.write(b'\x04') != 1 :
                                 pass
+                            self._repl.flush()
                         except :
                             self._raiseConnectionError()
                         break
@@ -357,7 +361,15 @@ class ESP32Controller :
             raise self._raiseConnectionError()
         try :
             with self._lockWrite :
-                self._repl.write(b'\x03\r\n')
+                self._repl.write(b'\r\x03\r\x03\r\n')
+                self._repl.flush()
+            if not self._threadRunning :
+                sleep(0.250)
+                x = self._repl.in_waiting
+                while x :
+                    self._repl.read(x)
+                    sleep(0.030)
+                    x = self._repl.in_waiting
         except :
             self._raiseConnectionError()
         maxTime = (time() + self.KILL_AFTER_INTERRUPT_SEC)
@@ -435,7 +447,8 @@ class ESP32Controller :
         try :
             try :
                 with self._lockWrite :
-                    self._repl.write(b'\x01')
+                    self._repl.write(b'\r\x01')
+                    self._repl.flush()
             except :
                 self._raiseConnectionError()
             self._readUntilReady(b'\r\n>', timeoutSec=3)
@@ -453,7 +466,8 @@ class ESP32Controller :
         try :
             try :
                 with self._lockWrite :
-                    self._repl.write(b'\x02')
+                    self._repl.write(b'\r\x02')
+                    self._repl.flush()
             except :
                 self._raiseConnectionError()
             self._readUntilReady(b'\r\n>>> ', timeoutSec=3)
@@ -503,6 +517,7 @@ class ESP32Controller :
         try :
             with self._lockWrite :
                 self._repl.write(code.encode() + b'\x04')
+                self._repl.flush()
         except :
             self._raiseConnectionError()
         r = self._readUntilReady(b'\x04>', timeoutSec=timeoutSec)
