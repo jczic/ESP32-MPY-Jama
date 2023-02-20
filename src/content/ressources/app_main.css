@@ -1136,10 +1136,7 @@ select {
 }
 
 #exec-jama-funcs-args-title {
-    color: steelblue;
-    border-bottom-color: steelblue;
-    background-color: #e9f4fb;
-    border-radius: 3px;
+    background-color: #54546c;
 }
 
 .exec-jama-funcs-input {
