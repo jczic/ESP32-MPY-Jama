@@ -733,8 +733,6 @@ function recvJamaFuncConfig(config) {
     getSubElm(itemElm, "list-jama-funcs-item-version").innerText     = "v" + ver[0] + "." + ver[1] + "." + ver[2];
     getSubElm(itemElm, "list-jama-funcs-item-description").innerText = cfgInfo.description;
     getSubElm(itemElm, "list-jama-funcs-item-author").innerText      = cfgInfo.author;
-    getSubElm(itemElm, "list-jama-funcs-item-mail").innerText        = cfgInfo.mail;
-    getSubElm(itemElm, "list-jama-funcs-item-www").innerText         = cfgInfo.www;
     var mailElm = getSubElm(itemElm, "list-jama-funcs-item-mail");
     var wwwElm  = getSubElm(itemElm, "list-jama-funcs-item-www");
     if (cfgInfo.mail) mailElm.innerText = cfgInfo.mail; else hideElm(mailElm);
