@@ -672,7 +672,7 @@ function setPinsList(pList) {
             }
             right = !right;
         }
-        wsSendCmd("GET-PINS-LIST", null);
+        wsSendCmd("GET-PINS-LIST", true);
     }    
 }
 
@@ -681,9 +681,9 @@ function deviceReset() {
     var actPage = getActivePage();
     if (actPage)
         if (actPage.id == "page-networks-info")
-            wsSendCmd("GET-NETWORKS-INFO", false);
+            wsSendCmd("GET-NETWORKS-INFO", true);
         if (actPage.id == "page-system-info")
-            wsSendCmd("GET-SYS-INFO", false);
+            wsSendCmd("GET-SYS-INFO", true);
 }
 
 function showGPIOInfos() {
@@ -1242,19 +1242,19 @@ function wifiConnected(ssid, key) {
 function wifiAPOpened(ssid) {
     var actPage = getActivePage();
     if (actPage && actPage.id == "page-networks-info")
-        wsSendCmd("GET-NETWORKS-INFO", false);
+        wsSendCmd("GET-NETWORKS-INFO", true);
 }
 
 function interfaceClosed(interface) {
     var actPage = getActivePage();
     if (actPage && actPage.id == "page-networks-info")
-        wsSendCmd("GET-NETWORKS-INFO", false);
+        wsSendCmd("GET-NETWORKS-INFO", true);
 }
 
 function sysInfoChanged() {
     var actPage = getActivePage();
     if (actPage && actPage.id == "page-system-info")
-        wsSendCmd("GET-SYS-INFO", false);
+        wsSendCmd("GET-SYS-INFO", true);
 }
 
 function terminalFocusClick(e) {

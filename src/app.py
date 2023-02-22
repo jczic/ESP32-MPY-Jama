@@ -182,7 +182,7 @@ class Application :
             elif cmd == 'GET-FLASH-ROOT-PATH' :
                 self._sendFlashRootPath()
             elif cmd == 'GET-PINS-LIST' :
-                self._sendPinsList()
+                self._sendPinsList(arg)
             elif cmd == 'GET-LIST-DIR' :
                 self._sendListDir(arg)
             elif cmd == 'CREATE-DIR' :
@@ -370,11 +370,13 @@ class Application :
         
     # ------------------------------------------------------------------------
 
-    def _ableToUseDevice(self) :
+    def _ableToUseDevice(self, silence=False) :
         if not self.esp32Ctrl or not self.esp32Ctrl.IsConnected() :
-            self._wsSendCmd('SHOW-INFO', 'The device must be connected first.')
+            if not silence :
+                self._wsSendCmd('SHOW-INFO', 'The device must be connected first.')
         elif self.esp32Ctrl.IsProcessing() :
-            self._wsSendCmd('SHOW-INFO', 'The device is already in use.')
+            if not silence :
+                self._wsSendCmd('SHOW-INFO', 'The device is already in use.')
         else :
             return True
         return False
@@ -564,8 +566,8 @@ class Application :
 
     # ------------------------------------------------------------------------
     
-    def _sendPinsList(self) :
-        if self._ableToUseDevice() :
+    def _sendPinsList(self, silence=False) :
+        if self._ableToUseDevice(silence) :
             try :
                 self._wsSendCmd('PINS-LIST', self.esp32Ctrl.GetPinsState())
             except :
@@ -574,7 +576,7 @@ class Application :
     # ------------------------------------------------------------------------
 
     def _sendSysInfo(self, silence) :
-        if self._ableToUseDevice() :
+        if self._ableToUseDevice(silence) :
             if (not silence) :
                 self._wsSendCmd('SHOW-WAIT', 'Collecting informations...')
             try :
@@ -593,7 +595,7 @@ class Application :
     # ------------------------------------------------------------------------
 
     def _sendNetworksInfo(self, silence) :
-        if self._ableToUseDevice() :
+        if self._ableToUseDevice(silence) :
             if (not silence) :
                 self._wsSendCmd('SHOW-WAIT', 'Collecting informations...')
             try :
@@ -1179,7 +1181,7 @@ class Application :
     # ------------------------------------------------------------------------
 
     def _sendAutoInfo(self) :
-        if self.esp32Ctrl and self.esp32Ctrl.IsConnected() and not self.esp32Ctrl.IsProcessing() :
+        if self._ableToUseDevice(silence=True) :
             try :
                 r = self.esp32Ctrl.ExeCodeREPL(   'import gc\n' \
                                                 + 'try :\n' \
