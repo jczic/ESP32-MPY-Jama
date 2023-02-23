@@ -8,7 +8,7 @@ dict(
     info = dict(
         name        = 'LEDs - NeoPixel RBG(+W/Y) Strip',
         version     = [1, 0, 0],
-        description = 'Try your NeoPixel RGB(+W/Y) LEDs via only one GPIO, compatible with strips WS2812(B), SK6812, ADA4xx6, APA106, FLORA and more. ' \
+        description = 'Try your NeoPixel RGB(+W/Y) LEDs via only one GPIO, compatible with strips WS2812(B), SK6812, ADAxxxx, APA106, FLORA and more. ' \
                     + 'You can choose the number as well as the type of LEDs like RGB or RGB+W/Y, the frequency, and the lighting in full ' \
                     + 'power or in fading rainbow. The NeoPixel library was coded by Damien P. George.',
         author      = 'JC`zic for the colors demo',
