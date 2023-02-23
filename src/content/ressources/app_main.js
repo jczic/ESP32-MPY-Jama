@@ -641,6 +641,8 @@ function execCodeEnd(normalFinished) {
         hide("img-processing");
         show("terminal-bar");
         getElmById("terminal-input-cmd").focus();
+        if (connectionState)
+            wsSendCmd("GET-LIST-DIR", browsePath);
     }
 }
 
@@ -1239,6 +1241,7 @@ function wifiConnected(ssid, key) {
                     function(yes) {
                         if (yes)
                             wsSendCmd("WIFI-SAVE", { ssid: ssid, key: key });
+                            wsSendCmd("GET-LIST-DIR", browsePath);
                     } );
 }
 
@@ -1378,6 +1381,8 @@ function setSwitchButton(btnSwitch) {
     else if (btnSwitch.id == "switch-btn-browse") {
         hide("menu-panel-btns");
         show("menu-panel-browse");
+        if (connectionState)
+            wsSendCmd("GET-LIST-DIR", browsePath);
     }
 }
 function showIDE() {

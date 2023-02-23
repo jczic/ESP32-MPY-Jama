@@ -532,7 +532,7 @@ class Application :
     # ------------------------------------------------------------------------
 
     def _sendListDir(self, path) :
-        if self._ableToUseDevice() :
+        if self._ableToUseDevice(silence=True) :
             try :
                 self._wsSendCmd('LIST-DIR', dict( path    = path,
                                                   entries = self.esp32Ctrl.GetListDir(path)) )
