@@ -108,7 +108,7 @@ a:hover, a:focus, a:active {
     100% { transform: rotate(359deg); }
 }
 
-  #logo {
+#logo {
     position: absolute;
     left: 20px;
     top: 5px;
@@ -125,11 +125,31 @@ a:hover, a:focus, a:active {
 #menubar-title {
     float: left;
     margin-left: 23px;
-    line-height: 54px;
+    line-height: 55px;
     font-size: 22px;
     font-weight: lighter;
     letter-spacing: 3px;
     text-shadow: 1px 1px 10px #101010;
+}
+
+#device-info {
+    display: none;
+    float: right;
+    margin-top: 16px;
+    margin-right: 13px;
+    font-size: 11px;
+    line-height: 13px;
+    color: #e9f4fb;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 5px #101010;
+}
+
+#device-mcu {
+    float: right;
+}
+
+#device-module {
+    float: right;
 }
 
 @keyframes btn-connection-anim {

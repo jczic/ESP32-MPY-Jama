@@ -311,7 +311,9 @@ class Application :
             self._wsSendCmd('HIDE-WAIT')
             if self.esp32Ctrl :
                 self._wsSendCmd('SERIAL-CONNECTED', True)
-                self._wsSendCmd('SHOW-ALERT', "Device connected to port %s." % self.esp32Ctrl.GetDevicePort())
+                self._wsSendCmd('DEVICE-INFO', dict( deviceMCU    = self.esp32Ctrl.GetDeviceMCU(),
+                                                     deviceModule = self.esp32Ctrl.GetDeviceModule() ))
+                self._wsSendCmd('SHOW-ALERT', "Port %s connected to %s." % (self.esp32Ctrl.GetDevicePort(), self.esp32Ctrl.GetDeviceMCU()))
                 self._sendFlashRootPath()
                 self._sendPinsList()
                 self._sendAutoInfo()
@@ -324,7 +326,7 @@ class Application :
         if self.esp32Ctrl :
             self.esp32Ctrl.Close()
             self._wsSendCmd('SERIAL-CONNECTED', False)
-            self._wsSendCmd('SHOW-ALERT', 'Device disconnected from port %s.' % self.esp32Ctrl.GetDevicePort())
+            self._wsSendCmd('SHOW-ALERT', 'Port %s disconnected from %s.' % (self.esp32Ctrl.GetDevicePort(), self.esp32Ctrl.GetDeviceMCU()))
             self._wsSendCmd('EXEC-CODE-END', False)
             self._cleanAfterJamaFunc = False
             self.esp32Ctrl = None

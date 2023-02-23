@@ -306,6 +306,9 @@ function onWSMessage(evt)
         case "ESPTOOL-VER" :
             setEsptoolPage(o.ARG);
             break;
+        case "DEVICE-INFO" :
+            setDeviceInfo(o.ARG);
+            break;
         case "AUTO-INFO" :
             setAutoInfo(o.ARG);
             break;
@@ -1229,7 +1232,7 @@ function setWiFiNetworks(networks) {
 function wifiConnected(ssid, key) {
     var actPage = getActivePage();
     if (actPage && actPage.id == "page-networks-info")
-        wsSendCmd("GET-NETWORKS-INFO", true);
+        wsSendCmd("GET-NETWORKS-INFO", false);
     boxDialogYesNo( "Wi-Fi Connected with success!",
                     "The device is now connected to access point " + ssid + ".\n\n" +
                     "Do you want to save this Wi-Fi network on the device for a permanent connection even after reboot?.",
@@ -1242,19 +1245,19 @@ function wifiConnected(ssid, key) {
 function wifiAPOpened(ssid) {
     var actPage = getActivePage();
     if (actPage && actPage.id == "page-networks-info")
-        wsSendCmd("GET-NETWORKS-INFO", true);
+        wsSendCmd("GET-NETWORKS-INFO", false);
 }
 
 function interfaceClosed(interface) {
     var actPage = getActivePage();
     if (actPage && actPage.id == "page-networks-info")
-        wsSendCmd("GET-NETWORKS-INFO", true);
+        wsSendCmd("GET-NETWORKS-INFO", false);
 }
 
 function sysInfoChanged() {
     var actPage = getActivePage();
     if (actPage && actPage.id == "page-system-info")
-        wsSendCmd("GET-SYS-INFO", true);
+        wsSendCmd("GET-SYS-INFO", false);
 }
 
 function terminalFocusClick(e) {
@@ -1300,6 +1303,12 @@ function sizeToText(size, unity) {
     if (size >= 1024)
         return Math.round(size/1024*100)/100 + " K" + unity[0];
     return size + " " + unity;
+}
+
+function setDeviceInfo(info) {
+    getElmById("device-mcu").innerText    = info["deviceMCU"];
+    getElmById("device-module").innerText = info["deviceModule"];
+    show("device-info");
 }
 
 function setAutoInfo(info) {
@@ -1508,8 +1517,10 @@ function setConnectionState(connected) {
     else
         if (connected)
             writeTextInTerminal("* Device connected.\n\n", "terminal-SeaGreen");
-        else
+        else {
             writeTextInTerminal("* Device disconnected.\n", "terminal-IndianRed");
+            hide("device-info");
+        }
     connectionState = connected;
     getElmById("btn-connection").value = (connected ? "Disconnect" : "  Connect") + " device";
     setTextTag("label-connection", "DEVICE " + (connected ? "CONNECTED" : "NOT CONNECTED"), connected);

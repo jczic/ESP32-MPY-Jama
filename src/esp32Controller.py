@@ -174,8 +174,9 @@ class ESP32Controller :
             self._isConnected = True
             self.InterruptProgram()
             self._switchToRawMode()
-            if not self._exeCodeREPL('True', timeoutSec=3) :
-                raise
+            machineNfo = self._exeCodeREPL('import uos; [x.strip() for x in uos.uname().machine.split("with")]', timeoutSec=3)
+            self._machineModule = (machineNfo[0] if len(machineNfo) >= 1 else None)
+            self._machineMCU    = (machineNfo[1] if len(machineNfo) >= 2 else None)
             self._onSerialConnError = onSerialConnError
         except :
             raise ESP32ControllerException('Cannot open serial "%s" to device.' % devicePort)
@@ -506,6 +507,16 @@ class ESP32Controller :
 
     def IsConnected(self) :
         return self._isConnected
+
+    # ---------------------------------------------------------------------------
+
+    def GetDeviceModule(self) :
+        return self._machineModule
+
+    # ---------------------------------------------------------------------------
+
+    def GetDeviceMCU(self) :
+        return self._machineMCU
 
     # ---------------------------------------------------------------------------
 
