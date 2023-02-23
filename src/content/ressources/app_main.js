@@ -1307,7 +1307,7 @@ function sizeToText(size, unity) {
 
 function setDeviceInfo(info) {
     getElmById("device-mcu").innerText    = info["deviceMCU"];
-    getElmById("device-module").innerText = info["deviceModule"];
+    getElmById("device-module").innerText = "On " + info["deviceModule"];
     show("device-info");
 }
 
