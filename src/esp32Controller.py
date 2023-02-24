@@ -169,12 +169,12 @@ class ESP32Controller :
             self._repl = Serial( port      = devicePort,
                                  baudrate  = baudrate,
                                  timeout   = None,
-                                 xonxoff   = True,
+                                 xonxoff   = False,
                                  exclusive = True )
             self._isConnected = True
             self.InterruptProgram()
             self._switchToRawMode()
-            machineNfo = self._exeCodeREPL('import uos; [x.strip() for x in uos.uname().machine.split("with")]', timeoutSec=3)
+            machineNfo = self._exeCodeREPL('import uos; [x.strip() for x in uos.uname().machine.split("with")]')
             self._machineModule = (machineNfo[0] if len(machineNfo) >= 1 else None)
             self._machineMCU    = (machineNfo[1] if len(machineNfo) >= 2 else None)
             self._onSerialConnError = onSerialConnError
@@ -200,11 +200,8 @@ class ESP32Controller :
     def _threadProcess(self) :
 
         def cleanREPLBuffer() :
-            with self._lockWrite :
-                self._repl.write(b'\r\x02\r\x01')
-                self._repl.flush()
-            self._readUntilEnd()
-            #self._readUntilReady(b'\r\n>', timeoutSec=3, lockRead=False)
+            self._switchToNormalMode()
+            self._switchToRawMode()
 
         self._threadRunning = True
         restarted           = False
@@ -221,11 +218,11 @@ class ESP32Controller :
                         if count > 0 :
                             b += self._repl.read(count)
                         if restarted :
-                            if b.find(b'\r\n>') >= 0 :
+                            if b.endswith(b'\r\n>') :
                                 restarted = False
                                 b = b''
                             continue
-                        if len(b) >= 6 and b.find(b'\r\n>>> ') >= 0 :
+                        if len(b) >= 6 and b.endswith(b'\r\n>>> ') :
                             b = b.replace(b'\r\n>>> ', b'\r\n')
                             restarted = True
                         if not inCode and b.startswith(b'OK') :
@@ -277,13 +274,12 @@ class ESP32Controller :
                             if not restarted :
                                 continue
                         if restarted :
-                            with self._lockWrite :
-                                self._repl.write(b'\r\x01')
-                                self._repl.flush()
                             self._endProcess()
+                            self._switchToRawMode()
                             if self._onDeviceReset :
                                 self._onDeviceReset(self)
-                            inCode = False
+                            inCode    = False
+                            restarted = False
                             continue
                         sleep(0.030)
                     except :
@@ -351,8 +347,7 @@ class ESP32Controller :
                         cbProgress(progress, size)
                     if progress == size :
                         try :
-                            while self._repl.write(b'\x04') != 1 :
-                                pass
+                            self._repl.write(b'\x04')
                             self._repl.flush()
                         except :
                             self._raiseConnectionError()
@@ -365,10 +360,8 @@ class ESP32Controller :
             raise self._raiseConnectionError()
         try :
             with self._lockWrite :
-                self._repl.write(b'\r\x03\r\x03\r\n')
+                self._repl.write(b'\x03\x03')
                 self._repl.flush()
-            if not self._threadRunning :
-                self._readUntilEnd()
         except :
             self._raiseConnectionError()
         maxTime = (time() + self.KILL_AFTER_INTERRUPT_SEC)
@@ -380,43 +373,25 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
-    def _readUntilEnd(self) :
-        sleep(0.150)
-        x = self._repl.in_waiting
-        while x :
-            self._repl.read(x)
-            sleep(0.030)
-            x = self._repl.in_waiting
-
-   # ---------------------------------------------------------------------------
-
-    def _readUntilReady(self, readyBytes, timeoutSec=1, lockRead=True) :
+    def _readUntil(self, readyBytes, timeoutSec=1, lockRead=True) :
         if not self._isConnected :
             self._raiseConnectionError()
-        connError = False
-        b         = b''
         if lockRead :
             self._lockRead.acquire()
-        maxTime = ((time() + timeoutSec) if timeoutSec else None)
-        while not maxTime or time() < maxTime :
-            try :
-                count = self._repl.in_waiting
-                if count > 0 :
-                    b += self._repl.read(count)
-                    if b.endswith(readyBytes) :
-                        if lockRead :
-                            self._lockRead.release()
-                        return b.decode()
-                sleep(0.030)
-            except :
-                connError = True
-                break
+        savedTimeout = self._repl.timeout
+        self._repl.timeout = timeoutSec
+        try :
+            b = self._repl.read_until(readyBytes)
+        except :
+            b = None
+        self._repl.timeout = savedTimeout
         if lockRead :
             self._lockRead.release()
-        if connError :
+        if b is None :
             self._raiseConnectionError()
-        else :
+        elif not b.endswith(readyBytes) :
             raise ESP32ControllerException('Timeout...')
+        return b.decode()
 
     # ---------------------------------------------------------------------------
 
@@ -451,42 +426,26 @@ class ESP32Controller :
     def _switchToRawMode(self) :
         if not self._isConnected :
             raise self._raiseConnectionError()
-        self._threadStopReading()
-        self._beginProcess()
         try :
-            try :
-                with self._lockWrite :
-                    self._repl.write(b'\r\x01')
-                    self._repl.flush()
-            except :
-                self._raiseConnectionError()
-            if not self._threadRunning :
-                self._readUntilEnd()
-            #self._readUntilReady(b'\r\n>', timeoutSec=3)
-        finally :
-            self._endProcess()
-            self._threadStartReading()
+            with self._lockWrite :
+                self._repl.write(b'\x01')
+                self._repl.flush()
+            self._readUntil(b'exit\r\n>', timeoutSec=3, lockRead=False)
+        except :
+            self._raiseConnectionError()
 
     # ---------------------------------------------------------------------------
 
     def _switchToNormalMode(self) :
         if not self._isConnected :
             raise self._raiseConnectionError()
-        self._threadStopReading()
-        self._beginProcess()
         try :
-            try :
-                with self._lockWrite :
-                    self._repl.write(b'\r\x02')
-                    self._repl.flush()
-            except :
-                self._raiseConnectionError()
-            if not self._threadRunning :
-                self._readUntilEnd()
-            #self._readUntilReady(b'\r\n>>> ', timeoutSec=3)
-        finally :
-            self._endProcess()
-            self._threadStartReading()
+            with self._lockWrite :
+                self._repl.write(b'\x02')
+                self._repl.flush()
+            self._readUntil(b'\r\n>>> ', timeoutSec=3, lockRead=False)
+        except :
+            self._raiseConnectionError()
 
     # ---------------------------------------------------------------------------
 
@@ -543,7 +502,7 @@ class ESP32Controller :
                 self._repl.flush()
         except :
             self._raiseConnectionError()
-        r = self._readUntilReady(b'\x04>', timeoutSec=timeoutSec)
+        r = self._readUntil(b'\x04>', timeoutSec=timeoutSec)
         if len(r) >= 5 and r.startswith('OK') :
             if r[-3] == '\x04' :
                 r = r[2:-3]
@@ -788,9 +747,10 @@ class ESP32Controller :
         try :
             entries = self._exeCodeREPL( 'from os import ilistdir\n' +
                                          '__ent = [ ]\n'             +
-                                         'for x in ilistdir(%s) :\n' % repr(path) +
-                                         '  __ent.append(x)\n'       +
+                                         'for __x in ilistdir(%s) :\n' % repr(path) +
+                                         '  __ent.append(__x)\n'     +
                                          'print(__ent)\n'            +
+                                         'del __x\n'                 +
                                          'del __ent\n',
                                          timeoutSec = 3 )
             entries.sort( key = lambda entry: (entry[1] == 0x8000) )
@@ -1326,6 +1286,97 @@ class ESP32Controller :
 
     def Set240MHzFreq(self) :
         return self.SetFreq(240000000)
+
+    # ---------------------------------------------------------------------------
+
+    def InitSDCardAndGetSize(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            self._exeCodeREPL('from machine import SDCard')
+            try :
+                return self._exeCodeREPL( 'try :\n'                         +
+                                          '  print(__sdCard.info()[0])\n'   +
+                                          'except :\n'                      +
+                                          '  __sdCard = SDCard()\n'         +
+                                          '  try :\n'                       +
+                                          '    print(__sdCard.info()[0])\n' +
+                                          '  except :\n'                    +
+                                          '    del __sdCard\n'              +
+                                          'del SDCard' )
+            except :
+                return None
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def CheckSDCardConf(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            size = self._exeCodeREPL('print(__sdCard.info()[0])')
+            try :
+                mountPoint = self._exeCodeREPL('print(__sdMountPt)')
+            except :
+                mountPoint = None
+            return dict( size = size, mountPoint = mountPoint )
+        except :
+            return None
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def MountSDCardFileSystem(self, mountPointName) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            return self._exeCodeREPL( 'from uos import mount\n' +
+                                      'try :\n'                 +
+                                      '  mount(__sdCard, %s)\n' % repr(mountPointName) +
+                                      '  __sdMountPt = %s\n'    % repr(mountPointName) +
+                                      '  return True\n'         +
+                                      'except :\n'              +
+                                      '  return False\n'        +
+                                      'finally :\n'             +
+                                      '  del mount' )
+        except :
+            return False
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def UmountSDCardFileSystem(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            return self._exeCodeREPL( 'from uos import umount\n' +
+                                      'try :\n'                  +
+                                      '  umount(__sdMountPt)\n'  +
+                                      '  del __sdMountPt\n'      +
+                                      '  return True\n'          +
+                                      'except :\n'               +
+                                      '  return False\n'         +
+                                      'finally :\n'              +
+                                      '  del umount' )
+        except :
+            return False
+        finally :
+            self._endProcess()
+            self._threadStartReading()
 
     # ---------------------------------------------------------------------------
 

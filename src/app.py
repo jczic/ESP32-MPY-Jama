@@ -21,7 +21,6 @@ import webbrowser
 import esptoolProc
 import json
 import conf
-import sys
 import os
 import gc
 

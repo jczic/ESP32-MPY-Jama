@@ -176,6 +176,7 @@ a:hover, a:focus, a:active {
     text-align: center;
     line-height: 19px;
     font-size: 12px;
+    text-shadow: 0px 0px 1px gray;
     background-size: 24px 24px;
     background-position-x: 2px;
     background-position-y: 2px;
@@ -248,6 +249,7 @@ input[type=button].menu-button {
     background-position-x: 8px;
     background-position-y: 6px;
     background-repeat: no-repeat;
+    text-shadow: 0px 0px 1px gray;
 } input[type=button].menu-button:hover { background-color: #66A0BE; }
 
 #browse-current-dir {
@@ -308,6 +310,7 @@ input[type=button].menu-button {
     right: 0;
     font-size: 10px;
     word-break: break-all;
+    text-shadow: 0px 0px 1px gray;
     overflow: hidden;
 }
 
@@ -1260,12 +1263,14 @@ input[type=button].tiny-btn-right {
 #menu-btn-net-info         { background-image: url('img/menu-net-info.png'); }
 #menu-btn-wifi-sta         { background-image: url('img/menu-wifi-sta.png'); }
 #menu-btn-wifi-ap          { background-image: url('img/menu-wifi-ap.png'); }
+#menu-btn-sdcard           { background-image: url('img/menu-sdcard.png'); }
 #menu-btn-reset            { background-image: url('img/menu-reset.png'); }
 #menu-btn-firmware         { background-image: url('img/menu-firmware-tools.png'); }
 
 #page-logo-jama-funcs      { background-image: url('img/menu-jama-funcs.png'); }
 #page-logo-sys-info        { background-image: url('img/menu-sys-info.png'); }
 #page-logo-networks-info   { background-image: url('img/menu-net-info.png'); }
+#page-logo-sdcard          { background-image: url('img/menu-sdcard.png'); }
 #page-logo-esptool         { background-image: url('img/menu-firmware-tools.png'); }
 #page-logo-no-esptool      { background-image: url('img/exclamation.png'); }
 

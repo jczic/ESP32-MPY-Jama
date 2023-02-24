@@ -55,6 +55,7 @@
             <input type="button" id="menu-btn-net-info"        class="menu-button" value="Networks info"      onclick="btnNetworksInfoClick(this);" />
             <input type="button" id="menu-btn-wifi-sta"        class="menu-button" value="Wi-Fi connection"   onclick="btnWiFiSTAClick(this);" />
             <input type="button" id="menu-btn-wifi-ap"         class="menu-button" value="Wi-Fi access point" onclick="btnWiFiAPClick(this);" />
+            <!--<input type="button" id="menu-btn-sdcard"          class="menu-button" value="SD card"            onclick="btnSDCardClick(this);" />-->
             <input type="button" id="menu-btn-reset"           class="menu-button" value="Hard reset"         onclick="btnHardResetClick(this);" />
             <input type="button" id="menu-btn-firmware"        class="menu-button" value="Firmware tools"     onclick="btnFirmwareToolsClick(this);" />
         </div>
@@ -305,6 +306,16 @@
                         <span id="label-netnfo-ble-active"></span><span id="close-IF-BLE"> (<a href="#" onclick="closeWirelessInterfaceClick(this, 'BLE');">close</a>)</span><br />
                         <span id="label-netnfo-ble-mac"></span><br />
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-sdcard" class="page-container">
+            <div class="page">
+                <div id="page-logo-sdcard" class="page-logo"></div>
+                <div class="page-title">Manage the SD card of your ESP32 device.</div>
+                <div class="properties-container-large">
+                    Not implemented
                 </div>
             </div>
         </div>

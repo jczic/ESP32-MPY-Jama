@@ -682,7 +682,7 @@ function setPinsList(pList) {
 }
 
 function deviceReset() {
-    writeTextInTerminal("\n* ESP32 has been reset!\n", "terminal-IndianRed");
+    writeTextInTerminal("\n* ESP32 has been reset!\n\n", "terminal-IndianRed");
     var actPage = getActivePage();
     if (actPage)
         if (actPage.id == "page-networks-info")
@@ -1385,6 +1385,7 @@ function setSwitchButton(btnSwitch) {
             wsSendCmd("GET-LIST-DIR", browsePath);
     }
 }
+
 function showIDE() {
     showPage("page-ide");
     show("ide-code");
@@ -1416,6 +1417,10 @@ function btnIDEClick(e) {
     if (connectionState)
         setSwitchButton(getElmById("switch-btn-browse"));
     showIDE();
+}
+
+function btnSDCardClick(e) {
+    showPage("page-sdcard");
 }
 
 function btnHardResetClick(e) {
