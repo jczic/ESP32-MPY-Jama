@@ -176,6 +176,11 @@ class ESP32Controller :
             raise ESP32ControllerException('Cannot open serial port "%s".' % devicePort)
 
         try :
+            self._serialCheckUntilNoData(timeoutSec=3)
+        except :
+            raise ESP32ControllerException('The device on the "%s" port seems busy.' % devicePort)
+
+        try :
             self.InterruptProgram()
             self._switchToRawMode()
             machineNfo          = self._exeCodeREPL('import uos; [x.strip() for x in uos.uname().machine.split("with")]')
@@ -360,6 +365,24 @@ class ESP32Controller :
 
    # ---------------------------------------------------------------------------
 
+    def _serialCheckUntilNoData(self, timeoutSec) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        maxTime = (time() + timeoutSec)
+        sleep(0.150)
+        while True :
+            b = self._repl.read_all()
+            if b is None :
+                self._raiseConnectionError()
+            elif not b :
+                break
+            if time() >= maxTime :
+                raise ESP32ControllerException('Timeout...')
+            else :
+                sleep(0.500)
+
+    # ---------------------------------------------------------------------------
+
     def InterruptProgram(self) :
         if not self._isConnected :
             raise self._raiseConnectionError()
@@ -378,7 +401,7 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
-    def _readUntil(self, readyBytes, timeoutSec=1, lockRead=True) :
+    def _serialReadUntil(self, b, timeoutSec=1, lockRead=True) :
         if not self._isConnected :
             self._raiseConnectionError()
         if lockRead :
@@ -386,7 +409,7 @@ class ESP32Controller :
         savedTimeout = self._repl.timeout
         self._repl.timeout = timeoutSec
         try :
-            b = self._repl.read_until(readyBytes)
+            b = self._repl.read_until(b)
         except :
             b = None
         self._repl.timeout = savedTimeout
@@ -394,7 +417,7 @@ class ESP32Controller :
             self._lockRead.release()
         if b is None :
             self._raiseConnectionError()
-        elif not b.endswith(readyBytes) :
+        elif not b.endswith(b) :
             raise ESP32ControllerException('Timeout...')
         return b.decode()
 
@@ -435,7 +458,7 @@ class ESP32Controller :
             with self._lockWrite :
                 self._repl.write(b'\x01')
                 self._repl.flush()
-            self._readUntil(b'exit\r\n>', timeoutSec=3, lockRead=False)
+            self._serialReadUntil(b'exit\r\n>', lockRead=False)
         except :
             self._raiseConnectionError()
 
@@ -448,7 +471,7 @@ class ESP32Controller :
             with self._lockWrite :
                 self._repl.write(b'\x02')
                 self._repl.flush()
-            self._readUntil(b'\r\n>>> ', timeoutSec=3, lockRead=False)
+            self._serialReadUntil(b'\r\n>>> ', lockRead=False)
         except :
             self._raiseConnectionError()
 
@@ -507,7 +530,7 @@ class ESP32Controller :
                 self._repl.flush()
         except :
             self._raiseConnectionError()
-        r = self._readUntil(b'\x04>', timeoutSec=timeoutSec)
+        r = self._serialReadUntil(b'\x04>', timeoutSec=timeoutSec)
         if len(r) >= 5 and r.startswith('OK') :
             if r[-3] == '\x04' :
                 r = r[2:-3]
