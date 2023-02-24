@@ -172,15 +172,20 @@ class ESP32Controller :
                                  xonxoff   = False,
                                  exclusive = True )
             self._isConnected = True
+        except :
+            raise ESP32ControllerException('Cannot open serial port "%s".' % devicePort)
+
+        try :
             self.InterruptProgram()
             self._switchToRawMode()
-            machineNfo = self._exeCodeREPL('import uos; [x.strip() for x in uos.uname().machine.split("with")]')
-            self._machineModule = (machineNfo[0] if len(machineNfo) >= 1 else None)
-            self._machineMCU    = (machineNfo[1] if len(machineNfo) >= 2 else None)
-            self._onSerialConnError = onSerialConnError
+            machineNfo          = self._exeCodeREPL('import uos; [x.strip() for x in uos.uname().machine.split("with")]')
+            self._machineModule = (machineNfo[0] if len(machineNfo) >= 1 else '')
+            self._machineMCU    = (machineNfo[1] if len(machineNfo) >= 2 else '')
         except :
-            raise ESP32ControllerException('Cannot open serial "%s" to device.' % devicePort)
-
+            raise ESP32ControllerException('The device on the "%s" port is not compatible.' % devicePort)
+            
+        self._onSerialConnError = onSerialConnError
+        
         try :
             start_new_thread(self._threadProcess, ())
             while not self._threadRunning :
@@ -188,7 +193,7 @@ class ESP32Controller :
             self._threadStartReading()
         except :
             self._threadRunning = False
-            raise ESP32ControllerException('Cannot create thread.')
+            raise ESP32ControllerException('Error to create an internal thread.')
 
     # ---------------------------------------------------------------------------
 

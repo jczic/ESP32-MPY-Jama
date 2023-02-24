@@ -289,6 +289,7 @@ class Application :
     def _connectSerial(self, devicePort) :
         if not self.esp32Ctrl :
             self._wsSendCmd('SHOW-WAIT', 'Try to connect to the device...')
+            Err = None
             if devicePort :
                 try :
                     self.esp32Ctrl = ESP32Controller( devicePort        = devicePort,
@@ -298,8 +299,8 @@ class Application :
                                                       onProgramError    = self._onProgramError,
                                                       onProgramStopped  = self._onProgramStopped,
                                                       onDeviceReset     = self._onDeviceReset )
-                except :
-                    pass
+                except Exception as ex :
+                    Err = str(ex)
             else :
                 self.esp32Ctrl = ESP32Controller.GetFirstAvailableESP32Ctrl( onSerialConnError = self._onSerialConnError,
                                                                              onTerminalRecv    = self._onTerminalRecv,
@@ -317,7 +318,7 @@ class Application :
                 self._sendPinsList()
                 self._sendAutoInfo()
             else :
-                self._wsSendCmd('SHOW-ERROR', 'Unable to connect to the device.')
+                self._wsSendCmd('SHOW-ERROR', Err if Err else 'No compatible device was found.')
 
     # ------------------------------------------------------------------------
 
