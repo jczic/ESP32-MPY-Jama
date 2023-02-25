@@ -48,6 +48,8 @@ var contentRemotePath         = "";
 var keepTabCodeElm            = null;
 var keepCloseTabCodeElm       = false;
 
+var execAnimShowTime          = null;
+
 var execJamaFuncConfig        = null;
 var execJamaStopTimeout       = null;
 
@@ -583,7 +585,6 @@ function setSerialPorts(list) {
 function execCodeBegin() {
     if (processing == PRC_EXEC_CODE || processing == PRC_EXEC_JAMA) {
         refreshExecAndStopBtns();
-        showInline("img-processing");
         if (processing == PRC_EXEC_JAMA) {
             var name = execJamaFuncConfig.info.name;
             var ver  = String(execJamaFuncConfig.info.version).replaceAll(",", ".");
@@ -610,7 +611,13 @@ function execCodeBegin() {
                 },
                 timeoutSec * 1000 );    
         }
+        execAnimShowTime = setTimeout( function() {
+            execAnimShowTime = null;
+            showInline("img-processing");
+        },
+        500 );
     }
+
 }
 
 function execCodeRecv(text) {
@@ -635,6 +642,8 @@ function execCodeEnd(normalFinished) {
             if (normalFinished)
                 writeTextInTerminal("\n* Jama Func finished.\n", "terminal-SeaGreen");
         }
+        if (execAnimShowTime != null)
+            clearInterval(execAnimShowTime);
         writeTextInTerminal("\n");
         processing = PRC_NONE;
         refreshExecAndStopBtns();
