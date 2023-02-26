@@ -55,7 +55,7 @@
             <input type="button" id="menu-btn-net-info"        class="menu-button" value="Networks info"      onclick="btnNetworksInfoClick(this);" />
             <input type="button" id="menu-btn-wifi-sta"        class="menu-button" value="Wi-Fi connection"   onclick="btnWiFiSTAClick(this);" />
             <input type="button" id="menu-btn-wifi-ap"         class="menu-button" value="Wi-Fi access point" onclick="btnWiFiAPClick(this);" />
-            <!--<input type="button" id="menu-btn-sdcard"          class="menu-button" value="SD card"            onclick="btnSDCardClick(this);" />-->
+            <input type="button" id="menu-btn-sdcard"          class="menu-button" value="SD card"            onclick="btnSDCardClick(this);" />
             <input type="button" id="menu-btn-reset"           class="menu-button" value="Hard reset"         onclick="btnHardResetClick(this);" />
             <input type="button" id="menu-btn-firmware"        class="menu-button" value="Firmware tools"     onclick="btnFirmwareToolsClick(this);" />
         </div>
@@ -313,33 +313,39 @@
         <div id="page-sdcard" class="page-container">
             <div class="page">
                 <div id="page-logo-sdcard" class="page-logo"></div>
-                <div class="page-title">Manage the SD card of your ESP32 device.</div>
+                <div class="page-title">Manage your SD card in your ESP32 device.</div>
                 <div class="properties-container-large">
-                    Not implemented.<br />
-                    Blah blah blah...
+                    Initialize and access your SD card if your board is equipped with one.<br />
+                    However, make sure your board uses the ESP32 pins provided by default for the primary SD card.
                 </div>
-                <div class="properties-container">
+                <div class="properties-container-mini">
                     <br />
-                    <div class="properties-title">SD card A</div>
+                    <div class="properties-title">SD card</div>
                     <div class="properties-left">
-                        Blah 1:<br />
-                        Blah 2:<br />
+                        Initialized:<br />
+                        Size:<br />
                     </div>
                     <div class="properties-right">
-                        <span id="label-sysnfo-freq">Blabla</span> (<a id="change-freq" href="#">change</a>)<br />
-                        <span id="label-sysnfo-flash-size">toto</span>
+                        <span id="label-sdcard-init"></span>
+                        <span id="sdcard-init"> (<a href="#" onclick="initSDCardClick(this);">initialize</a>)</span>
+                        <span id="sdcard-format"> (<a href="#" onclick="formatSDCardClick(this);">format</a>)</span>
+                        <br />
+                        <span id="label-sdcard-size"></span>
                     </div>
                 </div>
-                <div class="properties-container">
+                <div class="properties-container-mini">
                     <br />
-                    <div class="properties-title">SD card B</div>
+                    <div class="properties-title">File system</div>
                     <div class="properties-left">
-                        Blah 1:<br />
-                        Blah 2:<br />
+                        Mounted<br />
+                        Mounted point name:<br />
                     </div>
                     <div class="properties-right">
-                        <span id="label-sysnfo-freq">Blabla</span> (<a id="change-freq" href="#">change</a>)<br />
-                        <span id="label-sysnfo-flash-size">toto</span><br />
+                        <span id="label-sdcard-mounted"></span>
+                        <span id="sdcard-mount"> (<a href="#" onclick="mountSDCardClick(this);">mount</a>)</span>
+                        <span id="sdcard-umount"> (<a href="#" onclick="umountSDCardClick(this);">umount</a>)</span>
+                        <br />
+                        <span id="sdcard-mounted-point"></span><br />
                     </div>
                 </div>
             </div>

@@ -308,6 +308,9 @@ function onWSMessage(evt)
         case "ESPTOOL-VER" :
             setEsptoolPage(o.ARG);
             break;
+        case "SDCARD-CONF" :
+            setSDCardConf(o.ARG)
+            break;
         case "DEVICE-INFO" :
             setDeviceInfo(o.ARG);
             break;
@@ -698,6 +701,8 @@ function deviceReset() {
             wsSendCmd("GET-NETWORKS-INFO", true);
         if (actPage.id == "page-system-info")
             wsSendCmd("GET-SYS-INFO", true);
+        if (actPage.id == "page-sdcard")
+            wsSendCmd("GET-SDCARD-CONF", true);
 }
 
 function showGPIOInfos() {
@@ -756,99 +761,95 @@ function recvJamaFuncConfig(config) {
 }
 
 function openJamaFuncsConfig(config) {
-    if (connectionState) {
-        var ver = String(config.info.version).replaceAll(",", ".");
-        getElmById("exec-jama-funcs-title").innerText       = config.info.name + " v" + ver;
-        getElmById("exec-jama-funcs-description").innerText = config.info.description;
-        getElmById("exec-jama-funcs-author").innerText      = "Developed by " + config.info.author;
-        rmElmChildren("exec-jama-funcs-args");
-        var argsTitle = getElmById("exec-jama-funcs-args-title");
-        var argsElm   = getElmById("exec-jama-funcs-args");
-        if (config.args && Object.keys(config.args).length > 0) {
-            for (var arg in config.args) {
-                var labelElm       = newElm("div", null, ["left"]);
-                labelElm.innerText = "▶️ " + config.args[arg].label;
-                argsElm.appendChild(labelElm);
-                var type     = config.args[arg].type;
-                var value    = config.args[arg].value;
-                var fieldElm = null;
-                if (type == "str") {
-                    fieldElm = newElm("input", null, ["exec-jama-funcs-input"]);
-                    fieldElm.setAttribute("type", "text");
-                    fieldElm.setAttribute("spellcheck", "false");
-                    if (value)
-                        fieldElm.value = value;
-                }
-                else if (type == "int") {
-                    fieldElm = newElm("input", null, ["exec-jama-funcs-input"]);
-                    fieldElm.setAttribute("type", "number");
-                    fieldElm.value = (value ? value : "0");
-                }
-                else if (type == "float") {
-                    fieldElm = newElm("input", null, ["exec-jama-funcs-input"]);
-                    fieldElm.setAttribute("type", "number");
-                    fieldElm.setAttribute("step", "0.01");
-                    fieldElm.value = (value ? value : "0.00");
-                }
-                else if (type == "bool") {
-                    fieldElm = newElm("div", null, ["exec-jama-funcs-input", "exec-jama-funcs-bool"]);
-                    if (value)
-                        fieldElm.classList.add("exec-jama-funcs-bool-on");
-                    else
-                        fieldElm.classList.add("exec-jama-funcs-bool-off");
-                    fieldElm.addEventListener( "click", function(e) {
-                        e.preventDefault();
-                        var elm = e.currentTarget;
-                        classToggle(elm, "exec-jama-funcs-bool-off", "exec-jama-funcs-bool-on");
-                    } );
-                }
-                else if (type == "list") {
-                    fieldElm   = newElm("select", null, ["exec-jama-funcs-input"]);
-                    var optElm = newElm("option", null, null);
-                    optElm.value = "";
-                    optElm.text  = "No GPIO";
-                    fieldElm.appendChild(optElm);
-                    for (var pin in pinsList) {
-                        var optElm   = newElm("option", null, null);
-                        optElm.value = pin;
-                        optElm.text  = "GPIO-" + pin;
-                        fieldElm.appendChild(optElm);
-                    }
-                    btnElm = newElm("input", null, ["button-little-text", "right"]);
-                    btnElm.type  = 'button';
-                    btnElm.value = ' ? ';
-                    btnElm.addEventListener("click", function(e) { showGPIOInfos(); });
-                    argsElm.appendChild(btnElm);
-                }
-                else if (type == "dict") {
-                    fieldElm  = newElm("select", null, ["exec-jama-funcs-input"]);
-                    var items = config.args[arg].items;
-                    for (var item in items) {
-                        var optElm   = newElm("option", null, null);
-                        optElm.value = item;
-                        optElm.text  = items[item];
-                        fieldElm.appendChild(optElm);
-                    }
-                    if (config.args[arg].value)
-                        fieldElm.value = config.args[arg].value;
-                }
-                if (fieldElm) {
-                    fieldElm.classList.add("exec-jama-funcs-args-field");
-                    argsElm.appendChild(fieldElm);
-                }
+    var ver = String(config.info.version).replaceAll(",", ".");
+    getElmById("exec-jama-funcs-title").innerText       = config.info.name + " v" + ver;
+    getElmById("exec-jama-funcs-description").innerText = config.info.description;
+    getElmById("exec-jama-funcs-author").innerText      = "Developed by " + config.info.author;
+    rmElmChildren("exec-jama-funcs-args");
+    var argsTitle = getElmById("exec-jama-funcs-args-title");
+    var argsElm   = getElmById("exec-jama-funcs-args");
+    if (config.args && Object.keys(config.args).length > 0) {
+        for (var arg in config.args) {
+            var labelElm       = newElm("div", null, ["left"]);
+            labelElm.innerText = "▶️ " + config.args[arg].label;
+            argsElm.appendChild(labelElm);
+            var type     = config.args[arg].type;
+            var value    = config.args[arg].value;
+            var fieldElm = null;
+            if (type == "str") {
+                fieldElm = newElm("input", null, ["exec-jama-funcs-input"]);
+                fieldElm.setAttribute("type", "text");
+                fieldElm.setAttribute("spellcheck", "false");
+                if (value)
+                    fieldElm.value = value;
             }
-            showElm(argsTitle);
-            showElm(argsElm);
+            else if (type == "int") {
+                fieldElm = newElm("input", null, ["exec-jama-funcs-input"]);
+                fieldElm.setAttribute("type", "number");
+                fieldElm.value = (value ? value : "0");
+            }
+            else if (type == "float") {
+                fieldElm = newElm("input", null, ["exec-jama-funcs-input"]);
+                fieldElm.setAttribute("type", "number");
+                fieldElm.setAttribute("step", "0.01");
+                fieldElm.value = (value ? value : "0.00");
+            }
+            else if (type == "bool") {
+                fieldElm = newElm("div", null, ["exec-jama-funcs-input", "exec-jama-funcs-bool"]);
+                if (value)
+                    fieldElm.classList.add("exec-jama-funcs-bool-on");
+                else
+                    fieldElm.classList.add("exec-jama-funcs-bool-off");
+                fieldElm.addEventListener( "click", function(e) {
+                    e.preventDefault();
+                    var elm = e.currentTarget;
+                    classToggle(elm, "exec-jama-funcs-bool-off", "exec-jama-funcs-bool-on");
+                } );
+            }
+            else if (type == "list") {
+                fieldElm   = newElm("select", null, ["exec-jama-funcs-input"]);
+                var optElm = newElm("option", null, null);
+                optElm.value = "";
+                optElm.text  = "No GPIO";
+                fieldElm.appendChild(optElm);
+                for (var pin in pinsList) {
+                    var optElm   = newElm("option", null, null);
+                    optElm.value = pin;
+                    optElm.text  = "GPIO-" + pin;
+                    fieldElm.appendChild(optElm);
+                }
+                btnElm = newElm("input", null, ["button-little-text", "right"]);
+                btnElm.type  = 'button';
+                btnElm.value = ' ? ';
+                btnElm.addEventListener("click", function(e) { showGPIOInfos(); });
+                argsElm.appendChild(btnElm);
+            }
+            else if (type == "dict") {
+                fieldElm  = newElm("select", null, ["exec-jama-funcs-input"]);
+                var items = config.args[arg].items;
+                for (var item in items) {
+                    var optElm   = newElm("option", null, null);
+                    optElm.value = item;
+                    optElm.text  = items[item];
+                    fieldElm.appendChild(optElm);
+                }
+                if (config.args[arg].value)
+                    fieldElm.value = config.args[arg].value;
+            }
+            if (fieldElm) {
+                fieldElm.classList.add("exec-jama-funcs-args-field");
+                argsElm.appendChild(fieldElm);
+            }
         }
-        else {
-            hideElm(argsTitle);
-            hideElm(argsElm);
-        }
-        execJamaFuncConfig = config;
-        showPage("page-exec-jama-funcs");
+        showElm(argsTitle);
+        showElm(argsElm);
     }
-    else
-        showError("The device must be connected first.");
+    else {
+        hideElm(argsTitle);
+        hideElm(argsElm);
+    }
+    execJamaFuncConfig = config;
+    showPage("page-exec-jama-funcs");
 }
 
 function recvJamaFuncImported(config) {
@@ -1310,11 +1311,29 @@ function setEsptoolPage(ver) {
 }
 
 function sizeToText(size, unity) {
+    if (size >= 1024*1024*1024)
+        return Math.round(size/1024/1024/1024*100)/100 + " G" + unity[0];
     if (size >= 1024*1024)
         return Math.round(size/1024/1024*100)/100 + " M" + unity[0];
     if (size >= 1024)
         return Math.round(size/1024*100)/100 + " K" + unity[0];
     return size + " " + unity;
+}
+
+function setSDCardConf(conf) {
+    var ok = (conf != null);
+    setTextTag("label-sdcard-init", (ok ? "Yes" : "No"), ok);
+    if (!ok) showInline("sdcard-init"); else hide("sdcard-init");
+    if (ok && conf.mountPoint == null) showInline("sdcard-format"); else hide("sdcard-format");
+    getElmById("label-sdcard-size").innerText = (ok ? sizeToText(conf.size, "octets") : "Unavailable");
+    ok = (ok && conf.mountPoint != null);
+    setTextTag("label-sdcard-mounted", (ok ? "Yes" : "No"), ok);
+    if (!ok && conf != null) showInline("sdcard-mount"); else hide("sdcard-mount");
+    if (ok) showInline("sdcard-umount"); else hide("sdcard-umount");
+    getElmById("sdcard-mounted-point").innerText = (ok ? '"' + conf.mountPoint + '"' : "Unavailable");
+    showPage("page-sdcard");
+    if (connectionState)
+        wsSendCmd("GET-LIST-DIR", browsePath);
 }
 
 function setDeviceInfo(info) {
@@ -1429,7 +1448,7 @@ function btnIDEClick(e) {
 }
 
 function btnSDCardClick(e) {
-    showPage("page-sdcard");
+    wsSendCmd("GET-SDCARD-CONF", false);
 }
 
 function btnHardResetClick(e) {
@@ -1497,6 +1516,41 @@ function elmAPAuthChange(e) {
         hide("elm-AP-key-container");
 }
 
+function initSDCardClick(e) {
+    wsSendCmd("SDCARD-INIT", null);
+}
+
+function formatSDCardClick(e) {
+    boxDialogYesNo( "FORMAT?",
+    "Are you sure you want to format the SD card that is in the device?\n\n" +
+    "Warning: All your files stored on it will be lost!",
+    function(yes) {
+        if (yes)
+            wsSendCmd("SDCARD-FORMAT", null);
+    } );
+}
+
+function mountSDCardClick(e) {
+    boxDialogQuery( "Mount the SD card:",
+                    "Enter a name to mount the SD card to the device's file system:",
+                    "/sd",
+                    function(name) {
+                        name = name.trim();
+                        if (name != "") {
+                            if (name[0] != "/")
+                                name = "/" + name;
+                            if (name.length > 1 && name.length < 256 && name.split("/").length-1 == 1)
+                                wsSendCmd("SDCARD-MOUNT", name);
+                            else
+                                showError("The name of this mount point is incorrect.");
+                        }
+                    } );
+}
+
+function umountSDCardClick(e) {
+    wsSendCmd("SDCARD-UMOUNT", null);
+}
+
 function btnTerminalClick(e) {
     showREPL();
 }
@@ -1544,6 +1598,12 @@ function setConnectionState(connected) {
     getElmById("btn-connection").value = (connected ? "Disconnect" : "  Connect") + " device";
     setTextTag("label-connection", "DEVICE " + (connected ? "CONNECTED" : "NOT CONNECTED"), connected);
     if (!connected) {
+        var actPage = getActivePage();
+        if ( actPage && ( actPage.id == "page-networks-info" ||
+                          actPage.id == "page-system-info"   ||
+                          actPage.id == "page-sdcard" ) )
+            hideElm(actPage)
+        setSwitchButton(getElmById("switch-btn-menu"));
         hide("panel-connection");
         setListDirAndFiles("", { });
         setCurrentDirLabel(null);

@@ -80,6 +80,8 @@ class Application :
 
     @staticmethod
     def _sizeToText(size, unity) :
+        if size >= 1024*1024*1024 :
+            return '%s G%s' % (round(size/1024/1024/1024*100)/100, unity[0])
         if size >= 1024*1024 :
             return '%s M%s' % (round(size/1024/1024*100)/100, unity[0])
         if size >= 1024 :
@@ -232,6 +234,16 @@ class Application :
                 self._installPackage(arg)
             elif cmd == 'SET-MCU-FREQ' :
                 self._setMCUFreq(arg)
+            elif cmd == 'SDCARD-INIT' :
+                self._initSDCard()
+            elif cmd == 'SDCARD-FORMAT' :
+                self._formatSDCard()
+            elif cmd == 'GET-SDCARD-CONF' :
+                self._sendSDCardConf(arg)
+            elif cmd == 'SDCARD-MOUNT' :
+                self._mountSDCard(arg)
+            elif cmd == 'SDCARD-UMOUNT' :
+                self._umountSDCard()
             elif cmd == "CLOSE-SOFTWARE" :
                 self._closeSoftware()
             elif cmd == "OPEN-URL" :
@@ -288,9 +300,9 @@ class Application :
 
     def _connectSerial(self, devicePort) :
         if not self.esp32Ctrl :
-            self._wsSendCmd('SHOW-WAIT', 'Try to connect to the device...')
             Err = None
             if devicePort :
+                self._wsSendCmd('SHOW-WAIT', 'Try to connect to the device...')
                 try :
                     self.esp32Ctrl = ESP32Controller( devicePort        = devicePort,
                                                       onSerialConnError = self._onSerialConnError,
@@ -302,6 +314,7 @@ class Application :
                 except Exception as ex :
                     Err = str(ex)
             else :
+                self._wsSendCmd('SHOW-WAIT', 'Search for a device to connect to...')
                 self.esp32Ctrl = ESP32Controller.GetFirstAvailableESP32Ctrl( onSerialConnError = self._onSerialConnError,
                                                                              onTerminalRecv    = self._onTerminalRecv,
                                                                              onEndOfProgram    = self._onEndOfProgram,
@@ -534,8 +547,12 @@ class Application :
     def _sendListDir(self, path) :
         if self._ableToUseDevice(silence=True) :
             try :
-                self._wsSendCmd('LIST-DIR', dict( path    = path,
-                                                  entries = self.esp32Ctrl.GetListDir(path)) )
+                try :
+                    entries = self.esp32Ctrl.GetListDir(path)
+                except :
+                    path    = self.esp32Ctrl.GetFlashRootPath()
+                    entries = self.esp32Ctrl.GetListDir(path)
+                self._wsSendCmd('LIST-DIR', dict( path = path, entries = entries ))
             except :
                 self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
 
@@ -579,18 +596,18 @@ class Application :
 
     def _sendSysInfo(self, silence) :
         if self._ableToUseDevice(silence) :
-            if (not silence) :
+            if not silence :
                 self._wsSendCmd('SHOW-WAIT', 'Collecting informations...')
             try :
                 o = dict( freq      = self.esp32Ctrl.GetMHzFreq(),
                           flashSize = self.esp32Ctrl.GetFlashSize(),
                           os        = self.esp32Ctrl.GetPlatformInfo(),
                           pins      = self.esp32Ctrl.GetPinsState() )
-                if (not silence) :
+                if not silence :
                     self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('SYS-INFO', o)
             except :
-                if (not silence) :
+                if not silence :
                     self._wsSendCmd('HIDE-WAIT')
                     self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
 
@@ -598,7 +615,7 @@ class Application :
 
     def _sendNetworksInfo(self, silence) :
         if self._ableToUseDevice(silence) :
-            if (not silence) :
+            if not silence :
                 self._wsSendCmd('SHOW-WAIT', 'Collecting informations...')
             try :
                 wifiSTACnf = self.esp32Ctrl.GetWiFiConfig(ap=False)
@@ -634,11 +651,11 @@ class Application :
                           ),
                           internetOK = internetOk
                 )
-                if (not silence) :
+                if not silence :
                     self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('NETWORKS-INFO', o)
             except :
-                if (not silence) :
+                if not silence :
                     self._wsSendCmd('HIDE-WAIT')
                     self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
 
@@ -1182,6 +1199,80 @@ class Application :
 
     # ------------------------------------------------------------------------
 
+    def _initSDCard(self) :
+        if self._ableToUseDevice() :
+            try :
+                if self.esp32Ctrl.InitSDCardAndGetSize() :
+                    self._sendSDCardConf()
+                else :
+                    self._wsSendCmd('SHOW-ERROR', 'No SD card is present.')
+            except ESP32ControllerCodeException :
+                self._wsSendCmd('SHOW-ERROR', 'The MicroPython port of your device does not implement SD card support.')
+            except :
+                self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+
+    def _formatSDCard(self) :
+        if self._ableToUseDevice() :
+            try :
+                self._wsSendCmd('SHOW-WAIT', 'Format SD card...')
+                if self.esp32Ctrl.FormatSDCard() :
+                    self._sendSDCardConf(silence=True)
+                    self._wsSendCmd('HIDE-WAIT')
+                    self._wsSendCmd('SHOW-INFO', 'The SD card has been formated.')
+                else :
+                    self._wsSendCmd('HIDE-WAIT')
+                    self._wsSendCmd('SHOW-ERROR', 'Unable to format the SD card.')
+            except :
+                self._wsSendCmd('HIDE-WAIT')
+                self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+
+    # ------------------------------------------------------------------------
+
+    def _sendSDCardConf(self, silence=False) :
+        if self._ableToUseDevice(silence) :
+            if not silence :
+                self._wsSendCmd('SHOW-WAIT', 'Collecting informations...')
+            try :
+                conf = self.esp32Ctrl.GetSDCardConf()
+                self._wsSendCmd('SDCARD-CONF', dict( size       = conf['size'],
+                                                     mountPoint = conf['mountPoint'] )
+                                               if conf else None )
+                if not silence :
+                    self._wsSendCmd('HIDE-WAIT')
+            except :
+                if not silence :
+                    self._wsSendCmd('HIDE-WAIT')
+                    self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+    
+    def _mountSDCard(self, mountPointName) :
+        if self._ableToUseDevice() :
+            try :
+                if self.esp32Ctrl.MountSDCardFileSystem(mountPointName) :
+                    self._sendSDCardConf()
+                else :
+                    self._wsSendCmd('SHOW-ERROR', 'The file system of the SD card cannot be mounted on the device.')
+            except :
+                self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+
+    def _umountSDCard(self) :
+        if self._ableToUseDevice() :
+            try :
+                if self.esp32Ctrl.UmountSDCardFileSystem() :
+                    self._sendSDCardConf()
+                else :
+                    self._wsSendCmd('SHOW-ERROR', 'Impossible to umount the file system of the SD card.')
+            except :
+                self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+    
     def _sendAutoInfo(self) :
         if self._ableToUseDevice(silence=True) :
             try :

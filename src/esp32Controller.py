@@ -768,6 +768,7 @@ class ESP32Controller :
         try :
             entries = self._exeCodeREPL( 'from os import ilistdir\n' +
                                          '__ent = [ ]\n'             +
+                                         '__x = None\n'              +
                                          'for __x in ilistdir(%s) :\n' % repr(path) +
                                          '  __ent.append(__x)\n'     +
                                          'print(__ent)\n'            +
@@ -1318,14 +1319,17 @@ class ESP32Controller :
         try :
             self._exeCodeREPL('from machine import SDCard')
             try :
-                return self._exeCodeREPL( 'try :\n'                         +
-                                          '  print(__sdCard.info()[0])\n'   +
-                                          'except :\n'                      +
-                                          '  __sdCard = SDCard()\n'         +
-                                          '  try :\n'                       +
-                                          '    print(__sdCard.info()[0])\n' +
-                                          '  except :\n'                    +
-                                          '    del __sdCard\n'              +
+                return self._exeCodeREPL( 'try :\n'                           +
+                                          '  print(__sdCard.info()[0])\n'     +
+                                          'except :\n'                        +
+                                          '  try :\n'                         +
+                                          '    __sdCard = SDCard()\n'         +
+                                          '    try :\n'                       +
+                                          '      print(__sdCard.info()[0])\n' +
+                                          '    except :\n'                    +
+                                          '      del __sdCard\n'              +
+                                          '  except :\n'                      +
+                                          '      pass\n'                      +
                                           'del SDCard' )
             except :
                 return None
@@ -1335,15 +1339,37 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
-    def CheckSDCardConf(self) :
+    def FormatSDCard(self) :
         if not self._isConnected :
             self._raiseConnectionError()
         self._threadStopReading()
         self._beginProcess()
         try :
-            size = self._exeCodeREPL('print(__sdCard.info()[0])')
+            return self._exeCodeREPL( 'from os import VfsFat\n'   +
+                                      'try :\n'                   +
+                                      '  VfsFat.mkfs(__sdCard)\n' +
+                                      '  print(True)\n'           +
+                                      'except :\n'                +
+                                      '  print(False)\n'          +
+                                      'finally :\n'               +
+                                      '  del VfsFat' )
+        except :
+            return False
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def GetSDCardConf(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            size = self._exeCodeREPL('__sdCard.info()[0]')
             try :
-                mountPoint = self._exeCodeREPL('print(__sdMountPt)')
+                mountPoint = self._exeCodeREPL('__sdMountPt')
             except :
                 mountPoint = None
             return dict( size = size, mountPoint = mountPoint )
@@ -1355,7 +1381,7 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
-    def MountSDCardFileSystem(self, mountPointName) :
+    def MountSDCardFileSystem(self, mountPointName='/sd') :
         if not self._isConnected :
             self._raiseConnectionError()
         self._threadStopReading()
@@ -1365,9 +1391,9 @@ class ESP32Controller :
                                       'try :\n'                 +
                                       '  mount(__sdCard, %s)\n' % repr(mountPointName) +
                                       '  __sdMountPt = %s\n'    % repr(mountPointName) +
-                                      '  return True\n'         +
+                                      '  print(True)\n'         +
                                       'except :\n'              +
-                                      '  return False\n'        +
+                                      '  print(False)\n'        +
                                       'finally :\n'             +
                                       '  del mount' )
         except :
@@ -1388,9 +1414,9 @@ class ESP32Controller :
                                       'try :\n'                  +
                                       '  umount(__sdMountPt)\n'  +
                                       '  del __sdMountPt\n'      +
-                                      '  return True\n'          +
+                                      '  print(True)\n'          +
                                       'except :\n'               +
-                                      '  return False\n'         +
+                                      '  print(False)\n'         +
                                       'finally :\n'              +
                                       '  del umount' )
         except :
