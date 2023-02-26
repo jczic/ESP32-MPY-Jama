@@ -140,6 +140,7 @@ class ESP32Controller :
     def __init__( self,
                   devicePort,
                   baudrate          = 115200,
+                  connectTimeoutSec = 3,
                   onSerialConnError = None,
                   onTerminalRecv    = None,
                   onEndOfProgram    = None,
@@ -177,7 +178,7 @@ class ESP32Controller :
 
         try :
             self.InterruptProgram()
-            self._switchToRawMode(timeoutSec=3)
+            self._switchToRawMode(timeoutSec=connectTimeoutSec)
             machineNfo          = self._exeCodeREPL('import uos; [x.strip() for x in uos.uname().machine.split("with")]')
             self._machineModule = (machineNfo[0] if len(machineNfo) >= 1 else '')
             self._machineMCU    = (machineNfo[1] if len(machineNfo) >= 2 else '')
@@ -364,7 +365,7 @@ class ESP32Controller :
 
     def InterruptProgram(self) :
         if not self._isConnected :
-            raise self._raiseConnectionError()
+            self._raiseConnectionError()
         try :
             with self._lockWrite :
                 self._repl.write(b'\x03\x03')
@@ -430,7 +431,7 @@ class ESP32Controller :
 
     def _switchToRawMode(self, timeoutSec=1) :
         if not self._isConnected :
-            raise self._raiseConnectionError()
+            self._raiseConnectionError()
         timeoutExists = False
         maxTime       = (time() + timeoutSec)
         while True :
@@ -447,19 +448,22 @@ class ESP32Controller :
                 if time() >= maxTime :
                     raise ESP32ControllerException('Timeout...')
         if timeoutExists :
-            while True :
-                sleep(0.250)
-                x = self._repl.in_waiting
-                if x :
-                    self._repl.read(x)
-                else :
-                    break
+            try :
+                while True :
+                    sleep(0.250)
+                    x = self._repl.in_waiting
+                    if x :
+                        self._repl.read(x)
+                    else :
+                        break
+            except :
+                self._raiseConnectionError()
 
     # ---------------------------------------------------------------------------
 
     def _switchToNormalMode(self, timeoutSec=1) :
         if not self._isConnected :
-            raise self._raiseConnectionError()
+            self._raiseConnectionError()
         try :
             with self._lockWrite :
                 self._repl.write(b'\x02')

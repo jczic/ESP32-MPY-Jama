@@ -305,6 +305,7 @@ class Application :
                 self._wsSendCmd('SHOW-WAIT', 'Try to connect to the device...')
                 try :
                     self.esp32Ctrl = ESP32Controller( devicePort        = devicePort,
+                                                      connectTimeoutSec = 7,
                                                       onSerialConnError = self._onSerialConnError,
                                                       onTerminalRecv    = self._onTerminalRecv,
                                                       onEndOfProgram    = self._onEndOfProgram,
