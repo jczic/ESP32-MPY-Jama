@@ -32,6 +32,7 @@ var pinsList                  = [ ]
 
 var flashRootPath             = "";
 var browsePath                = "";
+var sdcardMountPoint          = null;
 
 var codeMirrorTerm            = null;
 var codeMirrorJamaTerm        = null;
@@ -661,7 +662,6 @@ function execCodeEnd(normalFinished) {
 function setFlashRootPath(path) {
     flashRootPath = path;
     browsePath    = path;
-    wsSendCmd("GET-LIST-DIR", path);
 }
 
 function setPinsList(pList) {
@@ -933,14 +933,17 @@ function setListDirAndFiles(path, entries) {
             else if (filename.toUpperCase().endsWith(".PY"))
                 getFileContent(browsePath + "/" + filename);
         } );
+        var sdcard     = (browsePath + "/" + filename == sdcardMountPoint);
         var pictoClass = ( filesize == null
-                                ? "list-files-picto-dir"
+                                ? ( sdcard
+                                    ? "list-files-picto-sdcard"
+                                    : "list-files-picto-dir" )
                                 : filename.toUpperCase().endsWith(".PY")
                                     ? "list-files-picto-file-python"
                                     : "list-files-picto-file" );
         getSubElm(listElm, "list-files-picto").classList.add(pictoClass);
         var text = (filesize == null ? "/" : "") + filename + "\n"
-                 + (filesize == null ? "Folder" : sizeToText(filesize, "octets"));
+                 + (filesize == null ? (sdcard ? "SD card" : "Folder") : sizeToText(filesize, "octets"));
         getSubElm(listElm, "list-files-text").innerText = text;
         listElm.classList.remove("hide");
         list.appendChild(listElm);
@@ -1322,6 +1325,7 @@ function sizeToText(size, unity) {
 
 function setSDCardConf(conf) {
     var ok = (conf != null);
+    sdcardMountPoint = (ok ? conf.mountPoint : null);
     setTextTag("label-sdcard-init", (ok ? "Yes" : "No"), ok);
     if (!ok) showInline("sdcard-init"); else hide("sdcard-init");
     if (ok && conf.mountPoint == null) showInline("sdcard-format"); else hide("sdcard-format");

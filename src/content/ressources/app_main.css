@@ -317,6 +317,7 @@ input[type=button].menu-button {
 .list-files-picto-dir         { background-image: url('img/folder.png'); }
 .list-files-picto-file        { background-image: url('img/file.png'); }
 .list-files-picto-file-python { background-image: url('img/file-python.png'); }
+.list-files-picto-sdcard      { background-image: url('img/sdcard.png'); }
 
 #panel-browse-buttons {
     position: absolute;

@@ -329,6 +329,7 @@ class Application :
                                                      deviceModule = self.esp32Ctrl.GetDeviceModule() ))
                 self._wsSendCmd('SHOW-ALERT', "Port %s connected to %s." % (self.esp32Ctrl.GetDevicePort(), self.esp32Ctrl.GetDeviceMCU()))
                 self._sendFlashRootPath()
+                self._sendSDCardConf(silence=True)
                 self._sendPinsList()
                 self._sendAutoInfo()
             else :
@@ -1255,6 +1256,7 @@ class Application :
             try :
                 if self.esp32Ctrl.MountSDCardFileSystem(mountPointName) :
                     self._sendSDCardConf()
+                    self._wsSendCmd('SHOW-INFO', 'The SD card has been mounted.')
                 else :
                     self._wsSendCmd('SHOW-ERROR', 'The file system of the SD card cannot be mounted on the device.')
             except :
