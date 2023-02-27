@@ -160,11 +160,11 @@ function setTextTag(id, text, success) {
 }
 
 function showInfo(text) {
-    boxDialogAlert("Information", text);
+    boxDialogAlert("😉 Information", text);
 }
 
 function showError(text) {
-    boxDialogAlert("Error", text);
+    boxDialogAlert("😭 Error", text);
 }
 
 function showPage(id) {
@@ -540,7 +540,7 @@ function writeFirmwareClick(e) {
 }
 
 function eraseFlashClick(e) {
-    boxDialogYesNo( "ERASE?",
+    boxDialogYesNo( "⚠️ ERASE?",
                     "Are you sure you want to erase all the flash memory on your device?",
                     function(yes) {
                         if (yes)
@@ -567,7 +567,7 @@ function setSerialPorts(list) {
                 "Text"   : list[i]["Name"],
                 "Picto2" : null
             } );
-        boxDialogList( "Connection to ESP32",
+        boxDialogList( "😀 Connection to ESP32",
                        "Select the USB/serial port connected to the device:",
                        itemsConf,
                        function(value) {
@@ -592,7 +592,7 @@ function execCodeBegin() {
         if (processing == PRC_EXEC_JAMA) {
             var name = execJamaFuncConfig.info.name;
             var ver  = String(execJamaFuncConfig.info.version).replaceAll(",", ".");
-            boxDialogGeneric( "Jama Func's execution",
+            boxDialogGeneric( "🚀 Jama Func's execution",
                               name + " (v" + ver + ")",
                               "elm-jama-func-terminal-container",
                               null,
@@ -706,7 +706,7 @@ function deviceReset() {
 }
 
 function showGPIOInfos() {
-    boxDialogGeneric( "GPIO diagram of Espressif ESP32-WROOM",
+    boxDialogGeneric( "😅 GPIO diagram of Espressif ESP32-WROOM",
                       "",
                       "elm-GPIO-info",
                       null,
@@ -734,7 +734,7 @@ function recvJamaFuncConfig(config) {
         e.preventDefault();
         var config = e.currentTarget.parentElement.parentElement["Config"];
         var ver    = String(config.info.version).replaceAll(",", ".");
-        boxDialogYesNo( "DELETE?",
+        boxDialogYesNo( "⚠️ DELETE?",
                         "Are you sure you want to remove <b>" + config.info.name + " " + ver + "</b> from Jama Funcs?",
                         function(yes) {
                             if (yes)
@@ -1071,9 +1071,9 @@ function wantToCloseTabCode(tabElm) {
     if (isTabCodeModified(tabElm)) {
         var filename = tabElm["tabData"]["filename"];
         var text     = ( filename
-                         ? "Do you want to save the changes of <b>" + filename + "</b>?"
-                         : "Do you want to save this new file in <b>" + browsePath + "/</b>?" );
-        boxDialogYesNo( "Save?",
+                         ? "Do you want to save the changes of file <b>'" + filename + "'</b> before closing it?"
+                         : "Do you want to save this new file in <b>'" + browsePath + "/'</b> before closing it?" );
+        boxDialogYesNo( "⚠️ NOT SAVED...",
                         text,
                         function(yes) {
                             if (yes)
@@ -1111,7 +1111,7 @@ function saveTabCode(tabElm, closeTabAfter) {
             var code     = tabData["codeEditor"]["codeMirror"].getValue();
             if (code) {
                 if (filename == null) {
-                    boxDialogQuery( "Save new file",
+                    boxDialogQuery( "💾 Save new file",
                                     "Enter a filename to save your new MicroPython file in <b>" + browsePath + "/</b>:",
                                     "",
                                     function(filename) {
@@ -1223,12 +1223,12 @@ function setWiFiNetworks(networks) {
             "Picto2" : "list-item-picto-wifi-sig" + r
         } )
     };
-    boxDialogList( "Wireless network connection",
+    boxDialogList( "📡 Wireless network connection",
                    "Select a Wi-Fi access point to connect the device:",
                    itemsConf,
                    function(value) {
                         if (value.secure)
-                            boxDialogQuery( "Secure Wi-Fi network",
+                            boxDialogQuery( "🔐 Secure Wi-Fi network",
                                             "The " + value.ssid + " access point requires an authentication key:",
                                             "",
                                             function(key) {
@@ -1248,7 +1248,7 @@ function wifiConnected(ssid, key) {
     var actPage = getActivePage();
     if (actPage && actPage.id == "page-networks-info")
         wsSendCmd("GET-NETWORKS-INFO", false);
-    boxDialogYesNo( "Wi-Fi Connected with success!",
+    boxDialogYesNo( "😎 Wi-Fi Connected with success!",
                     "The device is now connected to access point " + ssid + ".\n\n" +
                     "Do you want to save this Wi-Fi network on the device for a permanent connection even after reboot?.",
                     function(yes) {
@@ -1296,7 +1296,7 @@ function importModules(modules) {
             "Text"   : "Module " + modules[i],
             "Picto2" : null
         } );
-    boxDialogList( "Import MicroPython module",
+    boxDialogList( "⬇️ Import MicroPython module",
                    "Select an available MicroPython module to import:",
                    itemsConf,
                    function(value) {
@@ -1328,6 +1328,7 @@ function setSDCardConf(conf) {
     sdcardMountPoint = (ok ? conf.mountPoint : null);
     setTextTag("label-sdcard-init", (ok ? "Yes" : "No"), ok);
     if (!ok) showInline("sdcard-init"); else hide("sdcard-init");
+    if (ok && conf.mountPoint == null) showInline("sdcard-release"); else hide("sdcard-release");
     if (ok && conf.mountPoint == null) showInline("sdcard-format"); else hide("sdcard-format");
     getElmById("label-sdcard-size").innerText = (ok ? sizeToText(conf.size, "octets") : "Unavailable");
     ok = (ok && conf.mountPoint != null);
@@ -1389,7 +1390,7 @@ function wantCloseSoftware() {
         }
     }
     if (count)
-        boxDialogYesNo( "Quit?",
+        boxDialogYesNo( "⚠️ NOT SAVED...",
                         "Are you really sure you want to quit without saving?\n"
                         + "The following " + (count > 1 ? count + " files are" : "file is") + " modified but not saved:\n\n"
                         + modifiedTabNames,
@@ -1457,7 +1458,7 @@ function btnSDCardClick(e) {
 
 function btnHardResetClick(e) {
     if (connectionState)
-        boxDialogYesNo( "RESET?",
+        boxDialogYesNo( "⚠️ RESET?",
                         "Are you sure you want to hard reset the device?",
                         function(yes) {
                             if (yes)
@@ -1486,7 +1487,7 @@ function btnWiFiAPClick(e) {
         getElmById("elm-AP-key").value        = "";
         getElmById("elm-AP-maxclients").value = "3";
         hide("elm-AP-key-container");
-        boxDialogGeneric( "Wireless access point setup",
+        boxDialogGeneric( "📡 Wireless access point setup",
                           "Configure the device's Wi-Fi access point:",
                           "elm-AP-setup",
                           function() {
@@ -1525,9 +1526,9 @@ function initSDCardClick(e) {
 }
 
 function formatSDCardClick(e) {
-    boxDialogYesNo( "FORMAT?",
+    boxDialogYesNo( "⚠️ FORMAT?",
     "Are you sure you want to format the SD card that is in the device?\n\n" +
-    "Warning: All your files stored on it will be lost!",
+    "Be careful: All your files stored on it will be lost!",
     function(yes) {
         if (yes)
             wsSendCmd("SDCARD-FORMAT", null);
@@ -1535,7 +1536,7 @@ function formatSDCardClick(e) {
 }
 
 function mountSDCardClick(e) {
-    boxDialogQuery( "Mount the SD card:",
+    boxDialogQuery( "🔧 Mount the SD card:",
                     "Enter a name to mount the SD card to the device's file system:",
                     "/sd",
                     function(name) {
@@ -1553,6 +1554,10 @@ function mountSDCardClick(e) {
 
 function umountSDCardClick(e) {
     wsSendCmd("SDCARD-UMOUNT", null);
+}
+
+function releaseSDCardClick(e) {
+    wsSendCmd("SDCARD-RELEASE", null);
 }
 
 function btnTerminalClick(e) {
@@ -1703,7 +1708,7 @@ function btnListFilesRenameClick(e) {
         if (elm != null) {
             var filename = elm["filenameCB"];
             var srcPath  = browsePath + "/" + filename;
-            boxDialogQuery( "Rename",
+            boxDialogQuery( "✒️ Rename",
                             "Enter a new name for <b>" + srcPath + "</b>:",
                             filename,
                             function(newName) {
@@ -1725,7 +1730,7 @@ function btnListFilesRemoveClick(e) {
         var elm = getElmById("list-files-selected");
         if (elm != null) {
             var filepath = browsePath + "/" + elm["filenameCB"];
-            boxDialogYesNo( "DELETE?",
+            boxDialogYesNo( "⚠️ DELETE?",
                             "Are you sure you want to remove <b>" + filepath + "</b> from your device?",
                             function(yes) {
                                 if (yes) {
@@ -1739,7 +1744,7 @@ function btnListFilesRemoveClick(e) {
 
 function btnListFilesNewDirClick(e) {
     if (connectionState && getEventTarget(e).classList.contains("browse-button-actif"))
-        boxDialogQuery( "Create new folder",
+        boxDialogQuery( "📂 Create new folder",
                         "Create a new folder in <b>" + browsePath + "/</b>:",
                         "",
                         function(dirName) {
@@ -1888,7 +1893,7 @@ function checkUpdate() {
             try {
                 var lastVer = JSON.parse(this.responseText).tag_name;
                 if (lastVer != version)
-                    boxDialogYesNo( "Update?",
+                    boxDialogYesNo( "🚀 Update?",
                                     "A new version (" + lastVer + ") is available!\nDo you want to download it?",
                                     function(yes) {
                                         if (yes)
@@ -2052,7 +2057,7 @@ window.addEventListener( "load", function() {
     getElmById("packages-tiny-btn").addEventListener("click", function(e) {
         e.preventDefault();
         if (connectionState) {
-            boxDialogQuery( "Install package",
+            boxDialogQuery( "📦 Install package",
                             "Enter the package name to install it with your packages manager:\n(depending on your MicroPython installation <b>MIP</b> or <b>PyPI</b>)",
                             "",
                             function(name) {
@@ -2109,7 +2114,7 @@ window.addEventListener( "load", function() {
                             "Text"   : "240 MHz",
                             "Picto2" : null }
         ];
-        boxDialogList( "MCU frequency",
+        boxDialogList( "📈 MCU frequency",
         "Choose a frequency to set on your ESP32:",
         itemsConf,
         function(value) {

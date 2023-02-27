@@ -244,6 +244,8 @@ class Application :
                 self._mountSDCard(arg)
             elif cmd == 'SDCARD-UMOUNT' :
                 self._umountSDCard()
+            elif cmd == 'SDCARD-RELEASE' :
+                self._releaseSDCard()
             elif cmd == "CLOSE-SOFTWARE" :
                 self._closeSoftware()
             elif cmd == "OPEN-URL" :
@@ -1230,7 +1232,6 @@ class Application :
                 self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
 
-
     # ------------------------------------------------------------------------
 
     def _sendSDCardConf(self, silence=False) :
@@ -1276,6 +1277,18 @@ class Application :
 
     # ------------------------------------------------------------------------
     
+    def _releaseSDCard(self) :
+        if self._ableToUseDevice() :
+            try :
+                if self.esp32Ctrl.ReleaseSDCard() :
+                    self._sendSDCardConf(silence=True)
+                else :
+                    self._wsSendCmd('SHOW-ERROR', 'Unable to release the SD card.')
+            except :
+                self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+
     def _sendAutoInfo(self) :
         if self._ableToUseDevice(silence=True) :
             try :

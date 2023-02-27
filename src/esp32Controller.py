@@ -1431,6 +1431,23 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    def ReleaseSDCard(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            return self._exeCodeREPL( '__sdCard.deinit()\n' +
+                                      'del __sdCard\n'      +
+                                      'print(True)' )
+        except :
+            return False
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
     def Reset(self) :
         if not self._isConnected :
             self._raiseConnectionError()
