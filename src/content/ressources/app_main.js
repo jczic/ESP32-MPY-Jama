@@ -1336,7 +1336,6 @@ function setSDCardConf(conf) {
     if (!ok && conf != null) showInline("sdcard-mount"); else hide("sdcard-mount");
     if (ok) showInline("sdcard-umount"); else hide("sdcard-umount");
     getElmById("sdcard-mounted-point").innerText = (ok ? '"' + conf.mountPoint + '"' : "Unavailable");
-    showPage("page-sdcard");
     if (connectionState)
         wsSendCmd("GET-LIST-DIR", browsePath);
 }
@@ -1454,6 +1453,7 @@ function btnIDEClick(e) {
 
 function btnSDCardClick(e) {
     wsSendCmd("GET-SDCARD-CONF", false);
+    showPage("page-sdcard");
 }
 
 function btnHardResetClick(e) {
