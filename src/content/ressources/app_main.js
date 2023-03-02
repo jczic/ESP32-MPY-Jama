@@ -54,6 +54,17 @@ var execAnimShowTime          = null;
 var execJamaFuncConfig        = null;
 var execJamaStopTimeout       = null;
 
+var pinoutModels              = [ "ESP32-DevKitC (WROOM)",
+                                  "ESP32-DevKitM-1 (MINI-1)",
+                                  "ESP32-PICO-KIT (PICO-D4)",
+                                  "ESP32-S2-DevKitC-1 (S2-SOLO)",
+                                  "ESP32-S2-DevKitM-1 (S2-MINI-1)",
+                                  "ESP32-S2-Saola-1 (S2-WROVER)",
+                                  "ESP32-S3-DevKitC-1 (S3-WROOM-1)",
+                                  "ESP32-S3-DevKitM-1 (S3-MINI-1)",
+                                  "ESP32-C3-DevKitC-02 (C3-WROOM-02)",
+                                  "ESP32-C3-DevKitM-1 (C3-MINI-1)" ];
+
 function getElmById(id)
 { return document.getElementById(id); }
 
@@ -706,12 +717,25 @@ function deviceReset() {
 }
 
 function showGPIOInfos() {
-    boxDialogGeneric( "😅 GPIO diagram of Espressif ESP32-WROOM",
-                      "",
-                      "elm-GPIO-info",
-                      null,
-                      true,
-                      "Close" );
+    var itemsConf = [ ];
+    for (var i in pinoutModels)
+        itemsConf.push( { "Value"  : pinoutModels[i],
+                          "Picto1" : "list-item-picto-pins",
+                          "Text"   : pinoutModels[i],
+                          "Picto2" : null } );
+    boxDialogList( "📋 GPIO pinout memo",
+                   "Choose an Espressif board model to display the GPIO pinout memo:",
+                   itemsConf,
+                   function(value) {
+                       setPinoutInfoImg(value);
+                       getElmById("elm-list-pinout-info").value = value;
+                       boxDialogGeneric( "📋 GPIO pinout memo of Espressif " + value,
+                                         "",
+                                         "elm-pinout-info",
+                                         null,
+                                         true,
+                                         "Close" );
+                   } );
 }
 
 function recvJamaFuncConfig(config) {
@@ -820,7 +844,7 @@ function openJamaFuncsConfig(config) {
                 }
                 btnElm = newElm("input", null, ["button-little-text", "right"]);
                 btnElm.type  = 'button';
-                btnElm.value = ' ? ';
+                btnElm.value = ' 📋 ';
                 btnElm.addEventListener("click", function(e) { showGPIOInfos(); });
                 argsElm.appendChild(btnElm);
             }
@@ -1521,6 +1545,15 @@ function elmAPAuthChange(e) {
         hide("elm-AP-key-container");
 }
 
+function setPinoutInfoImg(name) {
+    var url = "img/pinout/" + name + ".png";
+    getElmById("elm-pinout-info").style.backgroundImage = "url('" + url + "')";
+}
+
+function elmListPinoutInfoChange(e) {
+    setPinoutInfoImg(getElmById("elm-list-pinout-info").value);
+}
+
 function initSDCardClick(e) {
     wsSendCmd("SDCARD-INIT", null);
 }
@@ -1536,7 +1569,7 @@ function formatSDCardClick(e) {
 }
 
 function mountSDCardClick(e) {
-    boxDialogQuery( "🔧 Mount the SD card:",
+    boxDialogQuery( "🛠 Mount the SD card:",
                     "Enter a name to mount the SD card to the device's file system:",
                     "/sd",
                     function(name) {
@@ -1936,6 +1969,14 @@ window.addEventListener( "load", function() {
         lineWrapping      : true
     } );
     codeMirrorJamaTerm.setSize("100%", "fit-content");
+
+    var selElm = getElmById("elm-list-pinout-info");
+    for (var i in pinoutModels) {
+        var optElm   = newElm("option", null, null);
+        optElm.value = pinoutModels[i];
+        optElm.text  = pinoutModels[i];
+        selElm.appendChild(optElm);
+    }
 
     setConnectionState(null);
     setSwitchButton(getElmById("switch-btn-menu"));

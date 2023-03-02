@@ -679,6 +679,7 @@ input[type=button].browse-button-actif {
 .list-item-picto-exec-func      { background-image: url('img/exec-func.png'); }
 .list-item-picto-python         { background-image: url('img/python.png'); }
 .list-item-picto-freq           { background-image: url('img/freq.png'); }
+.list-item-picto-pins           { background-image: url('img/pins.png'); }
 .list-item-picto-pin-up         { background-image: url('img/pin-up.png'); }
 .list-item-picto-pin-down       { background-image: url('img/pin-down.png'); }
 
@@ -1249,12 +1250,22 @@ input[type=button].tiny-btn-right {
     width: 50%;
 }
 
-#elm-GPIO-info {
-    width: 885px;
-    height: 510px;
-    background-size: 885px 510px;
+#elm-pinout-info {
+    width: 900px;
+    height: 530px;
+    background-size: 900px 530px;
     background-repeat: no-repeat;
     background-image: url('img/esp32-gpio.png');
+}
+
+#elm-list-pinout-info {
+    position: absolute;
+    width: auto;
+    height: 22px;
+    right: 25px;
+    bottom: -47px;
+    font-size: 10px;
+    line-height: 10px;
 }
 
 #menu-btn-ide              { background-image: url('img/menu-ide.png'); }
