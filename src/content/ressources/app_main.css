@@ -49,7 +49,7 @@ body {
 }
 
 a:link, a:visited {
-    color: SteelBlue;
+    color: #377c9e;
     cursor: pointer;
 }
 
@@ -191,7 +191,7 @@ a:hover, a:focus, a:active {
     top: 60px;
     bottom: 30px;
     border-right: 6px solid #6E7783;
-    background-color: #4A919E;
+    background-color: #377c9e;
     overflow: hidden;
 }
 
@@ -216,9 +216,9 @@ input[type=button].switch-button {
 
 input[type=button].switch-button-selected {
     color: white;
-    background-color: #4A919E;
+    background-color: #377c9e;
 } input[type=button].switch-button-selected:hover {
-    background-color: #4A919E;
+    background-color: #377c9e;
     cursor: inherit;
 }
 
@@ -250,7 +250,7 @@ input[type=button].menu-button {
     background-position-y: 6px;
     background-repeat: no-repeat;
     text-shadow: 0px 0px 1px gray;
-} input[type=button].menu-button:hover { background-color: #66A0BE; }
+} input[type=button].menu-button:hover { background-color: #2d99ce; }
 
 #browse-current-dir {
     position: absolute;
@@ -283,7 +283,7 @@ input[type=button].menu-button {
     color: #e9f4fb;
     cursor: pointer;
     overflow: hidden;
-} .list-files:hover { background-color: #66A0BE; }
+} .list-files:hover { background-color: #2d99ce; }
 
 #list-files-selected {
     height: 32px;
@@ -368,7 +368,7 @@ input[type=button].browse-button-actif {
     font-size: 8px;
     line-height: 17px;
     letter-spacing: 1px;
-    border: 6px solid #4A919E;
+    border: 6px solid #377c9e;
     border-top: 0;
     border-bottom: 0;
 }
@@ -553,7 +553,7 @@ input[type=button].browse-button-actif {
     margin: auto;
     padding-bottom: 20px;
     z-index: 100;
-    border: 5px solid #4A919E;
+    border: 5px solid #377c9e;
     border-radius: 5px;
     text-align: center;
     line-height: 10px;
@@ -570,7 +570,7 @@ input[type=button].browse-button-actif {
     color: white;
     letter-spacing: 2px;
     border-bottom: 1px solid darkgray;
-    background-color: #4A919E;
+    background-color: #377c9e;
 }
 
 .box-dialog-title-text {
@@ -627,7 +627,7 @@ input[type=button].browse-button-actif {
     cursor: pointer;
 } .list-item:hover {
     color: white;
-    background-color: #66A0BE;
+    background-color: #7cb7d7;
 }
 
 .list-item-picto1 {
@@ -702,7 +702,7 @@ input[type=button], input[type=submit] {
     margin: 2px;
     padding: 5px;
     border: none;
-    background-color: #4A919E;
+    background-color: #377c9e;
     font-family: Roboto;
     text-align: center;
     color: White;
@@ -710,7 +710,7 @@ input[type=button], input[type=submit] {
     outline: none;
     cursor: pointer;
 } input[type=button]:hover, input[type=submit]:hover {
-    background-color: #66A0BE;
+    background-color: #2d99ce;
 }
 
 input[type=button].button-little-text {
@@ -723,7 +723,7 @@ input[type=button].button-little-text {
     font-size: 9px;
     line-height: 9px;
 } input[type=button].button-little-text:hover {
-    background-color: steelblue;
+    background-color: #2d99ce;
 }
 
 input[type=button]:disabled, input[type=submit]:disabled {
@@ -834,12 +834,14 @@ select {
 .properties-title {
     width: 100%;
     margin-bottom: 5px;
+    padding-top: 3px;
     text-align: center;
-    font-weight: bold;
+    font-size: 11px;
+    font-weight: 600;
     line-height: 26px;
     color: white;
-    background-color: #66A0BE;
-    border-bottom: 3px solid #6E7783;
+    background-color: #687b95;
+    border-bottom: 3px solid #54546c;
     white-space: nowrap;
     letter-spacing: 2px;
     overflow: hidden;
@@ -925,7 +927,7 @@ select {
     color: white;
     background-color: #19242F;
     cursor: pointer;
-} .tabs-code-container-scroll-btn:hover { background-color: steelblue; }
+} .tabs-code-container-scroll-btn:hover { background-color: #377c9e; }
 
 #tabs-code-container-scroll-btn-left {
     left: 0;
@@ -954,7 +956,7 @@ select {
     line-height: 24px;
     background-color: #6E7783;
     cursor: pointer;
-} .tab-code:hover { color: white; background-color: #66A0BE; }
+} .tab-code:hover { color: white; background-color: #377c9e; }
 
 #tab-code-selected {
     color: white;
@@ -1102,7 +1104,7 @@ select {
     float: left;
     width: 24px;
     height: 24px;
-    background-color: steelblue;
+    background-color: #377c9e;
     border-radius: 6px;
     background-size: 18px 18px;
     background-position: center;
@@ -1157,11 +1159,11 @@ select {
     margin: 10px 50px 10px 0;
     font-size: 11px;
     letter-spacing: 3px;
-    color: steelblue;
+    color: #377c9e;
 }
 
 #exec-jama-funcs-args-title {
-    background-color: #54546c;
+    background-color: #687b95;
 }
 
 .exec-jama-funcs-input {
@@ -1215,7 +1217,7 @@ input[type=button].tiny-btn {
     background-position: center;
     background-repeat: no-repeat;
     background-color: #2B3E50;
-} input[type=button].tiny-btn:hover { background-color: SteelBlue; }
+} input[type=button].tiny-btn:hover { background-color: #377c9e; }
 
 input[type=button].tiny-btn-right {
     float: right;
