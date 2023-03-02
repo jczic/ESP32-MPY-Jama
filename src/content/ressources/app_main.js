@@ -729,7 +729,7 @@ function showGPIOInfos() {
                    function(value) {
                        setPinoutInfoImg(value);
                        getElmById("elm-list-pinout-info").value = value;
-                       boxDialogGeneric( "📋 GPIO pinout memo of Espressif " + value,
+                       boxDialogGeneric( "📋 GPIO pinout of Espressif " + value,
                                          "",
                                          "elm-pinout-info",
                                          null,
@@ -1476,8 +1476,12 @@ function btnIDEClick(e) {
 }
 
 function btnSDCardClick(e) {
-    wsSendCmd("GET-SDCARD-CONF", false);
-    showPage("page-sdcard");
+    if (connectionState) {
+        wsSendCmd("GET-SDCARD-CONF", false);
+        showPage("page-sdcard");
+    }
+    else
+        showError("The device must be connected first.");
 }
 
 function btnHardResetClick(e) {
