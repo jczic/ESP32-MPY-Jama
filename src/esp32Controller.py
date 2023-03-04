@@ -141,6 +141,7 @@ class ESP32Controller :
                   devicePort,
                   baudrate          = 115200,
                   connectTimeoutSec = 3,
+                  onConnProgress    = None,
                   onSerialConnError = None,
                   onTerminalRecv    = None,
                   onEndOfProgram    = None,
@@ -175,6 +176,9 @@ class ESP32Controller :
             self._isConnected = True
         except :
             raise ESP32ControllerException('Cannot open serial port "%s".' % devicePort)
+        
+        if onConnProgress :
+            onConnProgress()
 
         try :
             self.InterruptProgram()
@@ -388,16 +392,20 @@ class ESP32Controller :
             self._lockRead.acquire()
         savedTimeout = self._repl.timeout
         self._repl.timeout = timeoutSec
+        readErr = False
         try :
             b = self._repl.read_until(endBytes)
         except :
-            self._raiseConnectionError()
-        self._repl.timeout = savedTimeout
+            readErr = True
         if lockRead :
             self._lockRead.release()
-        if not b or not b.endswith(endBytes) :
-            raise ESP32ControllerException('Timeout...')
-        return b.decode()
+        if readErr :
+            self._raiseConnectionError()
+        else :
+            self._repl.timeout = savedTimeout
+            if not b or not b.endswith(endBytes) :
+                raise ESP32ControllerException('Timeout...')
+            return b.decode()
 
     # ---------------------------------------------------------------------------
 
@@ -479,11 +487,14 @@ class ESP32Controller :
             self._endThread()
             self._endProcess()
             if not kill :
+                saveSCE = self._onSerialConnError
+                self._onSerialConnError = None
                 try :
                     self.InterruptProgram()
                     self._switchToNormalMode()
                 except :
                     pass
+                self._onSerialConnError = saveSCE
             self._repl.close()
             self._isConnected = False
 

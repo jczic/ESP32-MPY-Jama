@@ -23,10 +23,11 @@ var canCloseWindow            = true;
 
 var version                   = "";
 
+var currentPort               = null;
 var connectionState           = false;
 var processing                = PRC_NONE;
 
-var portsDest                 = null;
+var showConnPortsDialog       = false;
 
 var pinsList                  = [ ]
 
@@ -245,8 +246,8 @@ function onWSMessage(evt)
         case "SERIAL-PORTS" :
             setSerialPorts(o.ARG);
             break;
-        case "SERIAL-CONNECTED" :
-            setConnectionState(o.ARG);
+        case "SERIAL-CONNECTION" :
+            setSerialConnection(o.ARG);
             break;
         case "EXEC-CODE-BEGIN" :
             execCodeBegin();
@@ -565,7 +566,8 @@ function setVersion(ver) {
 }
 
 function setSerialPorts(list) {
-    if (portsDest == "connection") {
+    if (showConnPortsDialog) {
+        showConnPortsDialog = false;
         var itemsConf = [ ];
         for (var i = 0; i < list.length; i++)
             itemsConf.push( {
@@ -585,16 +587,15 @@ function setSerialPorts(list) {
                             wsSendCmd("CONNECT-SERIAL", value);
                        } );
     }
-    else if (portsDest == "esptool") {
-        rmElmChildren("select-esptool-port");
-        var selElm = getElmById("select-esptool-port");
-        for (var i = 0; i < list.length; i++) {
-            var optElm   = newElm("option", null, null);
-            optElm.value = list[i]["Device"];
-            optElm.text  = list[i]["Name"];
-            selElm.appendChild(optElm);
-        }
+    rmElmChildren("select-esptool-port");
+    var selElm = getElmById("select-esptool-port");
+    for (var i = 0; i < list.length; i++) {
+        var optElm   = newElm("option", null, null);
+        optElm.value = list[i]["Device"];
+        optElm.text  = list[i]["Name"];
+        selElm.appendChild(optElm);
     }
+    selElm.value = (currentPort != null ? currentPort : "");
 }
 
 function execCodeBegin() {
@@ -1477,7 +1478,7 @@ function btnIDEClick(e) {
 
 function btnSDCardClick(e) {
     if (connectionState) {
-        wsSendCmd("GET-SDCARD-CONF", false);
+        wsSendCmd("GET-SDCARD-CONF", true);
         showPage("page-sdcard");
     }
     else
@@ -1602,7 +1603,6 @@ function btnTerminalClick(e) {
 }
 
 function btnFirmwareToolsClick(e) {
-    portsDest = "esptool";
     wsSendCmd("GET-SERIAL-PORTS", null);
     wsSendCmd("GET-ESPTOOL-VER", null);
 }
@@ -1613,7 +1613,7 @@ function btnJamaFuncsClick(e) {
 
 function btnConnectionClick(e) {
     if (!connectionState) {
-        portsDest = "connection";
+        showConnPortsDialog = true;
         wsSendCmd("GET-SERIAL-PORTS", null);
     }
     else
@@ -1634,11 +1634,13 @@ function setConnectionState(connected) {
         writeTextInTerminal("\nWelcome to ESP32 MicroPython REPL terminal.\n\n", "terminal-SeaGreen");
     }
     else
-        if (connected)
+        if (connected) {
+            hideExistingBoxesDialog();
             writeTextInTerminal("* Device connected.\n\n", "terminal-SeaGreen");
+        }
         else {
-            writeTextInTerminal("* Device disconnected.\n", "terminal-IndianRed");
             hide("device-info");
+            writeTextInTerminal("* Device disconnected.\n", "terminal-IndianRed");
         }
     connectionState = connected;
     getElmById("btn-connection").value = (connected ? "Disconnect" : "  Connect") + " device";
@@ -1654,6 +1656,12 @@ function setConnectionState(connected) {
         setListDirAndFiles("", { });
         setCurrentDirLabel(null);
     }
+}
+
+function setSerialConnection(port) {
+    currentPort = port;
+    setConnectionState(port != null);
+    getElmById("select-esptool-port").value = (port != null ? port : "");
 }
 
 function execCode(code, codeFilename) {

@@ -15,6 +15,8 @@ from   queue           import SimpleQueue
 from   hashlib         import sha256
 from   shutil          import copyfile
 from   pathlib         import Path
+from   time            import sleep
+from   _thread         import start_new_thread
 import webview
 import asyncio
 import webbrowser
@@ -35,6 +37,7 @@ class Application :
         self._appRunning         = False
         self._ws                 = None
         self.esp32Ctrl           = None
+        self._deviceReadyToCmd   = False
         self._wsMsgQueue         = SimpleQueue()
         self._contentTransfer    = None
         self._cleanAfterJamaFunc = False
@@ -300,14 +303,17 @@ class Application :
 
     # ------------------------------------------------------------------------
 
-    def _connectSerial(self, devicePort) :
+    def _connectSerial(self, devicePort, reconn=False) :
         if not self.esp32Ctrl :
-            Err = None
+            Err            = None
+            onConnProgress = (self._onConnProgress if reconn else None)
             if devicePort :
-                self._wsSendCmd('SHOW-WAIT', 'Try to connect to the device...')
+                if not reconn :
+                    self._wsSendCmd('SHOW-WAIT', 'Attempts to connect to the device...')
                 try :
                     self.esp32Ctrl = ESP32Controller( devicePort        = devicePort,
                                                       connectTimeoutSec = 7,
+                                                      onConnProgress    = onConnProgress,
                                                       onSerialConnError = self._onSerialConnError,
                                                       onTerminalRecv    = self._onTerminalRecv,
                                                       onEndOfProgram    = self._onEndOfProgram,
@@ -317,8 +323,10 @@ class Application :
                 except Exception as ex :
                     Err = str(ex)
             else :
-                self._wsSendCmd('SHOW-WAIT', 'Search for a device to connect to...')
-                self.esp32Ctrl = ESP32Controller.GetFirstAvailableESP32Ctrl( onSerialConnError = self._onSerialConnError,
+                if not reconn :
+                    self._wsSendCmd('SHOW-WAIT', 'Search for a device to connect to...')
+                self.esp32Ctrl = ESP32Controller.GetFirstAvailableESP32Ctrl( onConnProgress    = onConnProgress,
+                                                                             onSerialConnError = self._onSerialConnError,
                                                                              onTerminalRecv    = self._onTerminalRecv,
                                                                              onEndOfProgram    = self._onEndOfProgram,
                                                                              onProgramError    = self._onProgramError,
@@ -326,7 +334,7 @@ class Application :
                                                                              onDeviceReset     = self._onDeviceReset )
             self._wsSendCmd('HIDE-WAIT')
             if self.esp32Ctrl :
-                self._wsSendCmd('SERIAL-CONNECTED', True)
+                self._wsSendCmd('SERIAL-CONNECTION', self.esp32Ctrl.GetDevicePort())
                 self._wsSendCmd('DEVICE-INFO', dict( deviceMCU    = self.esp32Ctrl.GetDeviceMCU(),
                                                      deviceModule = self.esp32Ctrl.GetDeviceModule() ))
                 self._wsSendCmd('SHOW-ALERT', "Port %s connected to %s." % (self.esp32Ctrl.GetDevicePort(), self.esp32Ctrl.GetDeviceMCU()))
@@ -334,27 +342,57 @@ class Application :
                 self._sendSDCardConf(silence=True)
                 self._sendPinsList()
                 self._sendAutoInfo()
+                self._deviceReadyToCmd = True
+                return True
             else :
-                self._wsSendCmd('SHOW-ERROR', Err if Err else 'No compatible device was found.')
+                if not reconn :
+                    self._wsSendCmd('SHOW-ERROR', Err if Err else 'No compatible device was found.')
+                return False
 
+    # ------------------------------------------------------------------------
+
+    def _onConnProgress(self) :
+        self._wsSendCmd('SHOW-WAIT', 'Attempts an automatic reconnection to the device...')
+
+    # ------------------------------------------------------------------------
+
+    def _threadAutoReconnect(self, devicePort) :
+        while self.esp32Ctrl :
+            sleep(0.010)
+        while not self.esp32Ctrl or not self.esp32Ctrl.IsConnected() :
+            if not self._connectSerial(devicePort, reconn=True) :
+                sleep(0.250)
+
+    # ------------------------------------------------------------------------
+    
+    def _startAutoReconnect(self) :
+        if self.esp32Ctrl and not self.esp32Ctrl.IsConnected() :
+            try :
+                start_new_thread(self._threadAutoReconnect, (self.esp32Ctrl.GetDevicePort(), ))
+            except :
+                pass
+        
     # ------------------------------------------------------------------------
 
     def _disconnectSerial(self) :
         if self.esp32Ctrl :
             self.esp32Ctrl.Close()
-            self._wsSendCmd('SERIAL-CONNECTED', False)
+            self._wsSendCmd('SERIAL-CONNECTION', None)
             self._wsSendCmd('SHOW-ALERT', 'Port %s disconnected from %s.' % (self.esp32Ctrl.GetDevicePort(), self.esp32Ctrl.GetDeviceMCU()))
             self._wsSendCmd('EXEC-CODE-END', False)
             self._cleanAfterJamaFunc = False
+            self._deviceReadyToCmd   = False
             self.esp32Ctrl = None
 
     # ------------------------------------------------------------------------
 
     def _onSerialConnError(self, esp32Ctrl) :
-        self._wsSendCmd('SERIAL-CONNECTED', False)
+        self._wsSendCmd('SERIAL-CONNECTION', None)
         self._wsSendCmd('SHOW-ERROR', 'You have been disconnected from the device.')
         self._wsSendCmd('EXEC-CODE-END', False)
         self._cleanAfterJamaFunc = False
+        self._deviceReadyToCmd   = False
+        self._startAutoReconnect()
         self.esp32Ctrl = None
         
     # ------------------------------------------------------------------------
@@ -392,10 +430,10 @@ class Application :
     def _ableToUseDevice(self, silence=False) :
         if not self.esp32Ctrl or not self.esp32Ctrl.IsConnected() :
             if not silence :
-                self._wsSendCmd('SHOW-INFO', 'The device must be connected first.')
+                self._wsSendCmd('SHOW-INFO', 'A device must be connected first.')
         elif self.esp32Ctrl.IsProcessing() :
             if not silence :
-                self._wsSendCmd('SHOW-INFO', 'The device is already in use.')
+                self._wsSendCmd('SHOW-INFO', 'Your device is currently in use.')
         else :
             return True
         return False
@@ -768,14 +806,16 @@ class Application :
                     self._wsSendCmd('HIDE-WAIT')
                 else :
                     self.esp32Ctrl.Close(kill=True)
-                    self.esp32Ctrl = None
                     self._wsSendCmd('EXEC-CODE-STOPPED')
                     self._wsSendCmd('EXEC-CODE-END', False)
-                    self._wsSendCmd('SERIAL-CONNECTED', False)
+                    self._wsSendCmd('SERIAL-CONNECTION', None)
                     self._wsSendCmd('HIDE-WAIT')
                     self._wsSendCmd('SHOW-ERROR', 'The device did not respond correctly...\nThe connection had to be closed.\n\n' \
                                                 + 'Your ESP32 may need an electrical reboot.')
                     self._cleanAfterJamaFunc = False
+                    self._deviceReadyToCmd   = False
+                    self._startAutoReconnect()
+                    self.esp32Ctrl = None
             except :
                 self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
     
@@ -1323,12 +1363,13 @@ class Application :
                 while (not self._wsMsgQueue.empty()) :
                     o = self._wsMsgQueue.get()
                     self._wsProcessMessage(o)
-                if self._cleanAfterJamaFunc and self.esp32Ctrl and \
-                   self.esp32Ctrl.IsConnected() and not self.esp32Ctrl.IsProcessing() :
+                if ( self._cleanAfterJamaFunc and self.esp32Ctrl and self.esp32Ctrl.IsConnected() \
+                     and self._deviceReadyToCmd and not self.esp32Ctrl.IsProcessing() ) :
                     self._cleanAfterJamaFunc = False
                     self._cleanAfterExecJamaFunc()
                     continue
-            self._sendAutoInfo()
+            if self._deviceReadyToCmd :
+                self._sendAutoInfo()
             gc.collect()
 
     # ------------------------------------------------------------------------
