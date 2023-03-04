@@ -82,17 +82,21 @@ class KT403A :
     # ---------------------------------------------------------------------
 
     def _rxCmd(self) :
-        if self._uart.any() :
-            buf = self._uart.read(10)
-            if buf              and \
-               len(buf) ==   10 and \
-               buf[0]   == 0x7E and \
-               buf[1]   == 0xFF and \
-               buf[2]   == 0x06 and \
-               buf[9]   == 0xEF     :
-               cmd  = buf[3]
-               data = unpack('>H', buf[5:7])[0]
-               return (cmd, data)
+        for i in range(20) :
+            if self._uart.any() >= 10 :
+                buf = self._uart.read(10)
+                if buf              and \
+                   len(buf) ==   10 and \
+                   buf[0]   == 0x7E and \
+                   buf[1]   == 0xFF and \
+                   buf[2]   == 0x06 and \
+                   buf[9]   == 0xEF     :
+                   cmd  = buf[3]
+                   data = unpack('>H', buf[5:7])[0]
+                   return (cmd, data)
+                else :
+                    break
+            sleep_ms(50)
         return None
 
     # ----------------------------------------------------------------------------
