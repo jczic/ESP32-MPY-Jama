@@ -91,7 +91,7 @@ a:hover, a:focus, a:active {
     height: 100px;
     margin-left: -25px;
     margin-top: -25px;
-    background-color: #e9f4fb;
+    background-color: #f3f5ff;
     border-radius: 50px;
     cursor: pointer;
 }
@@ -146,6 +146,7 @@ a:hover, a:focus, a:active {
 
 #device-mcu {
     float: right;
+    font-weight: 600;
 }
 
 #device-module {
@@ -224,10 +225,12 @@ input[type=button].switch-button-selected {
 
 #switch-btn-menu {
     left: 0;
+    text-shadow: 1px 1px 5px #333333;
 }
 
 #switch-btn-browse {
     right: 0;
+    text-shadow: 1px 1px 5px #333333;
 }
 
 .menu-panel {
@@ -249,7 +252,7 @@ input[type=button].menu-button {
     background-position-x: 8px;
     background-position-y: 6px;
     background-repeat: no-repeat;
-    text-shadow: 0px 0px 1px gray;
+    text-shadow: 0px 0px 1px #505050;
 } input[type=button].menu-button:hover { background-color: #2d99ce; }
 
 #browse-current-dir {
@@ -288,7 +291,7 @@ input[type=button].menu-button {
 #list-files-selected {
     height: 32px;
     padding-top: 3px;
-    background-color: Peru;
+    background-color: #BD5E78;
     line-height: 14px;
     color: white;
 }
@@ -310,7 +313,7 @@ input[type=button].menu-button {
     right: 0;
     font-size: 10px;
     word-break: break-all;
-    text-shadow: 0px 0px 1px gray;
+    text-shadow: 0px 0px 1px #505050;
     overflow: hidden;
 }
 
@@ -347,7 +350,7 @@ input[type=button].browse-button-actif {
     border-color: white;
     color: white;
     cursor: pointer;
-} input[type=button].browse-button-actif:hover { background-color: Peru; }
+} input[type=button].browse-button-actif:hover { background-color: #BD5E78; }
 
 #menu-panel-connection {
     position: absolute;
@@ -356,7 +359,7 @@ input[type=button].browse-button-actif {
     bottom: 0;
     border-top: 3px solid #6E7783;
     text-align: center;
-    background-color: #e9f4fb;
+    background-color: #2b3e50;
 }
 
 #label-connection {
@@ -366,6 +369,7 @@ input[type=button].browse-button-actif {
     margin-bottom: 0;
     text-align: center;
     font-size: 8px;
+    font-weight: 600;
     line-height: 17px;
     letter-spacing: 1px;
     border: 6px solid #377c9e;
@@ -472,21 +476,21 @@ input[type=button].browse-button-actif {
     letter-spacing: 2px;
     line-height: 28px;
     color: #54546c;
+    text-shadow: 1px 1px 3px #E0E0E0;
 }
 
 #toast-info {
     display: none;
     position: absolute;
     z-index: 999;
-    left: 15%;
-    right: 15%;
-    bottom: 50px;
+    left: 13%;
+    right: 13%;
+    bottom: 45px;
     padding: 5px;
-    border: 2px solid #54546c;
     border-radius: 15px;
-    background-color: #98DDCA;
-    opacity: 0.60;
-    color: black;
+    background-color: #377c9e;
+    opacity: 0.75;
+    color: white;
     text-align: center;
     font-weight: 600;
     letter-spacing: 2px;
@@ -535,7 +539,7 @@ input[type=button].browse-button-actif {
     padding: 2px 6px;
     border-radius: 10px;
     background-color: #E97777;
-    color: white;
+    color: snow;
 }
 
 .center-container {
@@ -771,7 +775,7 @@ select {
     position: relative;
     margin: 5px 0;
     height: 14px;
-    border: 1px solid #4A919E;
+    border: 1px solid #377c9e;
     background-color: white;
     border-radius: 3px;
     overflow: hidden;
@@ -780,7 +784,7 @@ select {
 .progress-little-inner {
     width: 0;
     height: 100%;
-    background-color: #ABD9FF;
+    background-color: #E5D0F3;
 }
 
 .progress-little-text {

@@ -60,7 +60,7 @@ class Application :
 
         self._mainWin = webview.create_window( '%s (v%s)' % (conf.APPLICATION_TITLE, conf.APPLICATION_STR_VERSION),
                                                url        = self._localURL(conf.HTML_APP_MAIN_FILENAME),
-                                               width      = 1070,
+                                               width      = 1100,
                                                height     = 730,
                                                resizable  = True,
                                                min_size   = (640, 580),
@@ -374,9 +374,9 @@ class Application :
         
     # ------------------------------------------------------------------------
 
-    def _disconnectSerial(self) :
-        if self.esp32Ctrl :
-            self.esp32Ctrl.Close()
+    def _disconnectSerial(self, killEsp32Ctrl=False) :
+        if self.esp32Ctrl and self.esp32Ctrl.IsConnected() :
+            self.esp32Ctrl.Close(killEsp32Ctrl)
             self._wsSendCmd('SERIAL-CONNECTION', None)
             self._wsSendCmd('SHOW-ALERT', 'Port %s disconnected from %s.' % (self.esp32Ctrl.GetDevicePort(), self.esp32Ctrl.GetDeviceMCU()))
             self._wsSendCmd('EXEC-CODE-END', False)
@@ -859,6 +859,8 @@ class Application :
             imgFile = imgFile[0]
             try :
                 if esptoolProc.CheckFirmwareImg(imgFile) :
+                    if self.esp32Ctrl and self.esp32Ctrl.IsConnected() and self.esp32Ctrl.GetDevicePort() == port :
+                        self._disconnectSerial(killEsp32Ctrl=True)
                     ok = esptoolProc.WriteFirmwareImg( imgFile,
                                                        port                  = port,
                                                        connCallback          = self._onEspToolConn,
@@ -884,6 +886,8 @@ class Application :
 
     def _esp32EraseFlash(self, port) :
         try :
+            if self.esp32Ctrl and self.esp32Ctrl.IsConnected() and self.esp32Ctrl.GetDevicePort() == port :
+                self._disconnectSerial(killEsp32Ctrl=True)
             ok = esptoolProc.EraseFlash( port            = port,
                                          connCallback    = self._onEspToolConn,
                                          erasingCallback = self._onEspToolErasing )

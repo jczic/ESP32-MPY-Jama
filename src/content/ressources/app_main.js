@@ -604,8 +604,8 @@ function execCodeBegin() {
         if (processing == PRC_EXEC_JAMA) {
             var name = execJamaFuncConfig.info.name;
             var ver  = String(execJamaFuncConfig.info.version).replaceAll(",", ".");
-            boxDialogGeneric( "🚀 Jama Func's execution",
-                              name + " (v" + ver + ")",
+            boxDialogGeneric( "🚀 " + name + " (v" + ver + ")",
+                              "",
                               "elm-jama-func-terminal-container",
                               null,
                               true,
@@ -724,13 +724,13 @@ function showGPIOInfos() {
                           "Picto1" : "list-item-picto-pins",
                           "Text"   : pinoutModels[i],
                           "Picto2" : null } );
-    boxDialogList( "📋 GPIO pinout memo",
+    boxDialogList( "💡 GPIO pinout memo",
                    "Choose an Espressif board model to display the GPIO pinout memo:",
                    itemsConf,
                    function(value) {
                        setPinoutInfoImg(value);
                        getElmById("elm-list-pinout-info").value = value;
-                       boxDialogGeneric( "📋 GPIO pinout of Espressif " + value,
+                       boxDialogGeneric( "💡 GPIO pinout of Espressif " + value,
                                          "",
                                          "elm-pinout-info",
                                          null,
@@ -845,7 +845,7 @@ function openJamaFuncsConfig(config) {
                 }
                 btnElm = newElm("input", null, ["button-little-text", "right"]);
                 btnElm.type  = 'button';
-                btnElm.value = ' 📋 ';
+                btnElm.value = ' 💡 ';
                 btnElm.addEventListener("click", function(e) { showGPIOInfos(); });
                 argsElm.appendChild(btnElm);
             }
