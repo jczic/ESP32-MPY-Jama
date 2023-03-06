@@ -1271,6 +1271,28 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    def GetPartitions(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            return self._exeCodeREPL( 'from esp32 import Partition\n' +
+                                      '__p = []\n' +
+                                      '__x = None\n' +
+                                      'for __x in Partition.find(Partition.TYPE_APP) :\n'  +
+                                      '  __p.append(__x.info())\n' +
+                                      'for __x in Partition.find(Partition.TYPE_DATA) :\n' +
+                                      '  __p.append(__x.info())\n' +
+                                      'del __x\n'    +
+                                      'print(__p)\n' +
+                                      'del __p' )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
     def GetPinsState(self) :
         if not self._isConnected :
             self._raiseConnectionError()

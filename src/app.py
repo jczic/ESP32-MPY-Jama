@@ -641,10 +641,11 @@ class Application :
             if not silence :
                 self._wsSendCmd('SHOW-WAIT', 'Collecting informations...')
             try :
-                o = dict( freq      = self.esp32Ctrl.GetMHzFreq(),
-                          flashSize = self.esp32Ctrl.GetFlashSize(),
-                          os        = self.esp32Ctrl.GetPlatformInfo(),
-                          pins      = self.esp32Ctrl.GetPinsState() )
+                o = dict( freq       = self.esp32Ctrl.GetMHzFreq(),
+                          flashSize  = self.esp32Ctrl.GetFlashSize(),
+                          os         = self.esp32Ctrl.GetPlatformInfo(),
+                          partitions = self.esp32Ctrl.GetPartitions(),
+                          pins       = self.esp32Ctrl.GetPinsState() )
                 if not silence :
                     self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('SYS-INFO', o)

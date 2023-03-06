@@ -1187,6 +1187,7 @@ function endOfFileContentData() {
 }
 
 function setSystemInfo(o) {
+
     getElmById("label-sysnfo-freq").innerText       = o.freq + " MHz";
     getElmById("label-sysnfo-flash-size").innerText = sizeToText(o.flashSize, "Bytes");
     getElmById("label-sysnfo-platform").innerText   = o.os.platform;
@@ -1196,6 +1197,39 @@ function setSystemInfo(o) {
     getElmById("label-sysnfo-implem").innerText     = o.os.implem;
     setTextTag("label-sysnfo-spiram", (o.os.spiram ? "Yes" : "No"), o.os.spiram);
     getElmById("label-sysnfo-mpyver").innerText     = o.os.mpyver;
+
+    var partElm = getElmById("sysnfo-partitions");
+    while (partElm.childElementCount > 1)
+        partElm.removeChild(partElm.lastChild);
+
+    for (var i in o.partitions) {
+        var part = o.partitions[i];
+        var trElm = newElm("tr");
+
+        var tdElm = newElm("td");
+        tdElm.innerText = (part[0] == 0 ? "⚙️" : "💾");
+        trElm.appendChild(tdElm);
+
+        var tdElm = newElm("td");
+        tdElm.innerText = part[4];
+        trElm.appendChild(tdElm);
+        
+        var tdElm = newElm("td");
+        tdElm.innerText = "0x" + part[2].toString(16);
+        trElm.appendChild(tdElm);
+        
+        var tdElm = newElm("td");
+        tdElm.innerText = "0x" + part[3].toString(16)
+                        + " (" + sizeToText(part[3], "bytes") + ")";
+        trElm.appendChild(tdElm);
+
+        var tdElm = newElm("td");
+        if (part[5])
+            tdElm.innerText = "🔑";
+        trElm.appendChild(tdElm);
+
+        partElm.appendChild(trElm);
+    }
     
     showPage("page-system-info");
     

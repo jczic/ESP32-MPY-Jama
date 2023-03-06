@@ -73,6 +73,10 @@ a:hover, a:focus, a:active {
     float: right;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 #menubar {
     position: absolute;
     height: 54px;
@@ -127,7 +131,7 @@ a:hover, a:focus, a:active {
     margin-left: 23px;
     line-height: 55px;
     font-size: 22px;
-    font-weight: lighter;
+    font-weight: normal;
     letter-spacing: 3px;
     text-shadow: 1px 1px 10px #101010;
 }
@@ -874,8 +878,17 @@ select {
     margin-bottom: 15px;
 }
 
+#sysnfo-partitions {
+    text-align: left;
+    width: 100%;
+    font: 11px monospace;
+    line-height: 22px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 #esptool-version {
-    color: #4A919E;
+    color: #377c9e;
     font-weight: bold;
 }
 
