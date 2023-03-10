@@ -37,6 +37,7 @@ var sdcardMountPoint          = null;
 
 var codeMirrorTerm            = null;
 var codeMirrorJamaTerm        = null;
+var termTextBuffer            = '';
 
 var cmdHistory                = [ ];
 var cmdHistoryNav             = [""];
@@ -529,10 +530,19 @@ function clearTerminal(cmTerm) {
 }
 
 function writeTextInTerminal(text, colorClass) {
+    if (termTextBuffer != '') {
+        var buf        = termTextBuffer;
+        termTextBuffer = '';
+        writeTextInTerminal(buf);
+    }
     var ctnr   = getElmById( processing == PRC_EXEC_JAMA ? "elm-jama-func-terminal-container" : "terminal-container" );
     var cm     = ( processing == PRC_EXEC_JAMA ? codeMirrorJamaTerm : codeMirrorTerm );
     var doc    = cm.getDoc();
     var lCount = doc.lineCount();
+    if (lCount >= 1100) {
+        doc.replaceRange("", { line: 0 }, { line: lCount-1000 });
+        lCount = doc.lineCount();
+    }
     text = text.replaceAll("\r", "");
     if (cm._addLineBefore)
         text = "\n" + text;
@@ -637,7 +647,8 @@ function execCodeBegin() {
 }
 
 function execCodeRecv(text) {
-    writeTextInTerminal(text);
+    termTextBuffer += text;
+    //writeTextInTerminal(text);
 }
 
 function execCodeError(error) {
@@ -1219,8 +1230,11 @@ function setSystemInfo(o) {
         trElm.appendChild(tdElm);
         
         var tdElm = newElm("td");
-        tdElm.innerText = "0x" + part[3].toString(16)
-                        + " (" + sizeToText(part[3], "bytes") + ")";
+        tdElm.innerText = "0x" + part[3].toString(16);
+        trElm.appendChild(tdElm);
+
+        var tdElm = newElm("td");
+        tdElm.innerText = "(" + sizeToText(part[3], "bytes") + ")";
         trElm.appendChild(tdElm);
 
         var tdElm = newElm("td");
@@ -1961,9 +1975,10 @@ function refreshTabCodeScrollBtns() {
         classToggle(tabsCodeCtnrScroll, "tabs-code-container-scroll-hide-btns", "tabs-code-container-scroll-show-btns");
 }
 
-window.addEventListener( "resize", function() {
-    refreshTabCodeScrollBtns();
-} )
+function timerAppSecond() {
+    if (termTextBuffer != '')
+        writeTextInTerminal('');
+}
 
 function checkUpdate() {
     try {
@@ -1984,6 +1999,10 @@ function checkUpdate() {
         req.send();
     } catch (ex) { }
 }
+
+window.addEventListener( "resize", function() {
+    refreshTabCodeScrollBtns();
+} );
 
 window.addEventListener( "load", function() {
 
@@ -2223,5 +2242,14 @@ window.addEventListener( "load", function() {
     } );
     
     createTabCode(null, "");
+
+    var f = function() {
+        setTimeout( function() {
+            timerAppSecond();
+            f();
+        },
+        1000 );
+    }
+    f();
 
 } );
