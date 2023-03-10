@@ -648,7 +648,6 @@ function execCodeBegin() {
 
 function execCodeRecv(text) {
     termTextBuffer += text;
-    //writeTextInTerminal(text);
 }
 
 function execCodeError(error) {
