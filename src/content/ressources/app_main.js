@@ -1319,7 +1319,7 @@ function setWiFiNetworks(networks) {
 function wifiConnected(ssid, key) {
     var actPage = getActivePage();
     if (actPage && actPage.id == "page-networks-info")
-        wsSendCmd("GET-NETWORKS-INFO", false);
+        wsSendCmd("GET-NETWORKS-INFO", true);
     boxDialogYesNo( "😎 Wi-Fi Connected with success!",
                     "The device is now connected to access point " + ssid + ".\n\n" +
                     "Do you want to save this Wi-Fi network on the device for a permanent connection even after reboot?.",
