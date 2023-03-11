@@ -557,10 +557,6 @@ function writeTextInTerminal(text, colorClass) {
     cm.refresh();
 }
 
-function writeFirmwareClick(e) {
-    wsSendCmd("WRITE-FIRMWARE", getElmById("select-esptool-port").value);
-}
-
 function eraseFlashClick(e) {
     boxDialogYesNo( "⚠️ ERASE?",
                     "Are you sure you want to erase all the flash memory on your device?",
@@ -568,6 +564,10 @@ function eraseFlashClick(e) {
                         if (yes)
                             wsSendCmd("ERASE-FLASH", getElmById("select-esptool-port").value);
                     } );
+}
+
+function writeFirmwareClick(e) {
+    wsSendCmd("WRITE-FIRMWARE", getElmById("select-esptool-port").value);
 }
 
 function setVersion(ver) {
@@ -1645,8 +1645,36 @@ function releaseSDCardClick(e) {
     wsSendCmd("SDCARD-RELEASE", null);
 }
 
+function btnSoftInfoEspIdfClick(e)
+{ wsSendCmd("OPEN-URL", "https://github.com/espressif/esp-idf/releases"); }
+
+function btnSoftInfoMPY(e)
+{ wsSendCmd("OPEN-URL", "https://github.com/micropython/micropython/releases"); }
+
+function btnSoftInfoMPYJama(e)
+{ wsSendCmd("OPEN-URL", "https://github.com/jczic/ESP32-MPY-Jama/releases"); }
+
+function btnSoftInfoEsptool(e)
+{ wsSendCmd("OPEN-URL", "https://github.com/espressif/esptool/releases"); }
+
+function btnSoftInfoDevKits(e)
+{ wsSendCmd("OPEN-URL", "https://www.espressif.com/en/products/devkits"); }
+
+function btnSoftInfoFirmwares(e)
+{ wsSendCmd("OPEN-URL", "https://micropython.org/download?port=esp32"); }
+
+function btnSoftInfoESP32Port(e)
+{ wsSendCmd("OPEN-URL", "https://github.com/micropython/micropython/blob/master/ports/esp32/README.md"); }
+
+function btnSoftInfoLibDoc(e)
+{ wsSendCmd("OPEN-URL", "https://docs.micropython.org/en/latest/library"); }
+
 function btnTerminalClick(e) {
     showREPL();
+}
+
+function btnJamaFuncsClick(e) {
+    showPage("page-jama-funcs");
 }
 
 function btnFirmwareToolsClick(e) {
@@ -1654,8 +1682,8 @@ function btnFirmwareToolsClick(e) {
     wsSendCmd("GET-ESPTOOL-VER", null);
 }
 
-function btnJamaFuncsClick(e) {
-    showPage("page-jama-funcs");
+function btnSoftInfoClick(e) {
+    showPage("page-soft-info");
 }
 
 function btnConnectionClick(e) {
@@ -1979,13 +2007,43 @@ function timerAppSecond() {
         writeTextInTerminal('');
 }
 
+function getLatestVersions() {
+
+    var setVer = function(elmId, owner, repo) {
+        try {
+            var elm = getElmById(elmId);
+            var req = new XMLHttpRequest();
+            req.onload = function() {
+                var lastVer;
+                try {
+                    lastVer = JSON.parse(this.responseText).tag_name;
+                    if (lastVer == undefined)
+                        lastVer = 'error...'
+                } catch (ex) {
+                    lastVer = 'error...'
+                }
+                elm.innerText = lastVer;
+            }
+            elm.innerText = '...';
+            req.open("get", "https://api.github.com/repos/"+owner+"/"+repo+"/releases/latest", true);
+            req.send();
+        } catch (ex) { }
+    }
+
+    setVer( "label-softver-espidf",  "espressif",   "esp-idf"        );
+    setVer( "label-softver-mpy",     "micropython", "micropython"    );
+    setVer( "label-softver-mpyjama", "jczic",       "ESP32-MPY-Jama" );
+    setVer( "label-softver-esptool", "espressif",   "esptool"        );
+
+}
+
 function checkUpdate() {
     try {
         var req = new XMLHttpRequest();
         req.onload = function() {
             try {
                 var lastVer = JSON.parse(this.responseText).tag_name;
-                if (lastVer != version)
+                if (lastVer != undefined && lastVer != version)
                     boxDialogYesNo( "🚀 Update?",
                                     "A new version (" + lastVer + ") is available!\nDo you want to download it?",
                                     function(yes) {
@@ -2241,6 +2299,8 @@ window.addEventListener( "load", function() {
     } );
     
     createTabCode(null, "");
+
+    getLatestVersions();
 
     var f = function() {
         setTimeout( function() {

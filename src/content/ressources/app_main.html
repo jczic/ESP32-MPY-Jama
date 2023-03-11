@@ -48,16 +48,17 @@
         </div>
 
         <div id="menu-panel-btns" class="menu-panel">
-            <input type="button" id="menu-btn-ide"             class="menu-button" value="Code editor (IDE)"  onclick="btnIDEClick(this);" />
+            <input type="button" id="menu-btn-ide"             class="menu-button" value="Code Editor (IDE)"  onclick="btnIDEClick(this);" />
             <input type="button" id="menu-btn-jama-funcs"      class="menu-button" value="Jama Funcs"         onclick="btnJamaFuncsClick(this);" />
-            <input type="button" id="menu-btn-terminal"        class="menu-button" value="REPL terminal"      onclick="btnTerminalClick(this);" />
-            <input type="button" id="menu-btn-sys-info"        class="menu-button" value="System info"        onclick="btnSysInfoClick(this);" />
-            <input type="button" id="menu-btn-net-info"        class="menu-button" value="Networks info"      onclick="btnNetworksInfoClick(this);" />
-            <input type="button" id="menu-btn-wifi-sta"        class="menu-button" value="Wi-Fi connection"   onclick="btnWiFiSTAClick(this);" />
-            <input type="button" id="menu-btn-wifi-ap"         class="menu-button" value="Wi-Fi access point" onclick="btnWiFiAPClick(this);" />
-            <input type="button" id="menu-btn-sdcard"          class="menu-button" value="SD card"            onclick="btnSDCardClick(this);" />
-            <input type="button" id="menu-btn-reset"           class="menu-button" value="Hard reset"         onclick="btnHardResetClick(this);" />
-            <input type="button" id="menu-btn-firmware"        class="menu-button" value="Firmware tools"     onclick="btnFirmwareToolsClick(this);" />
+            <input type="button" id="menu-btn-terminal"        class="menu-button" value="REPL Terminal"      onclick="btnTerminalClick(this);" />
+            <input type="button" id="menu-btn-sys-info"        class="menu-button" value="About System"       onclick="btnSysInfoClick(this);" />
+            <input type="button" id="menu-btn-net-info"        class="menu-button" value="About Networks"     onclick="btnNetworksInfoClick(this);" />
+            <input type="button" id="menu-btn-wifi-sta"        class="menu-button" value="Wi-Fi Connection"   onclick="btnWiFiSTAClick(this);" />
+            <input type="button" id="menu-btn-wifi-ap"         class="menu-button" value="Wi-Fi Access Point" onclick="btnWiFiAPClick(this);" />
+            <input type="button" id="menu-btn-sdcard"          class="menu-button" value="SD Card"            onclick="btnSDCardClick(this);" />
+            <input type="button" id="menu-btn-reset"           class="menu-button" value="Hard Reset"         onclick="btnHardResetClick(this);" />
+            <input type="button" id="menu-btn-firmware"        class="menu-button" value="Firmware Tools"     onclick="btnFirmwareToolsClick(this);" />
+            <input type="button" id="menu-btn-soft-info"       class="menu-button" value="Releases & Links"   onclick="btnSoftInfoClick(this);" />
         </div>
 
         <div id="menu-panel-browse" class="menu-panel">
@@ -147,7 +148,7 @@
         <div id="page-jama-funcs" class="page-container">
             <div class="page">
                 <div id="page-logo-jama-funcs" class="page-logo"></div>
-                <div class="page-title">Jama Funcs on your ESP32 device.</div>
+                <div class="page-title">Use Jama Funcs on your ESP32 device.</div>
                 <div class="properties-container-large">
                     Use embedded <b>Jama Funcs</b> to perform configurable functions on your device.<br />
                     You can also <input type="button" class="button-little-text" value="import" onclick="importJamaFuncsClick(this);" /> or export these specific MicroPython code files.<br />
@@ -201,7 +202,7 @@
         <div id="page-system-info" class="page-container">
             <div class="page">
                 <div id="page-logo-sys-info" class="page-logo"></div>
-                <div class="page-title">Information about the system of your ESP32 device.</div>
+                <div class="page-title">Check the system of your ESP32 device.</div>
                 <div class="properties-container-large">
                     <div class="properties-title">MCU &amp; MicroPython</div>
                     <div class="properties-left">
@@ -253,7 +254,7 @@
         <div id="page-networks-info" class="page-container">
             <div class="page">
                 <div id="page-logo-networks-info" class="page-logo"></div>
-                <div class="page-title">Information about wireless networks of your ESP32 device.</div>
+                <div class="page-title">Check the wireless networks of your ESP32 device.</div>
                 <div class="properties-container">
                     <div class="properties-title">Wi-Fi station interface</div>
                     <div class="properties-left">
@@ -326,7 +327,7 @@
         <div id="page-sdcard" class="page-container">
             <div class="page">
                 <div id="page-logo-sdcard" class="page-logo"></div>
-                <div class="page-title">Manage your SD card in your ESP32 device.</div>
+                <div class="page-title">Manage the SD card in your ESP32 device.</div>
                 <div class="properties-container-large">
                     Initialize and access your SD card if your board is equipped with one.<br />
                     However, make sure your board uses the ESP32 pins provided by default for the primary SD card.
@@ -393,9 +394,9 @@
         <div id="page-esptool" class="page-container">
             <div class="page">
                 <div id="page-logo-esptool" class="page-logo"></div>
-                <div class="page-title">Firmware tools for your ESP32 device.</div>
+                <div class="page-title">Use firmware tools for your ESP32 device.</div>
                 <div class="properties-container-large">
-                    Espressif esptool <span id="esptool-version"></span> is available on your system (firmware upload works from version 4.3).<br />
+                    Espressif esptool <span id="esptool-version" class="label-version"></span> is available on your system (firmware upload works from version 4.3).<br />
                     Make sure that your device is booted in download flash mode.<br />
                     Press boot+reset buttons on your board or shunt the GPIO 0 to ground.<br />
                     <br />
@@ -410,6 +411,44 @@
                     <input type="button" value="Upload firmware image" onclick="writeFirmwareClick(this);" />
                     Write a new firmware image to the chip's flash memory.<br />
                     For more informations about this, see the <a id="openweb-esptool-commands" href="#">basic esptool commands</a>.<br />
+                </div>
+            </div>
+        </div>
+
+        <div id="page-soft-info" class="page-container">
+            <div class="page">
+                <div id="page-logo-soft-info" class="page-logo"></div>
+                <div class="page-title">Check releases and useful links for ESP32/MicroPython.</div>
+                <div class="properties-container-mini">
+                    <div class="properties-title">Latest stable versions available</div>
+                    <div class="properties-left">
+                        Espressif esp-idf<br />
+                        MicroPython<br />
+                        ESP32 MPY-Jama<br />
+                        Espressif Esptool<br />
+                    </div>
+                    <div class="properties-right">
+                        ▶ <span id="label-softver-espidf" class="label-version"></span>
+                        <span> (<a href="#" onclick="btnSoftInfoEspIdfClick(this);">browse</a>)</span><br />
+                        ▶ <span id="label-softver-mpy" class="label-version"></span>
+                        <span> (<a href="#" onclick="btnSoftInfoMPY(this);">browse</a>)</span><br />
+                        ▶ <span id="label-softver-mpyjama" class="label-version"></span>
+                        <span> (<a href="#" onclick="btnSoftInfoMPYJama(this);">browse</a>)</span><br />
+                        ▶ <span id="label-softver-esptool" class="label-version"></span>
+                        <span> (<a href="#" onclick="btnSoftInfoEsptool(this);">browse</a>)</span><br />
+                    </div>
+                </div>
+                <br />
+                <div class="properties-container-mini">
+                    <div class="properties-title">Links for build</div>
+                    🔗 <a href="#" onclick="btnSoftInfoDevKits(this);">Espressif development boards</a><br />
+                    🔗 <a href="#" onclick="btnSoftInfoFirmwares(this);">Compiled firmwares for ESP32 boards</a><br />
+                </div>
+                <br />
+                <div class="properties-container-mini">
+                    <div class="properties-title">Links for help</div>
+                    🔗 <a href="#" onclick="btnSoftInfoESP32Port(this);">Building environment and firmware</a><br />
+                    🔗 <a href="#" onclick="btnSoftInfoLibDoc(this);">MicroPython libraries documentation</a><br />
                 </div>
             </div>
         </div>

@@ -878,6 +878,11 @@ select {
     margin-bottom: 15px;
 }
 
+.label-version {
+    color: #377c9e;
+    font-weight: bold;
+}
+
 #sysnfo-partitions {
     text-align: left;
     width: 100%;
@@ -885,11 +890,6 @@ select {
     line-height: 22px;
     white-space: nowrap;
     overflow: hidden;
-}
-
-#esptool-version {
-    color: #377c9e;
-    font-weight: bold;
 }
 
 #ide-code {
@@ -1297,6 +1297,7 @@ input[type=button].tiny-btn-right {
 #menu-btn-sdcard           { background-image: url('img/menu-sdcard.png'); }
 #menu-btn-reset            { background-image: url('img/menu-reset.png'); }
 #menu-btn-firmware         { background-image: url('img/menu-firmware-tools.png'); }
+#menu-btn-soft-info        { background-image: url('img/menu-soft-info.png'); }
 
 #page-logo-jama-funcs      { background-image: url('img/menu-jama-funcs.png'); }
 #page-logo-sys-info        { background-image: url('img/menu-sys-info.png'); }
@@ -1304,6 +1305,7 @@ input[type=button].tiny-btn-right {
 #page-logo-sdcard          { background-image: url('img/menu-sdcard.png'); }
 #page-logo-esptool         { background-image: url('img/menu-firmware-tools.png'); }
 #page-logo-no-esptool      { background-image: url('img/exclamation.png'); }
+#page-logo-soft-info       { background-image: url('img/menu-soft-info.png'); }
 
 #new-tiny-btn              { background-image: url('img/btn-new.png?v2'); }
 #save-tiny-btn             { background-image: url('img/btn-save.png?v2'); }
