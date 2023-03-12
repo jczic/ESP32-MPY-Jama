@@ -23,6 +23,11 @@ IS_WIN32                         = (sys.platform.upper() == 'WIN32')
 IS_IN_BUNDLE                     = ( getattr(sys, "frozen", False) and \
                                      hasattr(sys, '_MEIPASS') )
 
+OS_NAME                          = 'MacOS'   if IS_MACOS else \
+                                   'Linux'   if IS_LINUX else \
+                                   'Windows' if IS_WIN32 else \
+                                   'Unknown'
+
 WEB_SRV_PORT                     = 11236
 WEB_SRV_BIND_IP                  = '127.0.0.1'
 WEB_SRV_PATH                     = 'ressources/'

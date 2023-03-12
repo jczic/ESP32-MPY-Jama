@@ -21,7 +21,9 @@ var boxDialogFunc             = null;
 var boxDialogGenericParentElm = null;
 var canCloseWindow            = true;
 
-var version                   = "";
+var appTitle                  = "";
+var appVer                    = "";
+var osName                    = "";
 
 var currentPort               = null;
 var connectionState           = false;
@@ -220,8 +222,8 @@ function onWSMessage(evt)
     var o = JSON.parse(evt.data);
     switch (o.CMD)
     {
-        case "VERSION" :
-            setVersion(o.ARG);
+        case "APP-INFO" :
+            setAppInfo(o.ARG);
             break;
         case "SHOW-ALERT" :
             toastInfo(o.ARG);
@@ -570,8 +572,14 @@ function writeFirmwareClick(e) {
     wsSendCmd("WRITE-FIRMWARE", getElmById("select-esptool-port").value);
 }
 
-function setVersion(ver) {
-    version = ver;
+function setAppInfo(o) {
+    appTitle = o.AppTitle;
+    appVer   = o.AppVer;
+    osName   = o.OSName;
+    
+    getElmById("menubar-title").innerText   = appTitle;
+    getElmById("label-ver-on-os").innerText = "Version "+appVer+" on "+osName;
+    
     setTimeout(checkUpdate, 7000);
 }
 
@@ -2043,7 +2051,7 @@ function checkUpdate() {
         req.onload = function() {
             try {
                 var lastVer = JSON.parse(this.responseText).tag_name;
-                if (lastVer != undefined && lastVer != version)
+                if (lastVer != undefined && lastVer != "v"+appVer)
                     boxDialogYesNo( "🚀 Update?",
                                     "A new version (" + lastVer + ") is available!\nDo you want to download it?",
                                     function(yes) {

@@ -265,7 +265,7 @@ class Application :
         self._ws                   = webSocket
         webSocket.RecvTextCallback = self._wsRecvTextCallback
         webSocket.ClosedCallback   = self._wsClosedCallback
-        self._wsSendCmd('VERSION', 'v' + conf.APPLICATION_STR_VERSION)
+        self._sendAppInfo()
         if self._splashScr :
             self._splashScr.destroy()
             self._splashScr = None
@@ -288,6 +288,13 @@ class Application :
 
     def _wsClosedCallback(self, webSocket) :
         self._ws = None
+
+    # ------------------------------------------------------------------------
+
+    def _sendAppInfo(self) :
+        self._wsSendCmd( 'APP-INFO', dict( AppTitle = conf.APPLICATION_TITLE,
+                                           AppVer   = conf.APPLICATION_STR_VERSION,
+                                           OSName   = conf.OS_NAME ) )
 
     # ------------------------------------------------------------------------
 
