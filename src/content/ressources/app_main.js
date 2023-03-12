@@ -1006,15 +1006,27 @@ function addNewCodeEditorElm(code) {
         lineNumbers       : true,
         indentUnit        : 4,
         tabSize           : 4,
-        indentWithTabs    : true,
+        indentWithTabs    : false,
+        smartIndent       : true,
         matchBrackets     : true,
         autoCloseBrackets : true,
         openDialog        : true,
         searchCursor      : true,
         search            : true,
         scrollbarStyle    : "overlay",
-        extraKeys         : { "Ctrl-F" : "findPersistent",
-                              "Cmd-F"  : "findPersistent" },
+        extraKeys         : { "Ctrl-F"    : "findPersistent",
+                              "Cmd-F"     : "findPersistent",
+                              "Tab"       : (cm) => {
+                                                if (cm.getMode().name === 'null')
+                                                    cm.execCommand('insertTab');
+                                                else
+                                                    if (cm.somethingSelected())
+                                                        cm.execCommand('indentMore');
+                                                    else
+                                                        cm.execCommand('insertSoftTab');
+                                            },
+                              "Shift-Tab" : (cm) => cm.execCommand('indentLess')
+                            },
         value             : code
     } );
     codeMirror.setSize("100%", "100%");
