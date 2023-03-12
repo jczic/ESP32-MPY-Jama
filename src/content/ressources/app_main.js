@@ -908,21 +908,26 @@ function setCurrentDirLabel(s) {
 }
 
 function getFileContent(filepath) {
-    if (connectionState && processing == PRC_NONE) {
-        var ctnr = getElmById("tabs-code-container");
-        for (var i = 0; i < ctnr.children.length; i++) {
-            var tabElm = ctnr.children[i];
-            if (tabElm["tabData"]["filename"] == filepath) {
-                selectTabCode(tabElm);
-                showIDE();
-                return;
+    if (connectionState)
+        if (processing == PRC_NONE) {
+            var ctnr = getElmById("tabs-code-container");
+            for (var i = 0; i < ctnr.children.length; i++) {
+                var tabElm = ctnr.children[i];
+                if (tabElm["tabData"]["filename"] == filepath) {
+                    selectTabCode(tabElm);
+                    showIDE();
+                    return;
+                }
             }
+            processing        = PRC_TRANSFER;
+            contentBytesArr   = [ ];
+            contentRemotePath = filepath;
+            wsSendCmd("GET-FILE-CONTENT", filepath);
         }
-        processing        = PRC_TRANSFER;
-        contentBytesArr   = [ ];
-        contentRemotePath = filepath;
-        wsSendCmd("GET-FILE-CONTENT", filepath);
-    }
+        else
+            showError("A process is in execution...");
+    else
+        showError("The device must be connected first.");
 }
 
 function setListDirAndFiles(path, entries) {
@@ -1159,7 +1164,7 @@ function endOfGetFileContent() {
 }
 
 function saveTabCode(tabElm, closeTabAfter) {
-    if (connectionState) {
+    if (connectionState)
         if (processing == PRC_NONE) {
             var tabData  = tabElm["tabData"];
             var filename = tabData["filename"];
@@ -1199,7 +1204,8 @@ function saveTabCode(tabElm, closeTabAfter) {
                 } while (i < contentBytesArr.length);
             }
         }
-    }
+        else
+            showError("A process is in execution...");
     else
         showError("The device must be connected first.");
 }
@@ -1815,11 +1821,16 @@ function btnListFilesOpenClick(e) {
 function btnListFilesExecuteClick(e) {
     if (connectionState && getEventTarget(e).classList.contains("browse-button-actif")) {
         var elm = getElmById("list-files-selected");
-        if (elm != null) {
-            var filepath = browsePath + "/" + elm["filenameCB"];
-            writeTextInTerminal("Attempts to execute file " + filepath + "...\n", "terminal-LightSkyBlue");
-            wsSendCmd("EXEC-PY-FILE", filepath);
-        }
+        if (elm != null)
+            if (processing == PRC_NONE) {
+                var filepath = browsePath + "/" + elm["filenameCB"];
+                writeTextInTerminal("Attempts to execute file " + filepath + "...\n", "terminal-LightSkyBlue");
+                hide("terminal-bar");
+                processing = PRC_EXEC_CODE;
+                wsSendCmd("EXEC-PY-FILE", filepath);
+            }
+            else
+                showError("A process is already in execution.");
     }
 }
 

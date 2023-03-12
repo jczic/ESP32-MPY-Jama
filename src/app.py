@@ -1207,8 +1207,10 @@ class Application :
     def _executePYFile(self, filename) :
         if self._ableToUseDevice() :
             try :
+                self._wsSendCmd('EXEC-CODE-BEGIN')
                 self.esp32Ctrl.ExecutePYFile(filename)
             except :
+                self._wsSendCmd('EXEC-CODE-END', False)
                 self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
 
     # ------------------------------------------------------------------------
