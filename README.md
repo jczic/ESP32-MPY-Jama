@@ -6,7 +6,11 @@
 
 # <img src="/img/logo.png" width="45" valign="bottom">  ESP32 MPY-Jama, the dev tool for your favorite MCU
 
-### <p align="justify">A powerful tool that easily connects to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, file manager, REPL, real-time dashboards and advanced features for efficient development on MacOS & Windows.</p>
+### <p align="justify">A powerful tool that easily connects to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, file manager, REPL, real-time dashboards and advanced features for efficient development on MacOS, Windows and Linux.</p>
+
+```diff
++🎁 New release v1.2.0 very soon with surprises! 🎁+
+```
 
 <br />
 
