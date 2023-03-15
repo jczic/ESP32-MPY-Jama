@@ -58,16 +58,17 @@ var execAnimShowTime          = null;
 var execJamaFuncConfig        = null;
 var execJamaStopTimeout       = null;
 
-var pinoutModels              = [ "ESP32-DevKitC (WROOM)",
-                                  "ESP32-DevKitM-1 (MINI-1)",
-                                  "ESP32-PICO-KIT (PICO-D4)",
-                                  "ESP32-S2-DevKitC-1 (S2-SOLO)",
-                                  "ESP32-S2-DevKitM-1 (S2-MINI-1)",
-                                  "ESP32-S2-Saola-1 (S2-WROVER)",
-                                  "ESP32-S3-DevKitC-1 (S3-WROOM-1)",
-                                  "ESP32-S3-DevKitM-1 (S3-MINI-1)",
+var pinoutModels              = [ "ESP32-C6-DevKitC-1 (C6-WROOM-1)",
+                                  "ESP32-C3-DevKitM-1 (C3-MINI-1)",
                                   "ESP32-C3-DevKitC-02 (C3-WROOM-02)",
-                                  "ESP32-C3-DevKitM-1 (C3-MINI-1)" ];
+                                  "ESP32-S3-DevKitM-1 (S3-MINI-1)",
+                                  "ESP32-S3-DevKitC-1 (S3-WROOM-1)",
+                                  "ESP32-S2-DevKitM-1 (S2-MINI-1)",
+                                  "ESP32-S2-Saola-1 (S2-WROVER)",,
+                                  "ESP32-S2-DevKitC-1 (S2-SOLO)",
+                                  "ESP32-PICO-KIT (PICO-D4)",
+                                  "ESP32-DevKitM-1 (MINI-1)",
+                                  "ESP32-DevKitC (WROOM)" ];
 
 function getElmById(id)
 { return document.getElementById(id); }
