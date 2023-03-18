@@ -391,7 +391,7 @@ class ESP32Controller :
         if lockRead :
             self._lockRead.acquire()
         savedTimeout = self._repl.timeout
-        self._repl.timeout = timeoutSec
+        self._repl.timeout = (timeoutSec if timeoutSec else None) 
         readErr = False
         try :
             b = self._repl.read_until(endBytes)
@@ -1522,7 +1522,6 @@ class ESP32Controller :
             self._raiseConnectionError()
         self._threadStopReading()
         self._beginProcess()
-        manager = None
         try :
             try :
                 self._exeCodeREPL('import mip', timeoutSec=3)
@@ -1531,7 +1530,7 @@ class ESP32Controller :
                 self._exeCodeREPL('import upip', timeoutSec=3)
                 module = 'upip'
             try :
-                r = self._exeCodeREPL('%s.install(%s)' % (module, repr(packageName)), timeoutSec=0)
+                r = self._exeCodeREPL('%s.install(%s)' % (module, repr(packageName)), timeoutSec=None)
             except Exception as ex :
                 if self._onTerminalRecv :
                     self._onTerminalRecv(self, 'Unable to install package (is Wi-Fi/Internet connected?)\n\n')
