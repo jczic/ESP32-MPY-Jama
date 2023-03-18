@@ -1470,7 +1470,7 @@ function setAutoInfo(info) {
     var uptime   = info["uptime"];
     var text     = "UPTIME  " + uptime + " minute" + (uptime > 1 ? "s" : "");
     var progress = getElmById("uptime-progress");
-    getSubElm(progress, "progress-little-inner").style.width = "100%";
+    getSubElm(progress, "progress-little-inner").style.width = "0";
     getSubElm(progress, "progress-little-text").innerText    = text;
     show("panel-connection");
 }

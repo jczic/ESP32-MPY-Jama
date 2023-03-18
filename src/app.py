@@ -60,8 +60,8 @@ class Application :
 
         self._mainWin = webview.create_window( '%s (v%s)' % (conf.APPLICATION_TITLE, conf.APPLICATION_STR_VERSION),
                                                url        = self._localURL(conf.HTML_APP_MAIN_FILENAME),
-                                               width      = 1100,
-                                               height     = 730,
+                                               width      = 1000,
+                                               height     = 700,
                                                resizable  = True,
                                                min_size   = (640, 580),
                                                hidden     = not (conf.IS_WIN32 | conf.IS_LINUX),

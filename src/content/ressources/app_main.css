@@ -502,7 +502,7 @@ input[type=button].browse-button-actif {
     padding: 5px;
     border: 2px solid #377c9e;
     border-radius: 15px;
-    background-color: #A75269;
+    background-color: #449292;
     opacity: 0.85;
     color: white;
     text-align: center;
@@ -546,14 +546,14 @@ input[type=button].browse-button-actif {
 .info-tag-success {
     padding: 2px 6px;
     border-radius: 10px;
-    background-color: #98DDCA;
-    color: #54546c;
+    background-color: #449292;
+    color: snow;
 }
 
 .info-tag-error {
     padding: 2px 6px;
     border-radius: 10px;
-    background-color: #E97777;
+    background-color: #a85f72;
     color: snow;
 }
 
@@ -646,7 +646,7 @@ input[type=button].browse-button-actif {
     cursor: pointer;
 } .list-item:hover {
     color: white;
-    background-color: #67a0bc;
+    background-color: #449292;
 }
 
 .list-item-picto1 {
@@ -723,13 +723,14 @@ input[type=button], input[type=submit] {
     border: none;
     background-color: #377c9e;
     font-family: Roboto;
+    font-size: 12px;
     text-align: center;
     color: White;
     border-radius: 5px;
     outline: none;
     cursor: pointer;
 } input[type=button]:hover, input[type=submit]:hover {
-    background-color: #A75269;
+    background-color: #449292;
 }
 
 input[type=button].button-little-text {
@@ -742,7 +743,7 @@ input[type=button].button-little-text {
     font-size: 9px;
     line-height: 9px;
 } input[type=button].button-little-text:hover {
-    background-color: #2d99ce;
+    background-color: #449292;
 }
 
 input[type=button]:disabled, input[type=submit]:disabled {
@@ -763,8 +764,8 @@ select {
     margin-bottom: 0;
     min-width: 400px;
     height: 25px;
-    border: 1px solid #436581;
-    background-color: #e9f4fb;
+    border: 2px solid #436581;
+    background-color: #54546c;
     border-radius: 3px;
     overflow: hidden;
 }
@@ -772,7 +773,7 @@ select {
 .progress-inner {
     width: 0;
     height: 100%;
-    background-color: #ABD9FF;
+    background-color: #449292;
 }
 
 .progress-text {
@@ -782,7 +783,7 @@ select {
     top: 0;
     bottom: 0;
     text-align: center;
-    color: DarkSlateGray;
+    color: white;
     line-height: 25px;
 }
 
@@ -799,7 +800,7 @@ select {
 .progress-little-inner {
     width: 0;
     height: 100%;
-    background-color: #A75269;
+    background-color: #a85f72;
 }
 
 .progress-little-text {
@@ -1245,7 +1246,7 @@ input[type=button].tiny-btn {
     background-position: center;
     background-repeat: no-repeat;
     background-color: #2B3E50;
-} input[type=button].tiny-btn:hover { background-color: #A75269; }
+} input[type=button].tiny-btn:hover { background-color: #449292; }
 
 input[type=button].tiny-btn-right {
     float: right;
