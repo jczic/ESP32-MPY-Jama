@@ -332,8 +332,7 @@ class Application :
             else :
                 if not reconn :
                     self._wsSendCmd('SHOW-WAIT', 'Search for a device to connect to...')
-                self.esp32Ctrl = ESP32Controller.GetFirstAvailableESP32Ctrl( onConnProgress    = onConnProgress,
-                                                                             onSerialConnError = self._onSerialConnError,
+                self.esp32Ctrl = ESP32Controller.GetFirstAvailableESP32Ctrl( onSerialConnError = self._onSerialConnError,
                                                                              onTerminalRecv    = self._onTerminalRecv,
                                                                              onEndOfProgram    = self._onEndOfProgram,
                                                                              onProgramError    = self._onProgramError,
@@ -346,8 +345,8 @@ class Application :
                                                      deviceModule = self.esp32Ctrl.GetDeviceModule() ))
                 self._wsSendCmd('SHOW-ALERT', "Port %s connected to %s." % (self.esp32Ctrl.GetDevicePort(), self.esp32Ctrl.GetDeviceMCU()))
                 self._sendFlashRootPath()
-                self._sendSDCardConf(silence=True)
                 self._sendPinsList()
+                self._sendSDCardConf(silence=True)
                 self._sendAutoInfo()
                 self._deviceReadyToCmd = True
                 return True
