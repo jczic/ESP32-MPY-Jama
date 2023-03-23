@@ -816,12 +816,12 @@ select {
     letter-spacing: 1px;
 }
 
-.elm-AP-setup-text {
+.elm-config-box-text {
     margin-bottom: 5px;
     text-align: left;
 }
 
-.elm-AP-setup-input {
+.elm-config-box-input {
     margin-bottom: 20px;
     text-align: left;
 }
@@ -1303,7 +1303,7 @@ input[type=button].tiny-btn-right {
 #menu-btn-jama-funcs       { background-image: url('img/menu-jama-funcs.png'); }
 #menu-btn-terminal         { background-image: url('img/menu-terminal.png'); }
 #menu-btn-sys-info         { background-image: url('img/menu-sys-info.png'); }
-#menu-btn-net-info         { background-image: url('img/menu-net-info.png'); }
+#menu-btn-net-info         { background-image: url('img/menu-nt-info.png'); }
 #menu-btn-wifi-sta         { background-image: url('img/menu-wifi-sta.png'); }
 #menu-btn-wifi-ap          { background-image: url('img/menu-wifi-ap.png'); }
 #menu-btn-sdcard           { background-image: url('img/menu-sdcard.png'); }
@@ -1313,7 +1313,7 @@ input[type=button].tiny-btn-right {
 
 #page-logo-jama-funcs      { background-image: url('img/menu-jama-funcs.png'); }
 #page-logo-sys-info        { background-image: url('img/menu-sys-info.png'); }
-#page-logo-networks-info   { background-image: url('img/menu-net-info.png'); }
+#page-logo-networks-info   { background-image: url('img/menu-nt-info.png'); }
 #page-logo-sdcard          { background-image: url('img/menu-sdcard.png'); }
 #page-logo-esptool         { background-image: url('img/menu-firmware-tools.png'); }
 #page-logo-no-esptool      { background-image: url('img/exclamation.png'); }

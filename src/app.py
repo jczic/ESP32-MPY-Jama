@@ -179,6 +179,12 @@ class Application :
                 self._wifiSave(arg['ssid'], arg['key'])
             elif cmd == 'WIFI-OPEN-AP' :
                 self._wifiOpenAP(arg['ssid'], arg['auth'], arg['key'], arg['maxcli'])
+            elif cmd == 'INIT_ETH_DRIVER' :
+                self._initETHDriver(arg['driver'], arg['addr'], arg['mdc'], arg['mdio'], arg['power'])
+            elif cmd == 'ENABLE_ETH_IF' :
+                self._enableETHInterface()
+            elif cmd == 'DISABLE_ETH_IF' :
+                self._disableETHInterface()
             elif cmd == 'EXEC-CODE' :
                 self._execCode(arg['code'], arg['codeFilename'])
             elif cmd == 'EXEC-CODE-STOP' :
@@ -645,7 +651,7 @@ class Application :
     def _sendSysInfo(self, silence) :
         if self._ableToUseDevice(silence) :
             if not silence :
-                self._wsSendCmd('SHOW-WAIT', 'Collecting informations...')
+                self._wsSendCmd('SHOW-WAIT', 'Updating informations...')
             try :
                 o = dict( freq       = self.esp32Ctrl.GetMHzFreq(),
                           flashSize  = self.esp32Ctrl.GetFlashSize(),
@@ -665,7 +671,7 @@ class Application :
     def _sendNetworksInfo(self, silence) :
         if self._ableToUseDevice(silence) :
             if not silence :
-                self._wsSendCmd('SHOW-WAIT', 'Collecting informations...')
+                self._wsSendCmd('SHOW-WAIT', 'Updating informations...')
             try :
                 wifiSTACnf = self.esp32Ctrl.GetWiFiConfig(ap=False)
                 wifiAPCnf  = self.esp32Ctrl.GetWiFiConfig(ap=True)
@@ -694,6 +700,7 @@ class Application :
                               gateway = wifiAPCnf['gateway'],
                               dns     = wifiAPCnf['dns']
                           ),
+                          eth = self.esp32Ctrl.GetETHInfo(),
                           ble = dict(
                               active  = bleActive,
                               mac     = bleMAC
@@ -722,7 +729,7 @@ class Application :
                     self.esp32Ctrl.CloseBLE()
                 else :
                     raise Exception()
-                self._wsSendCmd('INTERFACE-CLOSED', interface)
+                self._sendNetworksInfo(False)
             except :
                 self._wsSendCmd('SHOW-ERROR', 'Unable to close this interface.')
 
@@ -752,6 +759,7 @@ class Application :
                 self._wsSendCmd('HIDE-WAIT')
                 if ok :
                     self._wsSendCmd('SHOW-ALERT', 'The device is connected to the %s access point.' % ssid)
+                    self._sendNetworksInfo(False)
                     self._wsSendCmd('WIFI-CONNECTED', { "ssid": ssid, "key": key })
                 else :
                     self._wsSendCmd('SHOW-ERROR', 'Unable to connect the device to access point %s.' % ssid)
@@ -780,10 +788,59 @@ class Application :
                                            maxcli = maxcli )
                 self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('SHOW-ALERT', 'The Wi-Fi access point has been opened.')
-                self._wsSendCmd('WIFI-AP-OPENED', ssid)
+                self._sendNetworksInfo(False)
             except :
                 self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('SHOW-ERROR', 'Unable to open the Wi-Fi access point.')
+
+    # ------------------------------------------------------------------------
+
+    def _initETHDriver(self, driverName, phyAddr, mdcPinNum, mdioPinNum, powerPinNum=None) :
+        if self._ableToUseDevice() :
+            try :
+                if self.esp32Ctrl.InitETHDriver( driverName  = driverName,
+                                                 phyAddr     = phyAddr,
+                                                 mdcPinNum   = mdcPinNum,
+                                                 mdioPinNum  = mdioPinNum,
+                                                 powerPinNum = powerPinNum ) :
+                    self._sendNetworksInfo(False)
+                else :
+                    self._wsSendCmd('SHOW-ERROR', 'Cannot initialize the Ethernet driver.\n' +
+                                                  '\n' +
+                                                  '⚠️ Attention:\n' +
+                                                  'It is strongly recommended to reset your device\n' +
+                                                  'before trying to initialize the Ethernet driver again.\n' +
+                                                  'Indeed, all the following attempts are likely to fail.')
+            except :
+                self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+
+    def _enableETHInterface(self) :
+        if self._ableToUseDevice() :
+            try :
+                self._wsSendCmd('SHOW-WAIT', 'Activation of the Ethernet interface...')
+                if self.esp32Ctrl.EnableETHInterface() :
+                    self._wsSendCmd('HIDE-WAIT')
+                    self._sendNetworksInfo(False)
+                else :
+                    self._wsSendCmd('HIDE-WAIT')
+                    self._wsSendCmd('SHOW-ERROR', 'Cannot enable the Ethernet interface.')
+            except :
+                self._wsSendCmd('HIDE-WAIT')
+                self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+
+    def _disableETHInterface(self) :
+        if self._ableToUseDevice() :
+            try :
+                if self.esp32Ctrl.DisableETHInterface() :
+                    self._sendNetworksInfo(False)
+                else :
+                    self._wsSendCmd('SHOW-ERROR', 'Cannot disable the Ethernet interface.')
+            except :
+                self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
 
     # ------------------------------------------------------------------------
 
@@ -1248,7 +1305,7 @@ class Application :
                 else :
                     raise Exception()
                 if r :
-                    self._wsSendCmd('SYS-INFO-CHANGED')
+                    self._sendSysInfo(False)
                 else :
                     self._wsSendCmd('SHOW-ERROR', 'This frequency is not supported by your device.')
             except :

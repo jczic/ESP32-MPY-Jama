@@ -1084,6 +1084,111 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    def GetETHInfo(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            r = self._exeCodeREPL( 'import network\n'                +
+                                   'if hasattr(network, "LAN") :\n' +
+                                   '  try :\n'                       +
+                                   '    __lan = network.LAN()\n'     +
+                                   '    print([__lan.config("mac"), __lan.status(), __lan.ifconfig()])\n' +
+                                   '    del __lan\n'                 +
+                                   '  except :\n'                    +
+                                   '    print([])' )
+            if r :
+                return dict( mac     = self._macAddrToStr(r[0]),
+                             enable  = (r[1] != 0 and r[1] != 2),
+                             linkup  = (r[1] == 3 or  r[1] == 5),
+                             gotip   = (r[1] == 5),
+                             ip      = r[2][0],
+                             mask    = r[2][1],
+                             gateway = r[2][2],
+                             dns     = r[2][3] )
+            else :
+                return (None if r is None else dict())
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def InitETHDriver(self, driverName, phyAddr, mdcPinNum, mdioPinNum, powerPinNum=None) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            power = ( 'None' if powerPinNum is None else ('machine.Pin(%s)' % int(powerPinNum)) )
+            return self._exeCodeREPL( 'import network, machine\n'                                      +
+                                      'try :\n'                                                        +
+                                      '  network.LAN( mdc      = machine.Pin(%s),\n' % int(mdcPinNum)  +
+                                      '               mdio     = machine.Pin(%s),\n' % int(mdioPinNum) +
+                                      '               power    = %s,\n'              % power           +
+                                      '               phy_type = network.PHY_%s,\n'  % driverName      +
+                                      '               phy_addr = %s )\n'             % int(phyAddr)    +
+                                      '  print(True)\n'                                                +
+                                      'except :\n'                                                     +
+                                      '  print(False)',
+                                      timeoutSec = 3 )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def EnableETHInterface(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            return self._exeCodeREPL( 'import network\n'                        +
+                                      'try :\n'                                 +
+                                      '  __s = network.LAN().status()\n'        +
+                                      '  if __s != 0 and __s != 2 :\n'          +
+                                      '    print(True)\n'                       +
+                                      '  else :\n'                              +
+                                      '    print(network.LAN().active(True))\n' +
+                                      'except :\n'                              +
+                                      '  __s = None\n'                          +
+                                      '  print(False)\n'                        +
+                                      'finally :\n'                             +
+                                      '  del __s',
+                                      timeoutSec = 7 )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def DisableETHInterface(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            return self._exeCodeREPL( 'import network\n'                             +
+                                      'try :\n'                                      +
+                                      '  __s = network.LAN().status()\n'             +
+                                      '  if __s == 0 or __s == 2 :\n '               +
+                                      '    print(True)\n'                            +
+                                      '  else :\n'                                   +
+                                      '    print(not network.LAN().active(False))\n' +
+                                      'except :\n'                                   +
+                                      '  __s = None\n'                               +
+                                      '  print(False)\n'                             +
+                                      'finally :\n'                                  +
+                                      '  del __s',
+                                      timeoutSec = 3 )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
     def GetBLEActive(self) :
         if not self._isConnected :
             self._raiseConnectionError()
@@ -1141,7 +1246,11 @@ class ESP32Controller :
         self._beginProcess()
         try :
             return self._exeCodeREPL( 'import network\n'                                               +
-                                      'if network.WLAN(network.STA_IF).isconnected() :\n'              +
+                                      'try :\n'                                                        +
+                                      '  __lanOk = network.LAN().status() == 5\n'                      +
+                                      'except :\n'                                                     +
+                                      '  __lanOk = False\n'                                            +
+                                      'if __lanOk or network.WLAN(network.STA_IF).isconnected() :\n'   +
                                       '  import socket\n'                                              +
                                       '  __s = socket.socket()\n'                                      +
                                       '  try :\n'                                                      +
@@ -1152,7 +1261,8 @@ class ESP32Controller :
                                       '    print(False)\n'                                             +
                                       '  del __s\n'                                                    +
                                       'else :\n'                                                       +
-                                      '  print(False)\n'                                               ,
+                                      '  print(False)\n'                                               +
+                                      'del __lanOk',
                                       timeoutSec = 7 )
         finally :
             self._endProcess()

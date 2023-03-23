@@ -30,8 +30,9 @@ var connectionState           = false;
 var processing                = PRC_NONE;
 
 var showConnPortsDialog       = false;
+var showNetworksInfoPage      = false;
 
-var pinsList                  = [ ]
+var pinsList                  = { }
 
 var flashRootPath             = "";
 var browsePath                = "";
@@ -309,15 +310,6 @@ function onWSMessage(evt)
             break;
         case "WIFI-CONNECTED" :
             wifiConnected(o.ARG["ssid"], o.ARG["key"]);
-            break;
-        case "WIFI-AP-OPENED" :
-            wifiAPOpened(o.ARG);
-            break;
-        case "INTERFACE-CLOSED" :
-            interfaceClosed(o.ARG)
-            break;
-        case "SYS-INFO-CHANGED" :
-            sysInfoChanged();
             break;
         case "MODULES" :
             importModules(o.ARG);
@@ -1271,9 +1263,11 @@ function setSystemInfo(o) {
         partElm.appendChild(trElm);
     }
     
-    showPage("page-system-info");
-    
-    setPinsList(o.pins);
+    var actPage = getActivePage();
+    if (!actPage || actPage.id != "page-system-info") {
+        showPage("page-system-info");
+        setPinsList(o.pins);
+    }
 }
 
 function setNetworksInfo(o) {
@@ -1295,13 +1289,34 @@ function setNetworksInfo(o) {
     getElmById("label-netnfo-wl-ap-gateway").innerText  = o.wifiAP.gateway;
     getElmById("label-netnfo-wl-ap-dns").innerText      = o.wifiAP.dns;
 
+    var ok = (o.eth && o.eth.mac);
+    setTextTag("label-netnfo-eth-active", ( !o.eth ? "Not supported"
+                                            : !ok ? "No driver"
+                                              : o.eth.enable ? "Yes" : "No" ),
+                                            ok ? o.eth.enable : null);
+    if (o.eth && !ok)        showInline("init-ETH-driver"); else hide("init-ETH-driver");
+    if (ok && !o.eth.enable) showInline("enable-IF-ETH");   else hide("enable-IF-ETH");
+    if (ok && o.eth.enable)  showInline("disable-IF-ETH");  else hide("disable-IF-ETH");
+    getElmById("label-netnfo-eth-mac").innerText        = (ok ? o.eth.mac : "");
+    setTextTag("label-netnfo-eth-status", ( !ok || !o.eth.enable ? ""
+                                            : !o.eth.linkup ? "Unplugged"
+                                              : "Plugged in " + (o.eth.gotip ? "(IP Ok)" : "(NO IP)")),
+                                            ok && o.eth.enable ? o.eth.linkup : null);
+    getElmById("label-netnfo-eth-ip").innerText         = (ok ? o.eth.ip : "");
+    getElmById("label-netnfo-eth-mask").innerText       = (ok ? o.eth.mask : "");
+    getElmById("label-netnfo-eth-gateway").innerText    = (ok ? o.eth.gateway : "");
+    getElmById("label-netnfo-eth-dns").innerText        = (ok ? o.eth.dns : "");
+
     setTextTag("label-netnfo-internet-ok", (o.internetOK ? "Yes" : "No"), o.internetOK);
     
     setTextTag("label-netnfo-ble-active", (o.ble.active ? "Yes" : "No"), o.ble.active);
     if (o.ble.active) showInline("close-IF-BLE"); else hide("close-IF-BLE");
     getElmById("label-netnfo-ble-mac").innerText        = o.ble.mac;
     
-    showPage("page-networks-info");
+    if (showNetworksInfoPage) {
+        showNetworksInfoPage = false;
+        showPage("page-networks-info");
+    }
 }
 
 function setWiFiNetworks(networks) {
@@ -1344,35 +1359,14 @@ function setWiFiNetworks(networks) {
 }
 
 function wifiConnected(ssid, key) {
-    var actPage = getActivePage();
-    if (actPage && actPage.id == "page-networks-info")
-        wsSendCmd("GET-NETWORKS-INFO", true);
     boxDialogYesNo( "😎 Wi-Fi Connected with success!",
                     "The device is now connected to access point " + ssid + ".\n\n" +
-                    "Do you want to save this Wi-Fi network on the device for a permanent connection even after reboot?.",
+                    "💡 Do you want to save this Wi-Fi network on the device for a permanent connection even after reboot?.",
                     function(yes) {
                         if (yes)
                             wsSendCmd("WIFI-SAVE", { ssid: ssid, key: key });
                             wsSendCmd("GET-LIST-DIR", browsePath);
                     } );
-}
-
-function wifiAPOpened(ssid) {
-    var actPage = getActivePage();
-    if (actPage && actPage.id == "page-networks-info")
-        wsSendCmd("GET-NETWORKS-INFO", false);
-}
-
-function interfaceClosed(interface) {
-    var actPage = getActivePage();
-    if (actPage && actPage.id == "page-networks-info")
-        wsSendCmd("GET-NETWORKS-INFO", false);
-}
-
-function sysInfoChanged() {
-    var actPage = getActivePage();
-    if (actPage && actPage.id == "page-system-info")
-        wsSendCmd("GET-SYS-INFO", false);
 }
 
 function terminalFocusClick(e) {
@@ -1576,6 +1570,7 @@ function btnSysInfoClick(e) {
 }
 
 function btnNetworksInfoClick(e) {
+    showNetworksInfoPage = true;
     wsSendCmd("GET-NETWORKS-INFO", false);
 }
 
@@ -1622,6 +1617,69 @@ function elmAPAuthChange(e) {
         show("elm-AP-key-container");
     else
         hide("elm-AP-key-container");
+}
+
+function initETHDriverClick(e) {
+    if (connectionState) {
+        getElmById("elm-ETH-init-driver").value = "";
+        getElmById("elm-ETH-init-addr"  ).value = "00";
+        var mdcElm      = getElmById("elm-ETH-init-mdc");
+        var mdioElm     = getElmById("elm-ETH-init-mdio");
+        var powerElm    = getElmById("elm-ETH-init-power");
+        var selElements = [mdcElm, mdioElm, powerElm];
+        var optElm;
+        for (var i in selElements) {
+            rmElmChildren(selElements[i].id);
+            optElm       = newElm("option", null, null);
+            optElm.value = "";
+            optElm.text  = (selElements[i] == powerElm ? "Not used" : "-- Choose a GPIO --");
+            selElements[i].appendChild(optElm);
+            for (var pin in pinsList) {
+                    optElm       = newElm("option", null, null);
+                    optElm.value = pin;
+                    optElm.text  = "GPIO-" + pin;
+                    selElements[i].appendChild(optElm);
+            }
+        }
+        boxDialogGeneric( "🏗 Ethernet PHY initialization",
+                          "You must configure the driver of the chipset:",
+                          "elm-ETH-init",
+                          function() {
+                              var driver = getElmById("elm-ETH-init-driver").value;
+                              var addr   = parseInt(getElmById("elm-ETH-init-addr").value.trim(), 16);
+                              var mdc    = parseInt(getElmById("elm-ETH-init-mdc").value);
+                              var mdio   = parseInt(getElmById("elm-ETH-init-mdio").value);
+                              var power  = parseInt(getElmById("elm-ETH-init-power").value);
+                              if (isNaN(power))
+                                  power = null;
+                              if (driver == "")
+                                  showError("You must choose a chipset.");
+                              else if (isNaN(addr) || addr < 0 || addr > 0x1F)
+                                  showError("The PHY address is incorrect.");
+                              else if (isNaN(mdc))
+                                  showError("You must choose a mdc GPIO.");
+                              else if (isNaN(mdio))
+                                  showError("You must choose a mdio GPIO.");
+                              else
+                                  wsSendCmd( "INIT_ETH_DRIVER", {
+                                                "driver" : driver,
+                                                "addr"   : addr,
+                                                "mdc"    : mdc,
+                                                "mdio"   : mdio,
+                                                "power"  : power } );
+                          } );
+        getElmById("elm-ETH-init-driver").focus();
+    }
+    else
+        showError("The device must be connected first.");
+}
+
+function enableInterfaceETHClick(e) {
+    wsSendCmd("ENABLE_ETH_IF", null);
+}
+
+function disableInterfaceETHClick(e) {
+    wsSendCmd("DISABLE_ETH_IF", null);
 }
 
 function setPinoutInfoImg(name) {

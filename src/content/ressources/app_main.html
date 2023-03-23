@@ -46,13 +46,13 @@
         </div>
 
         <div id="menu-panel-btns" class="menu-panel">
-            <input type="button" id="menu-btn-ide"             class="menu-button" value="Code Editor (IDE)"  onclick="btnIDEClick(this);" />
+            <input type="button" id="menu-btn-ide"             class="menu-button" value="Code Editor"        onclick="btnIDEClick(this);" />
             <input type="button" id="menu-btn-jama-funcs"      class="menu-button" value="Jama Funcs"         onclick="btnJamaFuncsClick(this);" />
             <input type="button" id="menu-btn-terminal"        class="menu-button" value="REPL Terminal"      onclick="btnTerminalClick(this);" />
-            <input type="button" id="menu-btn-sys-info"        class="menu-button" value="About System"       onclick="btnSysInfoClick(this);" />
-            <input type="button" id="menu-btn-net-info"        class="menu-button" value="About Networks"     onclick="btnNetworksInfoClick(this);" />
-            <input type="button" id="menu-btn-wifi-sta"        class="menu-button" value="Wi-Fi Connection"   onclick="btnWiFiSTAClick(this);" />
-            <input type="button" id="menu-btn-wifi-ap"         class="menu-button" value="Wi-Fi Access Point" onclick="btnWiFiAPClick(this);" />
+            <input type="button" id="menu-btn-sys-info"        class="menu-button" value="System"             onclick="btnSysInfoClick(this);" />
+            <input type="button" id="menu-btn-net-info"        class="menu-button" value="Networks"           onclick="btnNetworksInfoClick(this);" />
+            <input type="button" id="menu-btn-wifi-sta"        class="menu-button" value="Connect Wi-Fi"      onclick="btnWiFiSTAClick(this);" />
+            <input type="button" id="menu-btn-wifi-ap"         class="menu-button" value="Open Wi-Fi AP"      onclick="btnWiFiAPClick(this);" />
             <input type="button" id="menu-btn-sdcard"          class="menu-button" value="SD Card"            onclick="btnSDCardClick(this);" />
             <input type="button" id="menu-btn-reset"           class="menu-button" value="Hard Reset"         onclick="btnHardResetClick(this);" />
             <input type="button" id="menu-btn-firmware"        class="menu-button" value="Firmware Tools"     onclick="btnFirmwareToolsClick(this);" />
@@ -253,9 +253,9 @@
         <div id="page-networks-info" class="page-container">
             <div class="page">
                 <div id="page-logo-networks-info" class="page-logo"></div>
-                <div class="page-title">Check the wireless networks of your ESP32 device.</div>
+                <div class="page-title">Manage the networks of your ESP32.</div>
                 <div class="properties-container">
-                    <div class="properties-title">Wi-Fi station interface</div>
+                    <div class="properties-title">Wi-Fi client interface</div>
                     <div class="properties-left">
                         STA active:<br />
                         MAC address:<br />
@@ -301,7 +301,31 @@
                     </div>
                 </div>
                 <div class="properties-container">
-                    <div class="properties-title">Internet access status</div>
+                    <div class="properties-title">Ethernet PHY interface</div>
+                    <div class="properties-left">
+                        ETH active:<br />
+                        MAC address:<br />
+                        Link status:<br />
+                        IP:<br />
+                        Mask:<br />
+                        Gateway:<br />
+                        DNS:<br />
+                    </div>
+                    <div class="properties-right">
+                        <span id="label-netnfo-eth-active"></span>
+                        <span id="init-ETH-driver"> (<a href="#" onclick="initETHDriverClick(this);">initialize</a>)</span>
+                        <span id="enable-IF-ETH"> (<a href="#" onclick="enableInterfaceETHClick(this);">activate</a>)</span>
+                        <span id="disable-IF-ETH"> (<a href="#" onclick="disableInterfaceETHClick(this);">close</a>)</span><br />
+                        <span id="label-netnfo-eth-mac"></span><br />
+                        <span id="label-netnfo-eth-status"></span><br />
+                        <span id="label-netnfo-eth-ip"></span><br />
+                        <span id="label-netnfo-eth-mask"></span><br />
+                        <span id="label-netnfo-eth-gateway"></span><br />
+                        <span id="label-netnfo-eth-dns"></span><br />
+                    </div>
+                </div>
+                <div class="properties-container">
+                    <div class="properties-title">Internet status</div>
                     <div class="properties-left">
                         Reachable:<br />
                     </div>
@@ -310,7 +334,7 @@
                     </div>
                 </div>
                 <div class="properties-container">
-                    <div class="properties-title">Bluetooth interface</div>
+                    <div class="properties-title">Bluetooth LE interface</div>
                     <div class="properties-left">
                         BLE active:<br />
                         MAC address:<br />
@@ -549,21 +573,41 @@
     </div>
     
     <div id="elm-AP-setup" class="hide">
-        <div class="elm-AP-setup-text">Enter the network name (SSID):</div>
-        <input id="elm-AP-ssid" class="elm-AP-setup-input" placeholder="ESP32" spellcheck="false" />
-        <div class="elm-AP-setup-text">Select the type of authentication:</div>
-        <select id="elm-AP-auth" class="elm-AP-setup-input" onchange="elmAPAuthChange(this);">
+        <div class="elm-config-box-text">Enter the network name (SSID):</div>
+        <input id="elm-AP-ssid" class="elm-config-box-input" placeholder="ESP32" spellcheck="false" />
+        <div class="elm-config-box-text">Select the type of authentication:</div>
+        <select id="elm-AP-auth" class="elm-config-box-input" onchange="elmAPAuthChange(this);">
             <option value="">No authentication (OPEN)</option>
             <option value="WPA-PSK">WPA-PSK</option>
             <option value="WPA2-PSK">WPA2-PSK</option>
             <option value="WPA/WPA2-PSK">WPA/WPA2-PSK</option>
         </select>
         <div id="elm-AP-key-container">
-            <div class="elm-AP-setup-text">Enter the protection key (8 characters minimum):</div>
-            <input id="elm-AP-key" class="elm-AP-setup-input" type="password" spellcheck="false" />
+            <div class="elm-config-box-text">Enter the protection key (8 characters minimum):</div>
+            <input id="elm-AP-key" class="elm-config-box-input" type="password" spellcheck="false" />
         </div>
-        <div class="elm-AP-setup-text">Enter the maximum number of client connections (0-10):</div>
-        <input type="number" id="elm-AP-maxclients" class="elm-AP-setup-input" spellcheck="false" />
+        <div class="elm-config-box-text">Enter the maximum number of client connections (0-10):</div>
+        <input type="number" id="elm-AP-maxclients" class="elm-config-box-input" spellcheck="false" />
+    </div>
+
+    <div id="elm-ETH-init" class="hide">
+        <div class="elm-config-box-text">Select the Ethernet transceiver chipset:</div>
+        <select id="elm-ETH-init-driver" class="elm-config-box-input">
+            <option value=""       >-- Choose a chipset --</option>
+            <option value="LAN8710">Chipset LAN8710</option>
+            <option value="LAN8720">Chipset LAN8720</option>
+            <option value="IP101"  >Chipset IP101</option>
+            <option value="RTL8201">Chipset RTL8201</option>
+            <option value="DP83848">Chipset DP83848</option>
+        </select>
+        <div class="elm-config-box-text">Enter the PHY address (5 bits in hex, from 00 to 1F):</div>
+        <input id="elm-ETH-init-addr" class="elm-config-box-input" spellcheck="false" />
+        <div class="elm-config-box-text">Select the RMII mdc GPIO:</div>
+        <select id="elm-ETH-init-mdc" class="elm-config-box-input"></select>
+        <div class="elm-config-box-text">Select the RMII mdio GPIO:</div>
+        <select id="elm-ETH-init-mdio" class="elm-config-box-input"></select>
+        <div class="elm-config-box-text">Select the power GPIO (optional):</div>
+        <select id="elm-ETH-init-power" class="elm-config-box-input"></select>
     </div>
 
     <div id="elm-jama-func-terminal-container" class="hide">
