@@ -169,6 +169,10 @@ class Application :
                 self._sendSysInfo(arg)
             elif cmd == 'GET-NETWORKS-INFO' :
                 self._sendNetworksInfo(arg)
+            elif cmd == 'GET-NETWORKS-MIN-INFO' :
+                self._sendNetworksMinInfo()
+            elif cmd == 'GET-AP-CLI-ADDR' :
+                self._sendAPClientsAddr()
             elif cmd == 'CLOSE-INTERFACE' :
                 self._closeInterface(arg)
             elif cmd == 'GET-WIFI-NETWORKS' :
@@ -644,7 +648,8 @@ class Application :
             try :
                 self._wsSendCmd('PINS-LIST', self.esp32Ctrl.GetPinsState())
             except :
-                self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+                if not silence :
+                    self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
 
     # ------------------------------------------------------------------------
 
@@ -714,6 +719,27 @@ class Application :
                 if not silence :
                     self._wsSendCmd('HIDE-WAIT')
                     self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+
+    def _sendNetworksMinInfo(self) :
+        if self._ableToUseDevice(True) :
+            try :
+                self._wsSendCmd('NETWORKS-MIN-INFO', self.esp32Ctrl.GetNetworksMinInfo())
+            except :
+                try :
+                    self._wsSendCmd('NETWORKS-MIN-INFO', dict())
+                except :
+                    pass
+    
+    # ------------------------------------------------------------------------
+
+    def _sendAPClientsAddr(self) :
+        if self._ableToUseDevice() :
+            try :
+                self._wsSendCmd('AP-CLI-ADDR', self.esp32Ctrl.GetAPClientsAddr())
+            except :
+                self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
 
     # ------------------------------------------------------------------------
 

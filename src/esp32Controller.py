@@ -1084,6 +1084,24 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    def GetAPClientsAddr(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            r = self._exeCodeREPL('import network; print(network.WLAN(network.AP_IF).status("stations"))')
+            for i in range(len(r)) :
+                r[i] = self._macAddrToStr(r[i][0])
+            return r
+        except Exception as ex :
+            print(ex)
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
     def GetETHInfo(self) :
         if not self._isConnected :
             self._raiseConnectionError()
@@ -1091,7 +1109,7 @@ class ESP32Controller :
         self._beginProcess()
         try :
             r = self._exeCodeREPL( 'import network\n'                +
-                                   'if hasattr(network, "LAN") :\n' +
+                                   'if hasattr(network, "LAN") :\n'  +
                                    '  try :\n'                       +
                                    '    __lan = network.LAN()\n'     +
                                    '    print([__lan.config("mac"), __lan.status(), __lan.ifconfig()])\n' +
@@ -1268,7 +1286,33 @@ class ESP32Controller :
             self._endProcess()
             self._threadStartReading()
 
+    # ---------------------------------------------------------------------------
 
+    def GetNetworksMinInfo(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            return self._exeCodeREPL( 'import network\n' +
+                                      '__r = dict()\n'   +
+                                      'try :\n'          +
+                                      '  __r["staRSSI"] = network.WLAN(network.STA_IF).status("rssi")\n' +
+                                      'except :\n'       +
+                                      '  pass\n'         +
+                                      'try :\n'          +
+                                      '  __r["apStaCount"] = len(network.WLAN(network.AP_IF).status("stations"))\n' +
+                                      'except :\n'       +
+                                      '  pass\n'         +
+                                      'try :\n'          +
+                                      '  __r["ethStatus"] = network.LAN().status()\n' +
+                                      'except :\n'       +
+                                      '  pass\n'         +
+                                      'print(__r)\n'     +
+                                      'del __r' )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
 
     # ---------------------------------------------------------------------------
 

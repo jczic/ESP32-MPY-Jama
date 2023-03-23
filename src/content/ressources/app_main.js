@@ -33,6 +33,7 @@ var showConnPortsDialog       = false;
 var showNetworksInfoPage      = false;
 
 var pinsList                  = { }
+var networkMiniInfos          = null
 
 var flashRootPath             = "";
 var browsePath                = "";
@@ -304,6 +305,12 @@ function onWSMessage(evt)
             break;
         case "NETWORKS-INFO" :
             setNetworksInfo(o.ARG);
+            break;
+        case "NETWORKS-MIN-INFO" :
+            setNetworksMinInfo(o.ARG);
+            break;
+        case "AP-CLI-ADDR" :
+            showAPClientsAddr(o.ARG);
             break;
         case "WIFI-NETWORKS" :
             setWiFiNetworks(o.ARG);
@@ -720,10 +727,15 @@ function deviceReset() {
     writeTextInTerminal("\n* ESP32 has been reset!\n\n", "terminal-IndianRed");
     var actPage = getActivePage();
     if (actPage)
-        if (actPage.id == "page-networks-info")
-            wsSendCmd("GET-NETWORKS-INFO", true);
-        if (actPage.id == "page-system-info")
+        if (actPage.id == "page-system-info") {
             wsSendCmd("GET-SYS-INFO", true);
+            wsSendCmd("GET-PINS-LIST", true);
+        }
+        if (actPage.id == "page-networks-info") {
+            wsSendCmd("GET-NETWORKS-INFO", true);
+            networkMiniInfos = { };
+            wsSendCmd("GET-NETWORKS-MIN-INFO", null);
+        }
         if (actPage.id == "page-sdcard")
             wsSendCmd("GET-SDCARD-CONF", true);
 }
@@ -1268,9 +1280,11 @@ function setSystemInfo(o) {
         showPage("page-system-info");
         setPinsList(o.pins);
     }
+
 }
 
 function setNetworksInfo(o) {
+
     setTextTag("label-netnfo-wl-sta-active", (o.wifiSTA.active ? "Yes" : "No"), o.wifiSTA.active);
     if (o.wifiSTA.active) showInline("close-IF-STA"); else hide("close-IF-STA");
     getElmById("label-netnfo-wl-sta-mac").innerText     = o.wifiSTA.mac;
@@ -1288,6 +1302,7 @@ function setNetworksInfo(o) {
     getElmById("label-netnfo-wl-ap-mask").innerText     = o.wifiAP.mask;
     getElmById("label-netnfo-wl-ap-gateway").innerText  = o.wifiAP.gateway;
     getElmById("label-netnfo-wl-ap-dns").innerText      = o.wifiAP.dns;
+    if (o.wifiAP.active) showInline("show-AP-cli-addr"); else hide("show-AP-cli-addr");
 
     var ok = (o.eth && o.eth.mac);
     setTextTag("label-netnfo-eth-active", ( !o.eth ? "Not supported"
@@ -1300,7 +1315,7 @@ function setNetworksInfo(o) {
     getElmById("label-netnfo-eth-mac").innerText        = (ok ? o.eth.mac : "");
     setTextTag("label-netnfo-eth-status", ( !ok || !o.eth.enable ? ""
                                             : !o.eth.linkup ? "Unplugged"
-                                              : "Plugged in " + (o.eth.gotip ? "(IP Ok)" : "(NO IP)")),
+                                              : "Plugged in " + (o.eth.gotip ? "(IP Ok)" : "(No IP)")),
                                             ok && o.eth.enable ? o.eth.linkup : null);
     getElmById("label-netnfo-eth-ip").innerText         = (ok ? o.eth.ip : "");
     getElmById("label-netnfo-eth-mask").innerText       = (ok ? o.eth.mask : "");
@@ -1315,8 +1330,30 @@ function setNetworksInfo(o) {
     
     if (showNetworksInfoPage) {
         showNetworksInfoPage = false;
-        showPage("page-networks-info");
+        var actPage = getActivePage();
+        if (!actPage || actPage.id != "page-networks-info") {
+            showPage("page-networks-info");
+            networkMiniInfos = null;
+            wsSendCmd("GET-NETWORKS-MIN-INFO", null);
+        }
     }
+
+}
+
+function setNetworksMinInfo(o) {
+    var actPage = getActivePage();
+    if (actPage && actPage.id == "page-networks-info") {
+        if (networkMiniInfos != null) {
+            getElmById("label-netnfo-wl-sta-rssi").innerText   = (o.staRSSI ? o.staRSSI + " dBm" : "N/A");
+            getElmById("label-netnfo-wl-ap-clients").innerText = (o.apStaCount != undefined ? o.apStaCount : "N/A");
+            if ( Boolean(o.staRSSI)    != Boolean(networkMiniInfos.staRSSI)    ||
+                 Boolean(o.apStaCount) != Boolean(networkMiniInfos.apStaCount) ||
+                 o.ethStatus           != networkMiniInfos.ethStatus )
+                wsSendCmd("GET-NETWORKS-INFO", true);
+        }
+        wsSendCmd("GET-NETWORKS-MIN-INFO", null);
+    }
+    networkMiniInfos = o;
 }
 
 function setWiFiNetworks(networks) {
@@ -1367,6 +1404,17 @@ function wifiConnected(ssid, key) {
                             wsSendCmd("WIFI-SAVE", { ssid: ssid, key: key });
                             wsSendCmd("GET-LIST-DIR", browsePath);
                     } );
+}
+
+function showAPClientsAddr(cliAddr) {
+    if (cliAddr.length > 0) {
+        var s = ""
+        for (i in cliAddr)
+            s += "\n<b>" + cliAddr[i] + "</b>";
+        showInfo("MAC address of <b>" + cliAddr.length + "</b> client(s) currently connected to the AP:\n" + s);
+    }
+    else
+        showInfo("No clients currently connected to the AP.");
 }
 
 function terminalFocusClick(e) {
@@ -1619,6 +1667,14 @@ function elmAPAuthChange(e) {
         hide("elm-AP-key-container");
 }
 
+function closeWirelessInterfaceClick(e, interface) {
+    wsSendCmd("CLOSE-INTERFACE", interface);
+}
+
+function showAPClientsAddrClick(e) {
+    wsSendCmd("GET-AP-CLI-ADDR", null);
+}
+
 function initETHDriverClick(e) {
     if (connectionState) {
         getElmById("elm-ETH-init-driver").value = "";
@@ -1782,10 +1838,6 @@ function btnConnectionClick(e) {
 
 function btnSwitchClick(e) {
     setSwitchButton(getEventTarget(e));
-}
-
-function closeWirelessInterfaceClick(e, interface) {
-    wsSendCmd("CLOSE-INTERFACE", interface);
 }
 
 function setConnectionState(connected) {
