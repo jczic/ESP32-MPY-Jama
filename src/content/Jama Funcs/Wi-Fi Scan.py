@@ -87,5 +87,5 @@ for x in scan :
     else :
         print('    SSID (is hidden)    :')
     print('    Channel             : %s' % chan)
-    print('    RSSI (signal)       : %sdb (%s)' % (rssi, signal))
+    print('    RSSI (signal)       : %s dBm (%s)' % (rssi, signal))
     print('    Authentication type : %s' % authName)

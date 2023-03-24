@@ -42,18 +42,13 @@ if not args.ntp_srv or args.ntp_srv.find('.') == -1 :
     import sys
     sys.exit()
 
-wlan = WLAN(STA_IF)
-if not wlan.active() or wlan.ifconfig()[0] == '0.0.0.0' :
-    print('Please, connect your ESP32 to a Wi-Fi access point first.')
-    import sys
-    sys.exit()
-
 ntptime.host = args.ntp_srv
 
 try :
     ntptime.settime()
 except Exception as ex :
     print('Unable to connect to NTP server "%s" (%s).' % (ntptime.host, ex))
+    print('Make sure your ESP32 is connected to the Internet first.')
     import sys
     sys.exit()
 

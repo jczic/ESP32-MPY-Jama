@@ -151,14 +151,17 @@ function textToHTML(text) {
 }
 
 function toastInfo(text) {
-    var toastElm = getElmById("toast-info");
-    toastElm.innerText = text;
-    show(toastElm.id);
+    var toastElm = getElmById("toast-elm-id");
+    if (toastElm)
+        delElm(toastElm);
     if (toastTimeout)
         clearTimeout(toastTimeout);
+    toastElm = newElm("div", "toast-elm-id", ["toast-info"]);
+    toastElm.innerText = text;
+    document.body.appendChild(toastElm);
     toastTimeout = setTimeout(
         function() {
-            hide(toastElm.id);
+            delElm(toastElm);
             toastTimeout = null;
         },
         5000 );
