@@ -295,7 +295,11 @@ input[type=button].menu-button {
     white-space: nowrap;
     cursor: pointer;
     overflow: hidden;
-} .list-files:hover { background-color: #436581; }
+} .list-files:hover {
+    background-color: #436581;
+    transform: scale(1.05);
+    transition: transform 130ms ease-out;
+}
 
 #list-files-selected {
     height: 32px;
@@ -303,6 +307,10 @@ input[type=button].menu-button {
     background-color: #A75269;
     line-height: 14px;
     color: white;
+    transition: height 350ms ease,
+                padding-top 500ms ease,
+                background-color 500ms ease,
+                line-height 500ms ease;
 }
 
 .list-files-picto {
