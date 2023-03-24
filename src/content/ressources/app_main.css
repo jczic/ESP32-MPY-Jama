@@ -308,9 +308,9 @@ input[type=button].menu-button {
     line-height: 14px;
     color: white;
     transition: height 350ms ease,
-                padding-top 500ms ease,
-                background-color 500ms ease,
-                line-height 500ms ease;
+                padding-top 350ms ease,
+                background-color 350ms ease,
+                line-height 350ms ease;
 }
 
 .list-files-picto {
