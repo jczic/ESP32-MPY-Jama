@@ -512,6 +512,7 @@ class Application :
         if self._ableToUseDevice() :
             file_types = ('All files (*.*)', )
             r = self._mainWin.create_file_dialog( webview.OPEN_DIALOG,
+                                                  directory      = '',
                                                   allow_multiple = False,
                                                   file_types     = file_types )
             if r and len(r) == 1 :
@@ -943,6 +944,7 @@ class Application :
     def _esp32WriteFirmwareImg(self, port) :
         file_types = ('Firmware image files (*.bin)', )
         imgFile    = self._mainWin.create_file_dialog( webview.OPEN_DIALOG,
+                                                       directory      = '',
                                                        allow_multiple = False,
                                                        file_types     = file_types )
         if imgFile and len(imgFile) == 1 :
@@ -1097,6 +1099,7 @@ class Application :
     def _importJamaFunc(self) :
         file_types = ('Jama Funcs MicroPython Files (*.py)', )
         filename   = self._mainWin.create_file_dialog( webview.OPEN_DIALOG,
+                                                       directory      = '',
                                                        allow_multiple = False,
                                                        file_types     = file_types )
         if filename and len(filename) == 1 :
