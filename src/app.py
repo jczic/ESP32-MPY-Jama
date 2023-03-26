@@ -504,7 +504,7 @@ class Application :
                                                       directory     = '',
                                                       save_filename = filename )
                 if r :
-                    self._recvFile(remoteFilename, r)
+                    self._recvFile(remoteFilename, str(r))
 
     # ------------------------------------------------------------------------
 
@@ -516,7 +516,7 @@ class Application :
                                                   allow_multiple = False,
                                                   file_types     = file_types )
             if r and len(r) == 1 :
-                localFilename  = r[0]
+                localFilename  = str(r[0])
                 remoteFilename = remoteFilePath + Path(localFilename).name
                 self._sendFile(localFilename, remoteFilename)
 
@@ -948,7 +948,7 @@ class Application :
                                                        allow_multiple = False,
                                                        file_types     = file_types )
         if imgFile and len(imgFile) == 1 :
-            imgFile = imgFile[0]
+            imgFile = str(imgFile[0])
             try :
                 if esptoolProc.CheckFirmwareImg(imgFile) :
                     if self.esp32Ctrl and self.esp32Ctrl.IsConnected() and self.esp32Ctrl.GetDevicePort() == port :
@@ -1103,7 +1103,7 @@ class Application :
                                                        allow_multiple = False,
                                                        file_types     = file_types )
         if filename and len(filename) == 1 :
-            filename = filename[0]
+            filename = str(filename[0])
             try :
                 config = self._loadJamaFuncConfig(filename)
                 error  = self._jamaFuncConfigError(config)
@@ -1138,7 +1138,7 @@ class Application :
                                                   directory     = '',
                                                   save_filename = 'Jama Func.py' )
             if r :
-                copyfile(filename, r)
+                copyfile(filename, str(r))
                 info = config['info']
                 ver  = '%s.%s.%s' % tuple(info['version'])
                 self._wsSendCmd( 'SHOW-INFO',
@@ -1155,7 +1155,7 @@ class Application :
                                                   directory     = '',
                                                   save_filename = 'Jama Funcs - Template.py' )
             if r :
-                copyfile(conf.JAMA_FUNCS_TEMPLATE_FILENAME, r)
+                copyfile(conf.JAMA_FUNCS_TEMPLATE_FILENAME, str(r))
                 self._wsSendCmd('SHOW-INFO', 'The template has been successfully saved.')
         except :
             self._wsSendCmd('SHOW-ERROR', 'An error occurred while saving the template.')
