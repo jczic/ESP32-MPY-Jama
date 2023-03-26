@@ -8,7 +8,7 @@ dict(
     info = dict(
         name        = 'ADC Reader',
         version     = [1, 0, 0],
-        description = ''' Simple voltage reader on an ADC GPIO.
+        description = ''' Simple level and voltage reader on an analog to digital converter (ADC) GPIO.
                           You can specify the dB applied attenuation and the bits resolution.
                       ''',
         author      = 'JC`zic',
