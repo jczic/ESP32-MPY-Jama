@@ -42,6 +42,7 @@ var sdcardMountPoint          = null;
 var codeMirrorTerm            = null;
 var codeMirrorJamaTerm        = null;
 var termTextBuffer            = '';
+var termLastWriteMS           = 0;
 
 var cmdHistory                = [ ];
 var cmdHistoryNav             = [""];
@@ -560,6 +561,7 @@ function writeTextInTerminal(text, colorClass) {
             doc.addLineClass(i, "text", colorClass);
     ctnr.scrollTop = ctnr.scrollHeight;
     cm.refresh();
+    termLastWriteMS = performance.now();
 }
 
 function eraseFlashClick(e) {
@@ -658,7 +660,10 @@ function execCodeBegin() {
 }
 
 function execCodeRecv(text) {
-    termTextBuffer += text;
+    if (performance.now() - termLastWriteMS > 50)
+        writeTextInTerminal(text);
+    else
+        termTextBuffer += text;
 }
 
 function execCodeError(error) {
