@@ -4,9 +4,9 @@
 dict(
     
     info = dict(
-        name        = '1-Wire ROMs Scan',
+        name        = '1-Wire Devices Scan',
         version     = [1, 0, 0],
-        description = 'Initializes a 1-Wire bus on a single data GPIO and scans it to find all the ROM (addresses).',
+        description = 'Initializes a 1-Wire bus on a single GPIO and finds all the family IDs and serial numbers of slave devices.',
         author      = 'JC`zic',
         mail        = 'jczic.bos@gmail.com',
         www         = 'https://github.com/jczic'
@@ -37,19 +37,24 @@ try :
             try :
                 print('Scans the 1-Wire bus...')
                 print()
-                roms = ow.scan()
-                if roms :
-                    for rom in roms :
-                        print('  - ROM found: [%s]' % rom.hex())
+                count = 0
+                roms  = ow.scan()
+                for rom in roms :
+                    if len(rom) == 8 and ow.crc8(rom[:7]) == rom[7] :
+                        deviceID = hex(rom[0])
+                        deviceSR = rom[1:7].hex()
+                        print('  - Device found: [FamilyID=%s] [Serial=%s]' % (deviceID, deviceSR))
+                        count += 1
+                if count :
                     print()
-                    print('%s ROM(s)!' % len(roms))
+                    print('%s device(s) found!' % count)
                 else :
-                    print('No ROM found.')
+                    print('No device found.')
             except :
                 print('Bus communication error.')
         else :
-            print('Unable to reset the bus on GPIO-%s (does the data wire exist?).' % args.dataPin)
-    except Exception as ex :
-        print('Bus initialization error (%s).' % ex)
+            raise
+    except :
+        print('Unable to initialize the bus on GPIO-%s (does the data wire exist?).' % args.dataPin)
 except :
     print('GPIO-%s invalid.' % args.dataPin)

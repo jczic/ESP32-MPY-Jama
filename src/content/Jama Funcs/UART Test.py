@@ -70,7 +70,7 @@ dict(
         rxPin     = dict( label    = 'RX GPIO:',
                           type     = list ),
 
-        cmd       = dict( label    = 'Custom command to send:',
+        cmd       = dict( label    = 'Custom command to send (optional):',
                           type     = str )
 
     )
