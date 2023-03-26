@@ -28,4 +28,4 @@ dict(
 from machine import Pin
 
 Pin(args.pin, Pin.OUT, value=args.OnOff)
-print('The GPIO output %s has been set to %s.' % (args.pin, ('ON (3v3)' if args.OnOff else 'OFF')))
+print('The GPIO output %s has been set to %s.' % (args.pin, ('ON (3V3)' if args.OnOff else 'OFF')))
