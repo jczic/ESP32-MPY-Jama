@@ -1265,32 +1265,37 @@ function setSystemInfo(o) {
     while (bootCfgElm.childElementCount > 0)
         bootCfgElm.removeChild(bootCfgElm.lastChild);
     for (var i in o.bootcfg) {
-        var desc = ( o.bootcfg[i] == "MCU" ? "Update system setting"             :
-                     o.bootcfg[i] == "STA" ? "Connect Wi-Fi (WLAN STA)"          :
-                     o.bootcfg[i] == "AP"  ? "Open Wi-Fi access point (WLAN AP)" :
-                     o.bootcfg[i] == "ETH" ? "Initialize Ethernet PHY (LAN)"     :
-                     o.bootcfg[i] == "SD"  ? "Mount SD card to file system"      :
-                     "" );
-        var elm  = newElm("div", null, ["prop-item"]);
-        var text = newElm("div", null, ["prop-item-text"]);
-        text.innerText = "▶️ " + desc;
-        elm.appendChild(text);
-        var btnElm   = newElm("div", "bootcfg-" + o.bootcfg[i], ["prop-item-picto", "prop-item-picto-btn", "right", "list-item-picto-remove"]);
-        btnElm.title = "Remove this setting";
-        btnElm["cfg"]  = o.bootcfg[i];
-        btnElm["desc"] = desc;
-        btnElm.addEventListener( "click", function(e) {
-            var target = getEventTarget(e);
-            boxDialogYesNo( "⚠️ REMOVE?",
-                            "<b>\" " + target.desc + " \"</b>\n" +
-                            "Are you sure you want to remove this setting from the boot of your device?",
-                            function(yes) {
-                                if (yes)
-                                    wsSendCmd("REMOVE-CFG", target.cfg);
-                            } );
-        } );
-        elm.appendChild(btnElm);
-        bootCfgElm.appendChild(elm);
+        var desc = ( o.bootcfg[i] == "BOOT" ? "🆗 Boot configuration file"       :
+                     o.bootcfg[i] == "MCU"  ? "▶️ Update system setting"         :
+                     o.bootcfg[i] == "STA"  ? "▶️ Connect Wi-Fi"                 :
+                     o.bootcfg[i] == "AP"   ? "▶️ Open Wi-Fi access point"       :
+                     o.bootcfg[i] == "ETH"  ? "▶️ Initialize Ethernet interface" :
+                     o.bootcfg[i] == "SD"   ? "▶️ Mount SD card to file system"  :
+                     null );
+        if (desc) {
+            var elm  = newElm("div", null, ["prop-item"]);
+            var text = newElm("div", null, ["prop-item-text"]);
+            text.innerText = desc;
+            elm.appendChild(text);
+            if (o.bootcfg[i] != 'BOOT' || o.bootcfg.length == 1) {
+                var btnElm     = newElm("div", "bootcfg-" + o.bootcfg[i], ["prop-item-picto", "prop-item-picto-btn", "right", "list-item-picto-remove"]);
+                btnElm.title   = "Remove this setting";
+                btnElm["cfg"]  = o.bootcfg[i];
+                btnElm["desc"] = desc;
+                btnElm.addEventListener( "click", function(e) {
+                    var target = getEventTarget(e);
+                    boxDialogYesNo( "⚠️ REMOVE?",
+                                    "<b>" + target.desc + "</b>\n" +
+                                    "Are you sure you want to remove this setting from the boot of your device?",
+                                    function(yes) {
+                                        if (yes)
+                                            wsSendCmd("REMOVE-CFG", target.cfg);
+                                    } );
+                } );
+                elm.appendChild(btnElm);
+            }
+            bootCfgElm.appendChild(elm);
+        }
     }
 
     var partElm = getElmById("sysnfo-partitions");

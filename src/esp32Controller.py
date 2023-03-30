@@ -989,6 +989,23 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    def CheckBootConfig(self) :
+        rootPath = self.GetFlashRootPath()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            return self._exeCodeREPL( 'import os\n'     +
+                                      'try :\n'         +
+                                      '  os.stat(%s)\n' % repr('%s/%s' % (rootPath, self.BOOT_CONFIG_MPY_FILENAME)) +
+                                      '  print(True)\n' +
+                                      'except :\n'      +
+                                      '  print(False)' )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
     def RemoveBootConfig(self) :
         rootPath = self.GetFlashRootPath()
         self._threadStopReading()
@@ -1027,8 +1044,7 @@ class ESP32Controller :
         keysAndTypes = dict()
         for n in list(x.values()) :
             keysAndTypes[n[0]] = n[1]
-
-        r = [ ]
+        r = ( ['BOOT'] if self.CheckBootConfig() else [ ] )
         for key in self.CheckCfgKeys(keysAndTypes) :
             for cfgName in x :
                 if x[cfgName][0] == key :
@@ -1038,11 +1054,12 @@ class ESP32Controller :
     # ---------------------------------------------------------------------------
 
     def RemoveConfiguration(self, cfgName) :
-        dict( MCU = self.RemoveMCUCfg,
-              STA = self.RemoveWiFiSTACfg,
-              AP  = self.RemoveWiFiAPCfg,
-              ETH = self.RemoveETHCfg,
-              SD  = self.RemoveSDCardCfg )[cfgName]()
+        dict( BOOT = self.RemoveBootConfig,
+              MCU  = self.RemoveMCUCfg,
+              STA  = self.RemoveWiFiSTACfg,
+              AP   = self.RemoveWiFiAPCfg,
+              ETH  = self.RemoveETHCfg,
+              SD   = self.RemoveSDCardCfg )[cfgName]()
 
     # ---------------------------------------------------------------------------
 
