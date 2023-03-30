@@ -1392,6 +1392,7 @@ class Application :
             try :
                 self.esp32Ctrl.SaveMCUCfg(freq)
                 self._wsSendCmd('HIDE-WAIT')
+                self._sendSysInfo(False)
             except :
                 self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('SHOW-ERROR', 'Unable to save MCU configuration.')
