@@ -27,7 +27,7 @@ def config() :
         # MCU,
         try :
             mcuFreq = gInt('mcufreq')
-            print('Sets the MCU frequency to %s MHz...' % mcuFreq, end=' ')
+            print('Setting the MCU frequency to %s MHz...' % mcuFreq, end=' ')
             try :
                 from machine import freq
                 freq(mcuFreq * 1000000)
@@ -41,15 +41,27 @@ def config() :
         try :
             ssid = gStr('ssid')
             key  = gStr('key')
-            print('Initiates Wi-Fi connection to %s...' % ssid, end=' ')
+            print('Connecting Wi-Fi to "%s"...' % ssid, end=' ')
             try :
-                import network
+                import network, time
                 wl = network.WLAN(network.STA_IF)
                 wl.active(False)
                 wl.active(True)
+                wl.config(reconnects=2)
                 wl.connect(ssid, key)
-                print('OK')
-                print('  - Connecting...')
+                t = time.ticks_ms()
+                while ( time.ticks_diff(time.ticks_ms(), t) <= 15*1000 and \
+                        wl.status() == network.STAT_CONNECTING ) :
+                    time.sleep(0.100)
+                if wl.isconnected() :
+                    wl.config(reconnects=-1)
+                    print('OK')
+                else :
+                    if wl.status() == network.STAT_CONNECTING :
+                        print('TIMEOUT') # 15s
+                    else :
+                        print('FAILED')
+                    wl.active(False)
             except :
                 print('ERROR')
         except :
@@ -86,7 +98,7 @@ def config() :
             powerPinNum = gInt('ethpower', True)
             print('Ethernet PHY interface:')
             import network, machine
-            print('  - Initialization...', end=' ')
+            print('  - Initializing...', end=' ')
             try :
                 lan = network.LAN( mdc      = machine.Pin(mdcPinNum),
                                    mdio     = machine.Pin(mdioPinNum),
@@ -95,7 +107,7 @@ def config() :
                                    phy_type = network.__dict__['PHY_%s' % driverName],
                                    phy_addr = phyAddr )
                 print('OK')
-                print('  - Activation...', end=' ')
+                print('  - Activating...', end=' ')
                 try :
                     lan.active(True)
                     print('OK')
@@ -110,7 +122,7 @@ def config() :
         try :
             mountPt = gStr('sdmountpt')
             print('SD card file system:')
-            print('  - Initialization...', end=' ')
+            print('  - Initializing...', end=' ')
             try :
                 from machine import SDCard
                 try :
@@ -127,7 +139,7 @@ def config() :
                     except :
                         print('ERROR')
                 except :
-                    print('NOT PRESENT')
+                    print('NO SD CARD')
             except :
                 print('NOT SUPPORTED')
         except :

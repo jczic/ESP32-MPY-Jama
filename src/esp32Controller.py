@@ -617,7 +617,8 @@ class ESP32Controller :
             if cbProgress :
                 cbProgress(progress, fileSize)
         try :
-            self._exeCodeREPL('f.close()')
+            self._exeCodeREPL( 'f.close()\n' +
+                               'del f' )
         except :
             pass
         f.close()
@@ -629,8 +630,8 @@ class ESP32Controller :
             self._raiseConnectionError()
         try :
             if cbProgress :
-                self._exeCodeREPL('from uos import stat')
-                fileSize = self._exeCodeREPL('stat(%s)[6]' % repr(remoteFilename))
+                fileSize = self._exeCodeREPL( 'from uos import stat\n' +
+                                              'print(stat(%s)[6])' % repr(remoteFilename) )
             self._exeCodeREPL('f=open(%s, "rb")' % repr(remoteFilename))
         except ESP32ControllerCodeException :
             raise ESP32ControllerException('Cannot open remote file "%s"' % remoteFilename)
@@ -659,7 +660,8 @@ class ESP32Controller :
                 cbProgress(progress, fileSize)
         f.close()
         try :
-            self._exeCodeREPL('f.close()')
+            self._exeCodeREPL( 'f.close()\n' +
+                               'del f' )
         except :
             pass
 
@@ -696,8 +698,8 @@ class ESP32Controller :
         try :
             try :
                 if cbProgress :
-                    self._exeCodeREPL('from uos import stat')
-                    fileSize = self._exeCodeREPL('stat(%s)[6]' % repr(remoteFilename))
+                    fileSize = self._exeCodeREPL( 'from uos import stat\n' +
+                                                  'print(stat(%s)[6])' % repr(remoteFilename) )
                     if not fileSize :
                         return
                     cbProgress(0, fileSize, b'')
@@ -722,7 +724,8 @@ class ESP32Controller :
                 if cbProgress :
                     cbProgress(progress, fileSize, buf)
             try :
-                self._exeCodeREPL('f.close()')
+                self._exeCodeREPL( 'f.close()\n' +
+                                   'del f' )
             except :
                 pass
             return content
@@ -761,7 +764,8 @@ class ESP32Controller :
                     if progress == fileSize :
                         break
             try :
-                self._exeCodeREPL('f.close()')
+                self._exeCodeREPL( 'f.close()\n' +
+                                   'del f' )
             except :
                 pass
         finally :
@@ -901,8 +905,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('from os import mkdir')
-            self._exeCodeREPL('mkdir(%s)' % repr(path))
+            self._exeCodeREPL( 'from os import mkdir\n' +
+                               'mkdir(%s)' % repr(path) )
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -915,8 +919,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('from os import rename')
-            self._exeCodeREPL('rename(%s, %s)' % (repr(srcPath), repr(dstPath)))
+            self._exeCodeREPL( 'from os import rename\n' +
+                               'rename(%s, %s)' % (repr(srcPath), repr(dstPath)) )
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -1069,8 +1073,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('import network')
-            self._exeCodeREPL('__w=network.WLAN(network.STA_IF)')
+            self._exeCodeREPL( 'import network\n' +
+                               '__w=network.WLAN(network.STA_IF)' )
             active = self._exeCodeREPL('__w.active()')
             if not active :
                 self._exeCodeREPL('__w.active(True)')
@@ -1092,14 +1096,16 @@ class ESP32Controller :
         self._beginProcess()
         ok = False
         try :
-            self._exeCodeREPL('import network')
-            self._exeCodeREPL('from time import sleep')
-            self._exeCodeREPL('__w=network.WLAN(network.STA_IF)')
-            self._exeCodeREPL('__w.active(False)')
-            self._exeCodeREPL('__w.active(True)')
-            self._exeCodeREPL('__w.config(reconnects=2)')
-            self._exeCodeREPL('__w.connect(%s, %s)' % (repr(ssid), repr(key) if key else '""'))
-            self._exeCodeREPL('while __w.status() == network.STAT_CONNECTING : sleep(0.100)', timeoutSec=15)
+            self._exeCodeREPL( 'import network\n'                     +
+                               'from time import sleep\n'             +
+                               '__w = network.WLAN(network.STA_IF)\n' +
+                               '__w.active(False)\n'                  +
+                               '__w.active(True)\n'                   +
+                               '__w.config(reconnects=2)\n'           +
+                               '__w.connect(%s, %s)\n' % (repr(ssid), repr(key) if key else '""') +
+                               'while __w.status() == network.STAT_CONNECTING :\n' +
+                               '  sleep(0.100)',
+                               timeoutSec = 15 )
             if self._exeCodeREPL('__w.isconnected()') :
                 self._exeCodeREPL('__w.config(reconnects=-1)')
                 ok = True
@@ -1148,16 +1154,16 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('import network')
-            self._exeCodeREPL('__w = network.WLAN(network.AP_IF)')
-            self._exeCodeREPL('__w.active(True)')
+            self._exeCodeREPL( 'import network\n' +
+                               '__w = network.WLAN(network.AP_IF)\n' +
+                               '__w.active(True)' )
             config = (repr(ssid), auth, repr(key))
             try :
                 self._exeCodeREPL('__w.config(ssid=%s, authmode=%s, password=%s)' % config)
             except :
                 self._exeCodeREPL('__w.config(essid=%s, authmode=%s, password=%s)' % config)
-            self._exeCodeREPL('__w.config(max_clients=%s)' % int(maxcli))
-            self._exeCodeREPL('del __w')
+            self._exeCodeREPL( '__w.config(max_clients=%s)\n' % int(maxcli) +
+                               'del __w' )
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -1184,8 +1190,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('import network')
-            return self._exeCodeREPL('network.WLAN(network.%s).active()' % ('AP_IF' if ap else 'STA_IF'))
+            return self._exeCodeREPL( 'import network\n' +
+                                      'print(network.WLAN(network.%s).active())' % ('AP_IF' if ap else 'STA_IF') )
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -1198,8 +1204,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('import network')
-            return self._exeCodeREPL('network.WLAN(network.%s).active(False)' % ('AP_IF' if ap else 'STA_IF'))
+            return self._exeCodeREPL( 'import network\n' +
+                                      'print(network.WLAN(network.%s).active(False))' % ('AP_IF' if ap else 'STA_IF') )
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -1212,8 +1218,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('import network')
-            macAddr = self._exeCodeREPL('network.WLAN(network.%s).config("mac")' % ('AP_IF' if ap else 'STA_IF'))
+            macAddr = self._exeCodeREPL( 'import network\n' +
+                                         'print(network.WLAN(network.%s).config("mac"))' % ('AP_IF' if ap else 'STA_IF') )
             return self._macAddrToStr(macAddr)
         finally :
             self._endProcess()
@@ -1251,12 +1257,11 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            r = self._exeCodeREPL('import network; print(network.WLAN(network.AP_IF).status("stations"))')
+            r = self._exeCodeREPL( 'import network\n' +
+                                    'print(network.WLAN(network.AP_IF).status("stations"))' )
             for i in range(len(r)) :
                 r[i] = self._macAddrToStr(r[i][0])
             return r
-        except Exception as ex :
-            print(ex)
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -1276,7 +1281,7 @@ class ESP32Controller :
                                    '    print([__lan.config("mac"), __lan.status(), __lan.ifconfig()])\n' +
                                    '    del __lan\n'                 +
                                    '  except :\n'                    +
-                                   '    print([])' )
+                                   '    print([ ])' )
             if r :
                 return dict( mac     = self._macAddrToStr(r[0]),
                              enable  = (r[1] != 0 and r[1] != 2),
@@ -1385,8 +1390,9 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('import bluetooth')
-            return self._exeCodeREPL('bluetooth.BLE().active()', timeoutSec=3)
+            return self._exeCodeREPL( 'import bluetooth\n' +
+                                      'print(bluetooth.BLE().active())',
+                                      timeoutSec = 3 )
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -1399,8 +1405,9 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('import bluetooth')
-            return self._exeCodeREPL('bluetooth.BLE().active(False)', timeoutSec=3)
+            return self._exeCodeREPL( 'import bluetooth\n' +
+                                      'print(bluetooth.BLE().active(False))',
+                                      timeoutSec = 3 )
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -1413,8 +1420,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('import bluetooth')
-            self._exeCodeREPL('__ble=bluetooth.BLE()')
+            self._exeCodeREPL( 'import bluetooth\n' +
+                               '__ble = bluetooth.BLE()' )
             active = self._exeCodeREPL('__ble.active()')
             if not active :
                 self._exeCodeREPL('__ble.active(True)', timeoutSec=3)
@@ -1512,8 +1519,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('from esp32 import raw_temperature')
-            f = self._exeCodeREPL('raw_temperature()')
+            f = self._exeCodeREPL( 'from esp32 import raw_temperature\n' +
+                                   'print(raw_temperature())' )
             c = round(self._fahrenheit2Celsius(f)*10)/10
             return dict( fahrenheit = f,
                          celsius    = c )
@@ -1529,8 +1536,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('from time import ticks_ms')
-            ms = self._exeCodeREPL('ticks_ms()')
+            ms = self._exeCodeREPL( 'from time import ticks_ms\n' +
+                                    'print(ticks_ms())' )
             return round(ms / 1000 / 60)
         finally :
             self._endProcess()
@@ -1544,8 +1551,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('from machine import freq')
-            return self._exeCodeREPL('freq()') // 1000000
+            return self._exeCodeREPL( 'from machine import freq\n' +
+                                      'print(freq())' ) // 1000000
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -1558,8 +1565,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('from esp import flash_size')
-            return self._exeCodeREPL('flash_size()')
+            return self._exeCodeREPL( 'from esp import flash_size\n' +
+                                      'print(flash_size())' )
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -1573,13 +1580,12 @@ class ESP32Controller :
         self._beginProcess()
         try :
             try :
-                self._exeCodeREPL('import uplatform')
-                platform = self._exeCodeREPL('uplatform.platform()')
+                platform = self._exeCodeREPL( 'import uplatform\n' +
+                                              'print(repr(uplatform.platform()))' )
             except :
                 platform = 'N/A'
-            self._exeCodeREPL('import uos')
+            self._exeCodeREPL('import uos, sys')
             system, __, release, version, implem = self._exeCodeREPL('tuple(uos.uname())')
-            self._exeCodeREPL('import sys')
             try :
                 mpyVer = self._exeCodeREPL('sys.implementation.mpy')
             except :
@@ -1604,7 +1610,7 @@ class ESP32Controller :
         self._beginProcess()
         try :
             return self._exeCodeREPL( 'from esp32 import Partition\n' +
-                                      '__p = []\n' +
+                                      '__p = [ ]\n' +
                                       '__x = None\n' +
                                       'for __x in Partition.find(Partition.TYPE_APP) :\n'  +
                                       '  __p.append(__x.info())\n' +
@@ -1647,11 +1653,11 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            self._exeCodeREPL('from machine import freq')
-            return self._exeCodeREPL( 'try :\n'               +
-                                      '  freq(%s)\n' % freq   +
-                                      '  print(True)\n'       +
-                                      'except ValueError :\n' +
+            return self._exeCodeREPL( 'from machine import freq\n' +
+                                      'try :\n'                    +
+                                      '  freq(%s)\n' % freq        +
+                                      '  print(True)\n'            +
+                                      'except ValueError :\n'      +
                                       '  print(False)' )
         finally :
             self._endProcess()
@@ -1832,14 +1838,8 @@ class ESP32Controller :
     def Reset(self) :
         if not self._isConnected :
             self._raiseConnectionError()
-        self._threadStopReading()
-        self._beginProcess()
-        try :
-            self._exeCodeREPL('from machine import reset')
-        finally :
-            self._endProcess()
-            self._threadStartReading()
-        self.ExecProgram('reset()')
+        self.ExecProgram( 'from machine import reset\n' +
+                          'reset()' )
 
     # ---------------------------------------------------------------------------
 
@@ -1848,7 +1848,8 @@ class ESP32Controller :
             self._raiseConnectionError()
         rfn = repr(filename)
         self.ExecProgram( 'with open(%s, "r") as __f :\n'           % rfn +
-                          '  exec(compile(__f.read(),%s,"exec"))\n' % rfn )
+                          '  exec(compile(__f.read(),%s,"exec"))\n' % rfn +
+                          'del __f' )
 
     # ---------------------------------------------------------------------------
 
