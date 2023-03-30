@@ -970,20 +970,21 @@ class ESP32Controller :
         self._beginProcess()
         try :
             self._sendFile(self.BOOT_CONFIG_MPY_FILENAME, '%s/%s' % (rootPath, self.BOOT_CONFIG_MPY_FILENAME))
-            modName = self.BOOT_CONFIG_MPY_FILENAME.rsplit('.', 1)[0]
-            oneLine = f'import {modName}; ___jama = {modName}.___jama'
-            self._exeCodeREPL( '_add = True\n'                        +
-                               'try :\n'                              +
-                               '  with open("boot.py", "r") as f :\n' +
-                               '    for __l in f.readlines() :\n'     +
+            modName  = self.BOOT_CONFIG_MPY_FILENAME.rsplit('.', 1)[0]
+            bootFile = '%s/boot.py' % rootPath
+            oneLine  = f'import {modName}; ___jama = {modName}.___jama'
+            self._exeCodeREPL( '_add = True\n'                                  +
+                               'try :\n'                                        +
+                               '  with open(%s, "r") as f :\n' % repr(bootFile) +
+                               '    for __l in f.readlines() :\n'               +
                                '      if __l.find(%s) >= 0 :\n' % repr(modName) +
-                               '        _add = False\n'               +
-                               '        break\n'                      +
-                               '  del __l\n'                          +
-                               'except :\n'                           +
-                               '  pass\n'                             +
-                               'if _add :\n'                          +
-                               '  with open("boot.py", "a") as f :\n' +
+                               '        _add = False\n'                         +
+                               '        break\n'                                +
+                               '  del __l\n'                                    +
+                               'except :\n'                                     +
+                               '  pass\n'                                       +
+                               'if _add :\n'                                    +
+                               '  with open(%s, "a") as f :\n' % repr(bootFile) +
                                '    f.write("\\n%s # Restore configuration (ESP32 MPY-Jama)\\n")\n' % oneLine +
                                'del f, _add',
                                timeoutSec = 3 )
@@ -1015,22 +1016,23 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            mod = self.BOOT_CONFIG_MPY_FILENAME.rsplit('.', 1)[0]
-            self._exeCodeREPL( 'import os\n'                          +
-                               'try :\n'                              +
-                               '  with open("boot.py", "r") as f :\n' +
-                               '    __lns = f.readlines()\n'          +
-                               '  with open("boot.py", "w") as f :\n' +
-                               '    for __l in __lns :\n'             +
-                               '      if __l.find(%s) == -1 :\n' % repr(mod) +
-                               '        f.write(__l)\n'               +
-                               '  del f, __lns\n'                     +
-                               '  del __l\n'                          +
-                               'except :\n'                           +
-                               '  pass\n'                             +
-                               'try :\n'                              +
+            bootFile = '%s/boot.py' % rootPath
+            modName  = self.BOOT_CONFIG_MPY_FILENAME.rsplit('.', 1)[0]
+            self._exeCodeREPL( 'import os\n'                                     +
+                               'try :\n'                                         +
+                               '  with open(%s, "r") as f :\n' % repr(bootFile)  +
+                               '    __lns = f.readlines()\n'                     +
+                               '  with open(%s, "w") as f :\n' % repr(bootFile)  +
+                               '    for __l in __lns :\n'                        +
+                               '      if __l.find(%s) == -1 :\n' % repr(modName) +
+                               '        f.write(__l)\n'                          +
+                               '  del f, __lns\n'                                +
+                               '  del __l\n'                                     +
+                               'except :\n'                                      +
+                               '  pass\n'                                        +
+                               'try :\n'                                         +
                                '  os.remove(%s)\n' % repr('%s/%s' % (rootPath, self.BOOT_CONFIG_MPY_FILENAME)) +
-                               'except :\n'                           +
+                               'except :\n'                                      +
                                '  pass',
                                timeoutSec = 3 )
         finally :
