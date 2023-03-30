@@ -390,6 +390,15 @@ function hideExistingBoxesDialog() {
     getElmById("protect-layer").classList.add("hide");
 }
 
+function validateExistingBoxDialog() {
+    for (var box of document.getElementsByClassName("center-container-show")) {
+        btn = getSubElm(box, "VALIDATE-BOX");
+        break;
+    }
+    if (btn)
+        btn.click();
+}
+
 function boxDialogAlert(title, text) {
     hideExistingBoxesDialog();
     var box = getElmById("box-dialog-alert");
@@ -2405,15 +2414,24 @@ window.addEventListener( "load", function() {
     setConnectionState(null);
     setSwitchButton(getElmById("switch-btn-menu"));
 
+    this.document.body.addEventListener("keydown", function(e) {
+        if (e.key == "Escape") {
+            hideExistingBoxesDialog();
+            e.preventDefault();
+        }
+        else if (e.key == "Enter") {
+            validateExistingBoxDialog();
+            e.preventDefault();
+        }
+        else if (e.key == "Tab")
+            e.preventDefault();
+    } );
+    
     this.document.body.addEventListener("keypress", function(e) {
         if (e.metaKey) {
             var k = e.key.toUpperCase();
             if (k == "A" || k == "Z" || k == "Q")
                 e.preventDefault();
-        }
-        if (e.key == "Escape") {
-            hideExistingBoxesDialog();
-            e.preventDefault();
         }
     } );
 
