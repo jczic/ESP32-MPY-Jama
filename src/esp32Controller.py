@@ -36,9 +36,13 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    BOOT_CONFIG_MPY_FILENAME = '_jamaBootCfg.py'
+    
     DEFAULT_CODE_FILENAME    = '<TERMINAL>'
     STDIN_CODE_FILENAME      = '<stdin>'
     KILL_AFTER_INTERRUPT_SEC = 5
+
+    NVS_NAMESPACE_CONFIG     = "esp32Ctrl"
 
     # ---------------------------------------------------------------------------
 
@@ -186,6 +190,7 @@ class ESP32Controller :
             machineNfo          = self._exeCodeREPL('import uos; [x.strip() for x in uos.uname().machine.split("with")]')
             self._machineModule = (machineNfo[0] if len(machineNfo) >= 1 else '')
             self._machineMCU    = (machineNfo[1] if len(machineNfo) >= 2 else '')
+            self._ensureJamaObjExists()
         except ESP32ControllerSerialConnException :
             raise
         except :
@@ -206,6 +211,11 @@ class ESP32Controller :
 
     def __del__(self) :
         self.Close(True)
+
+    # ---------------------------------------------------------------------------
+
+    def _ensureJamaObjExists(self) :
+        self._exeCodeREPL('if globals().get("___jama") is None : ___jama = dict()', lockRead=False)
 
     # ---------------------------------------------------------------------------
 
@@ -288,6 +298,7 @@ class ESP32Controller :
                         if restarted :
                             self._endProcess()
                             self._switchToRawMode()
+                            self._ensureJamaObjExists()
                             if self._onDeviceReset :
                                 self._onDeviceReset(self)
                             inCode    = False
@@ -525,7 +536,7 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
-    def _exeCodeREPL(self, code, timeoutSec=1) :
+    def _exeCodeREPL(self, code, timeoutSec=1, lockRead=True) :
         if not code :
             return None
         if not self._isConnected :
@@ -538,7 +549,7 @@ class ESP32Controller :
                 self._repl.flush()
         except :
             self._raiseConnectionError()
-        r = self._serialReadUntil(b'\x04>', timeoutSec=timeoutSec)
+        r = self._serialReadUntil(b'\x04>', timeoutSec=timeoutSec, lockRead=lockRead)
         if len(r) >= 5 and r.startswith('OK') :
             if r[-3] == '\x04' :
                 r = r[2:-3]
@@ -759,6 +770,89 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    def SaveCfgKeys(self, keysValues) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            self._exeCodeREPL( 'from esp32 import NVS\n' +
+                               '_nvs = NVS(%s)' % repr(self.NVS_NAMESPACE_CONFIG) )
+            for key, value in keysValues.items() :
+                if value is not None :
+                    if isinstance(value, int) :
+                        f     = 'set_i32'
+                        value = int(value)
+                    else :
+                        f     = 'set_blob'
+                        value = repr(value)
+                    try :
+                        self._exeCodeREPL('_nvs.%s(%s, %s)' % (f, repr(key), value))
+                    except :
+                        pass
+                else :
+                    try :
+                        self._exeCodeREPL('_nvs.erase_key(%s)' % repr(key))
+                    except :
+                        pass
+            self._exeCodeREPL( '_nvs.commit()\n' +
+                               'del _nvs' )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def CheckCfgKeys(self, keysAndTypes) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            self._exeCodeREPL( 'from esp32 import NVS\n' +
+                               '_nvs = NVS(%s)' % repr(self.NVS_NAMESPACE_CONFIG) )
+            r = [ ]
+            for key, _type in keysAndTypes.items() :
+                if _type == int :
+                    code = '_nvs.get_i32(%s)'
+                elif _type == str :
+                    code = '_nvs.get_blob(%s, bytearray(256))'
+                else :
+                    ValueError(keysAndTypes)
+                try :
+                    self._exeCodeREPL(code % repr(key))
+                    r.append(key)
+                except :
+                    pass
+            self._exeCodeREPL('del _nvs')
+            return r
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def RemoveCfgKeys(self, keys) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            self._exeCodeREPL( 'from esp32 import NVS\n' +
+                               '_nvs = NVS(%s)' % repr(self.NVS_NAMESPACE_CONFIG) )
+            for key in keys :
+                try :
+                    self._exeCodeREPL('_nvs.erase_key(%s)' % repr(key))
+                except :
+                    pass
+            self._exeCodeREPL( '_nvs.commit()\n' +
+                               'del _nvs' )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
     def GetFlashRootPath(self) :
         if not self._isConnected :
             self._raiseConnectionError()
@@ -866,6 +960,92 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    def CreateBootConfig(self) :
+        rootPath = self.GetFlashRootPath()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            self._sendFile(self.BOOT_CONFIG_MPY_FILENAME, '%s/%s' % (rootPath, self.BOOT_CONFIG_MPY_FILENAME))
+            modName = self.BOOT_CONFIG_MPY_FILENAME.rsplit('.', 1)[0]
+            oneLine = f'import {modName}; ___jama = {modName}.___jama'
+            self._exeCodeREPL( '_add = True\n'                        +
+                               'try :\n'                              +
+                               '  with open("boot.py", "r") as f :\n' +
+                               '    for __l in f.readlines() :\n'     +
+                               '      if __l.find(%s) >= 0 :\n' % repr(modName) +
+                               '        _add = False\n'               +
+                               '        break\n'                      +
+                               '  del __l\n'                          +
+                               'except :\n'                           +
+                               '  pass\n'                             +
+                               'if _add :\n'                          +
+                               '  with open("boot.py", "a") as f :\n' +
+                               '    f.write("\\n%s # Restore configuration (ESP32 MPY-Jama)\\n")\n' % oneLine +
+                               'del f, _add',
+                               timeoutSec = 3 )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def RemoveBootConfig(self) :
+        rootPath = self.GetFlashRootPath()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            mod = self.BOOT_CONFIG_MPY_FILENAME.rsplit('.', 1)[0]
+            self._exeCodeREPL( 'import os\n'                          +
+                               'try :\n'                              +
+                               '  with open("boot.py", "r") as f :\n' +
+                               '    __lns = f.readlines()\n'          +
+                               '  with open("boot.py", "w") as f :\n' +
+                               '    for __l in __lns :\n'             +
+                               '      if __l.find(%s) == -1 :\n' % repr(mod) +
+                               '        f.write(__l)\n'               +
+                               '  del f, __lns\n'                     +
+                               '  del __l\n'                          +
+                               'except :\n'                           +
+                               '  pass\n'                             +
+                               'try :\n'                              +
+                               '  os.remove(%s)\n' % repr('%s/%s' % (rootPath, self.BOOT_CONFIG_MPY_FILENAME)) +
+                               'except :\n'                           +
+                               '  pass',
+                               timeoutSec = 3 )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def CheckAllConfigurations(self) :
+        x = dict( MCU = ('mcufreq',   int),
+                  STA = ('ssid',      str),
+                  AP  = ('apssid',    str),
+                  ETH = ('ethdriver', str),
+                  SD  = ('sdmountpt', str) )
+        keysAndTypes = dict()
+        for n in list(x.values()) :
+            keysAndTypes[n[0]] = n[1]
+
+        r = [ ]
+        for key in self.CheckCfgKeys(keysAndTypes) :
+            for cfgName in x :
+                if x[cfgName][0] == key :
+                    r.append(cfgName)
+        return r
+
+    # ---------------------------------------------------------------------------
+
+    def RemoveConfiguration(self, cfgName) :
+        dict( MCU = self.RemoveMCUCfg,
+              STA = self.RemoveWiFiSTACfg,
+              AP  = self.RemoveWiFiAPCfg,
+              ETH = self.RemoveETHCfg,
+              SD  = self.RemoveSDCardCfg )[cfgName]()
+
+    # ---------------------------------------------------------------------------
+
     def ScanWiFiNetworks(self) :
         if not self._isConnected :
             self._raiseConnectionError()
@@ -882,34 +1062,6 @@ class ESP32Controller :
                 self._exeCodeREPL('__w.active(False)')
             self._exeCodeREPL('del __w')
             return self._wlanScanToFriendlyNetworks(wlanScan)
-        finally :
-            self._endProcess()
-            self._threadStartReading()
-
-    # ---------------------------------------------------------------------------
-
-    def CreateWiFiStartup(self) :
-        if not self._isConnected :
-            self._raiseConnectionError()
-        rootPath = self.GetFlashRootPath()
-        self._threadStopReading()
-        self._beginProcess()
-        try :
-            self._sendFile('esp32CtrlWiFi.py', '%s/esp32CtrlWiFi.py' % rootPath)
-            self._exeCodeREPL( '_add = True\n' +
-                               'try :\n' +
-                               '  with open("boot.py", "r") as f :\n' +
-                               '    for ln in f.readlines() :\n' +
-                               '      if ln.find("esp32CtrlWiFi") >= 0 :\n' +
-                               '        _add = False\n' +
-                               '        break\n' +
-                               'except :\n' +
-                               '  pass\n' +
-                               'if _add :\n' +
-                               '  with open("boot.py", "a") as f :\n' +
-                               '    f.write("\\nimport esp32CtrlWiFi\\n")\n' +
-                               'del _add',
-                               timeoutSec = 3 )
         finally :
             self._endProcess()
             self._threadStartReading()
@@ -944,67 +1096,45 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
-    def WiFiSave(self, ssid, key=None) :
-        if not self._isConnected :
-            self._raiseConnectionError()
-        self._threadStopReading()
-        self._beginProcess()
-        try :
-            self._exeCodeREPL('from esp32 import NVS')
-            self._exeCodeREPL('_nvs = NVS("esp32Ctrl")')
-            self._exeCodeREPL('_nvs.set_blob("ssid", %s)' % repr(ssid))
-            self._exeCodeREPL('_nvs.set_blob("key",  %s)' % repr(key) if key else '""')
-            self._exeCodeREPL('_nvs.commit()')
-            self._exeCodeREPL('del _nvs')
-        finally :
-            self._endProcess()
-            self._threadStartReading()
-        self.CreateWiFiStartup()
+    def SaveWiFiSTACfg(self, ssid, key) :
+        self.SaveCfgKeys( dict(ssid=ssid, key=key) )
+        self.CreateBootConfig()
 
     # ---------------------------------------------------------------------------
 
-    def DeleteSavedWiFi(self) :
-        if not self._isConnected :
-            self._raiseConnectionError()
-        self._threadStopReading()
-        self._beginProcess()
-        try :
-            self._exeCodeREPL('from esp32 import NVS')
-            self._exeCodeREPL('_nvs = NVS("esp32Ctrl")')
-            self._exeCodeREPL( 'try :\n' +
-                               '  _nvs.erase_key("ssid")\n' +
-                               '  _nvs.erase_key("key")\n' +
-                               '  _nvs.commit()\n' +
-                               'except :\n' +
-                               '  pass' )
-            self._exeCodeREPL('del _nvs')
-        finally :
-            self._endProcess()
-            self._threadStartReading()
+    def RemoveWiFiSTACfg(self) :
+        self.RemoveCfgKeys(keys = ['ssid', 'key'])
 
     # ---------------------------------------------------------------------------
 
-    def WifiOpenAP(self, ssid, auth=None, key=None, maxcli=3) :
+    @staticmethod
+    def _getWiFiAuthNum(auth) :
+        if not auth :
+            return 0
+        elif auth == 'WPA-PSK' :
+            return 2
+        elif auth == 'WPA2-PSK' :
+            return 3
+        elif auth == 'WPA/WPA2-PSK' :
+            return 4
+        else :
+            raise ESP32ControllerException('Unknown Wi-Fi authentication type.')
+
+    # ---------------------------------------------------------------------------
+
+    def WifiOpenAP(self, ssid, auth=None, key='', maxcli=3) :
         if not self._isConnected :
             self._raiseConnectionError()
         if not auth :
-            auth = 0
-            key  = ''
-        elif auth == 'WPA-PSK' :
-            auth = 2
-        elif auth == 'WPA2-PSK' :
-            auth = 3
-        elif auth == 'WPA/WPA2-PSK' :
-            auth = 4
-        else :
-            raise ESP32ControllerException('Unknown Wi-Fi authentication type.')
+            key = ''
+        auth = self._getWiFiAuthNum(auth)
         self._threadStopReading()
         self._beginProcess()
         try :
             self._exeCodeREPL('import network')
             self._exeCodeREPL('__w = network.WLAN(network.AP_IF)')
             self._exeCodeREPL('__w.active(True)')
-            config = (repr(ssid), repr(auth), repr(key))
+            config = (repr(ssid), auth, repr(key))
             try :
                 self._exeCodeREPL('__w.config(ssid=%s, authmode=%s, password=%s)' % config)
             except :
@@ -1014,6 +1144,20 @@ class ESP32Controller :
         finally :
             self._endProcess()
             self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def SaveWiFiAPCfg(self, ssid, auth, key, maxcli) :
+        if not auth :
+            key = ''
+        auth = self._getWiFiAuthNum(auth)
+        self.SaveCfgKeys( dict(apssid=ssid, apauth=auth, apkey=key, apmaxcli=maxcli) )
+        self.CreateBootConfig()
+
+    # ---------------------------------------------------------------------------
+
+    def RemoveWiFiAPCfg(self) :
+        self.RemoveCfgKeys(keys = ['apssid', 'apauth', 'apkey', 'apmaxcli'])
 
     # ---------------------------------------------------------------------------
 
@@ -1154,6 +1298,17 @@ class ESP32Controller :
         finally :
             self._endProcess()
             self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
+    def SaveETHCfg(self, driver, addr, mdc, mdio, power) :
+        self.SaveCfgKeys( dict(ethdriver=driver, ethaddr=addr, ethmdc=mdc, ethmdio=mdio, ethpower=power) )
+        self.CreateBootConfig()
+
+    # ---------------------------------------------------------------------------
+
+    def RemoveETHCfg(self) :
+        self.RemoveCfgKeys(keys = ['ethdriver', 'ethaddr', 'ethmdc', 'ethmdio', 'ethpower'])
 
     # ---------------------------------------------------------------------------
 
@@ -1502,6 +1657,17 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    def SaveMCUCfg(self, freq) :
+        self.SaveCfgKeys( dict(mcufreq=freq) )
+        self.CreateBootConfig()
+
+    # ---------------------------------------------------------------------------
+
+    def RemoveMCUCfg(self) :
+        self.RemoveCfgKeys(keys = ['mcufreq'])
+
+    # ---------------------------------------------------------------------------
+
     def InitSDCardAndGetSize(self) :
         if not self._isConnected :
             self._raiseConnectionError()
@@ -1510,17 +1676,17 @@ class ESP32Controller :
         try :
             self._exeCodeREPL('from machine import SDCard')
             try :
-                return self._exeCodeREPL( 'try :\n'                           +
-                                          '  print(__sdCard.info()[0])\n'     +
-                                          'except :\n'                        +
-                                          '  try :\n'                         +
-                                          '    __sdCard = SDCard()\n'         +
-                                          '    try :\n'                       +
-                                          '      print(__sdCard.info()[0])\n' +
-                                          '    except :\n'                    +
-                                          '      del __sdCard\n'              +
-                                          '  except :\n'                      +
-                                          '      pass\n'                      +
+                return self._exeCodeREPL( 'try :\n'                             +
+                                          '  print(___jama["sdCard"].info()[0])\n' +
+                                          'except :\n'                          +
+                                          '  try :\n'                           +
+                                          '    ___jama["sdCard"] = SDCard()\n'  +
+                                          '    try :\n'                         +
+                                          '      print(___jama["sdCard"].info()[0])\n' +
+                                          '    except :\n'                      +
+                                          '      del ___jama["sdCard"]\n'       +
+                                          '  except :\n'                        +
+                                          '      pass\n'                        +
                                           'del SDCard' )
             except :
                 return None
@@ -1536,13 +1702,13 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            return self._exeCodeREPL( 'from os import VfsFat\n'   +
-                                      'try :\n'                   +
-                                      '  VfsFat.mkfs(__sdCard)\n' +
-                                      '  print(True)\n'           +
-                                      'except :\n'                +
-                                      '  print(False)\n'          +
-                                      'finally :\n'               +
+            return self._exeCodeREPL( 'from os import VfsFat\n'            +
+                                      'try :\n'                            +
+                                      '  VfsFat.mkfs(___jama["sdCard"])\n' +
+                                      '  print(True)\n'                    +
+                                      'except :\n'                         +
+                                      '  print(False)\n'                   +
+                                      'finally :\n'                        +
                                       '  del VfsFat' )
         except :
             return False
@@ -1558,9 +1724,9 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            size = self._exeCodeREPL('__sdCard.info()[0]')
+            size = self._exeCodeREPL('___jama["sdCard"].info()[0]')
             try :
-                mountPoint = self._exeCodeREPL('__sdMountPt')
+                mountPoint = self._exeCodeREPL('___jama["sdMountPt"]')
             except :
                 mountPoint = None
             return dict( size = size, mountPoint = mountPoint )
@@ -1580,8 +1746,8 @@ class ESP32Controller :
         try :
             return self._exeCodeREPL( 'from uos import mount\n' +
                                       'try :\n'                 +
-                                      '  mount(__sdCard, %s)\n' % repr(mountPointName) +
-                                      '  __sdMountPt = %s\n'    % repr(mountPointName) +
+                                      '  mount(___jama["sdCard"], %s)\n' % repr(mountPointName) +
+                                      '  ___jama["sdMountPt"] = %s\n'    % repr(mountPointName) +
                                       '  print(True)\n'         +
                                       'except :\n'              +
                                       '  print(False)\n'        +
@@ -1595,6 +1761,17 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    def SaveSDCardCfg(self, mountpt) :
+        self.SaveCfgKeys( dict(sdmountpt=mountpt) )
+        self.CreateBootConfig()
+
+    # ---------------------------------------------------------------------------
+
+    def RemoveSDCardCfg(self) :
+        self.RemoveCfgKeys(keys = ['sdmountpt'])
+
+    # ---------------------------------------------------------------------------
+
     def UmountSDCardFileSystem(self) :
         if not self._isConnected :
             self._raiseConnectionError()
@@ -1603,8 +1780,8 @@ class ESP32Controller :
         try :
             return self._exeCodeREPL( 'from uos import umount\n' +
                                       'try :\n'                  +
-                                      '  umount(__sdMountPt)\n'  +
-                                      '  del __sdMountPt\n'      +
+                                      '  umount(___jama["sdMountPt"])\n' +
+                                      '  del ___jama["sdMountPt"]\n'     +
                                       '  print(True)\n'          +
                                       'except :\n'               +
                                       '  print(False)\n'         +
@@ -1624,8 +1801,8 @@ class ESP32Controller :
         self._threadStopReading()
         self._beginProcess()
         try :
-            return self._exeCodeREPL( '__sdCard.deinit()\n' +
-                                      'del __sdCard\n'      +
+            return self._exeCodeREPL( '___jama["sdCard"].deinit()\n' +
+                                      'del ___jama["sdCard"]\n'      +
                                       'print(True)' )
         except :
             return False

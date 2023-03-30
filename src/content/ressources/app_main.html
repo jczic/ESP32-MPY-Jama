@@ -203,7 +203,10 @@
                 <div id="page-logo-sys-info" class="page-logo"></div>
                 <div class="page-title">Check the system of your ESP32 device.</div>
                 <div class="properties-container-large">
-                    <div class="properties-title">MCU &amp; MicroPython</div>
+                    <div class="properties-title">
+                        MCU &amp; MicroPython
+                        <input type="button" id="keepMCUConfigBtn" class="properties-keepcnf-btn" title="Keep configuration" onclick="keepConfigClick(this, 'MCU');" />
+                    </div>
                     <div class="properties-left">
                         Frequency:<br />
                         Flash memory size:<br />
@@ -235,6 +238,11 @@
                     </div>
                 </div>
                 <div class="properties-container">
+                    <div class="properties-title">Boot startups configuration</div>
+                    <div id="sysnfo-boot-config">
+                    </div>
+                </div>
+                <div class="properties-container">
                     <div class="properties-title">Flash partitions</div>
                     <table id="sysnfo-partitions">
                         <tr>
@@ -255,7 +263,10 @@
                 <div id="page-logo-networks-info" class="page-logo"></div>
                 <div class="page-title">Manage the networks of your ESP32.</div>
                 <div class="properties-container">
-                    <div class="properties-title">Wi-Fi client interface</div>
+                    <div class="properties-title">
+                        Wi-Fi client interface
+                        <input type="button" id="keepSTAConfigBtn" class="properties-keepcnf-btn" title="Keep configuration" onclick="keepConfigClick(this, 'STA');" />
+                    </div>
                     <div class="properties-left">
                         STA active:<br />
                         MAC address:<br />
@@ -280,7 +291,10 @@
                     </div>
                 </div>
                 <div class="properties-container">
-                    <div class="properties-title">Wi-Fi access point interface</div>
+                    <div class="properties-title">
+                        Wi-Fi access point interface
+                        <input type="button" id="keepAPConfigBtn" class="properties-keepcnf-btn" title="Keep configuration" onclick="keepConfigClick(this, 'AP');" />
+                    </div>
                     <div class="properties-left">
                         AP active:<br />
                         MAC address:<br />
@@ -306,7 +320,10 @@
                     </div>
                 </div>
                 <div class="properties-container">
-                    <div class="properties-title">Ethernet PHY interface</div>
+                    <div class="properties-title">
+                        Ethernet PHY interface
+                        <input type="button" id="keepETHConfigBtn" class="properties-keepcnf-btn" title="Keep configuration" onclick="keepConfigClick(this, 'ETH');" />
+                    </div>
                     <div class="properties-left">
                         ETH active:<br />
                         MAC address:<br />
@@ -378,7 +395,10 @@
                 </div>
                 <div class="properties-container-mini">
                     <br />
-                    <div class="properties-title">File system</div>
+                    <div class="properties-title">
+                        File system
+                        <input type="button" id="keepSDConfigBtn" class="properties-keepcnf-btn" title="Keep configuration" onclick="keepConfigClick(this, 'SD');" />
+                    </div>
                     <div class="properties-left">
                         Mounted<br />
                         Mounted point name:<br />
@@ -551,9 +571,9 @@
         </div>
     </div>
     <div id="list-item-model" class="list-item hide">
-        <div class="list-item-picto1"></div>
+        <div class="picto1 list-item-picto left"></div>
         <div class="list-item-text"></div>
-        <div class="list-item-picto2"></div>
+        <div class="picto2 list-item-picto right"></div>
     </div>
 
     <div id="box-dialog-wait" class="center-container hide">

@@ -179,12 +179,16 @@ class Application :
                 self._sendWiFiNetworks()
             elif cmd == 'WIFI-CONNECT' :
                 self._wifiConnect(arg['ssid'], arg['key'])
-            elif cmd == 'WIFI-SAVE' :
-                self._wifiSave(arg['ssid'], arg['key'])
+            elif cmd == 'SAVE-WIFI-STA-CFG' :
+                self._saveWiFiSTACfg(arg['ssid'], arg['key'])
             elif cmd == 'WIFI-OPEN-AP' :
                 self._wifiOpenAP(arg['ssid'], arg['auth'], arg['key'], arg['maxcli'])
+            elif cmd == 'SAVE-WIFI-AP-CFG' :
+                self._saveWiFiAPCfg(arg['ssid'], arg['auth'], arg['key'], arg['maxcli'])
             elif cmd == 'INIT_ETH_DRIVER' :
                 self._initETHDriver(arg['driver'], arg['addr'], arg['mdc'], arg['mdio'], arg['power'])
+            elif cmd == 'SAVE-ETH-CFG' :
+                self._saveETHCfg(arg['driver'], arg['addr'], arg['mdc'], arg['mdio'], arg['power'])
             elif cmd == 'ENABLE_ETH_IF' :
                 self._enableETHInterface()
             elif cmd == 'DISABLE_ETH_IF' :
@@ -247,6 +251,8 @@ class Application :
                 self._installPackage(arg)
             elif cmd == 'SET-MCU-FREQ' :
                 self._setMCUFreq(arg)
+            elif cmd == 'SAVE-MCU-CFG' :
+                self._saveMCUCfg(arg['freq'])
             elif cmd == 'SDCARD-INIT' :
                 self._initSDCard()
             elif cmd == 'SDCARD-FORMAT' :
@@ -255,10 +261,16 @@ class Application :
                 self._sendSDCardConf(arg)
             elif cmd == 'SDCARD-MOUNT' :
                 self._mountSDCard(arg)
+            elif cmd == 'SAVE-SD-CARD-CFG' :
+                self._saveSDCardCfg(arg['mountpt'])
             elif cmd == 'SDCARD-UMOUNT' :
                 self._umountSDCard()
             elif cmd == 'SDCARD-RELEASE' :
                 self._releaseSDCard()
+            elif cmd == 'REMOVE-CFG' :
+                self._removeConfig(arg)
+            elif cmd == 'REMOVE-BOOT-CFG' :
+                self._removeBootConfig()
             elif cmd == "CLOSE-SOFTWARE" :
                 self._closeSoftware()
             elif cmd == "OPEN-URL" :
@@ -663,7 +675,8 @@ class Application :
                           flashSize  = self.esp32Ctrl.GetFlashSize(),
                           os         = self.esp32Ctrl.GetPlatformInfo(),
                           partitions = self.esp32Ctrl.GetPartitions(),
-                          pins       = self.esp32Ctrl.GetPinsState() )
+                          pins       = self.esp32Ctrl.GetPinsState(),
+                          bootcfg    = self.esp32Ctrl.CheckAllConfigurations() )
                 if not silence :
                     self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('SYS-INFO', o)
@@ -787,7 +800,7 @@ class Application :
                 if ok :
                     self._wsSendCmd('SHOW-ALERT', 'The device is connected to the %s access point.' % ssid)
                     self._sendNetworksInfo(False)
-                    self._wsSendCmd('WIFI-CONNECTED', { "ssid": ssid, "key": key })
+                    self._wsSendCmd('WIFI-CONNECTED')
                 else :
                     self._wsSendCmd('SHOW-ERROR', 'Unable to connect the device to access point %s.' % ssid)
             except :
@@ -796,11 +809,14 @@ class Application :
 
     # ------------------------------------------------------------------------
 
-    def _wifiSave(self, ssid, key) :
+    def _saveWiFiSTACfg(self, ssid, key) :
         if self._ableToUseDevice() :
+            self._wsSendCmd('SHOW-WAIT', 'Saving Wi-Fi configuration...')
             try :
-                self.esp32Ctrl.WiFiSave(ssid, key)
+                self.esp32Ctrl.SaveWiFiSTACfg(ssid, key)
+                self._wsSendCmd('HIDE-WAIT')
             except :
+                self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('SHOW-ERROR', 'Unable to save Wi-Fi configuration.')
 
     # ------------------------------------------------------------------------
@@ -816,9 +832,22 @@ class Application :
                 self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('SHOW-ALERT', 'The Wi-Fi access point has been opened.')
                 self._sendNetworksInfo(False)
+                self._wsSendCmd('WIFI-AP-OPENED')
             except :
                 self._wsSendCmd('HIDE-WAIT')
                 self._wsSendCmd('SHOW-ERROR', 'Unable to open the Wi-Fi access point.')
+
+    # ------------------------------------------------------------------------
+
+    def _saveWiFiAPCfg(self, ssid, auth, key, maxcli) :
+        if self._ableToUseDevice() :
+            self._wsSendCmd('SHOW-WAIT', 'Saving Wi-Fi AP configuration...')
+            try :
+                self.esp32Ctrl.SaveWiFiAPCfg(ssid, auth, key, maxcli)
+                self._wsSendCmd('HIDE-WAIT')
+            except :
+                self._wsSendCmd('HIDE-WAIT')
+                self._wsSendCmd('SHOW-ERROR', 'Unable to save Wi-Fi AP configuration.')
 
     # ------------------------------------------------------------------------
 
@@ -831,6 +860,7 @@ class Application :
                                                  mdioPinNum  = mdioPinNum,
                                                  powerPinNum = powerPinNum ) :
                     self._sendNetworksInfo(False)
+                    self._wsSendCmd('ETH-INITIALIZED')
                 else :
                     self._wsSendCmd('SHOW-ERROR', 'Cannot initialize the Ethernet driver.\n' +
                                                   '\n' +
@@ -840,6 +870,18 @@ class Application :
                                                   'Indeed, all the following attempts are likely to fail.')
             except :
                 self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+
+    def _saveETHCfg(self, driver, addr, mdc, mdio, power) :
+        if self._ableToUseDevice() :
+            self._wsSendCmd('SHOW-WAIT', 'Saving Ethernet configuration...')
+            try :
+                self.esp32Ctrl.SaveETHCfg(driver, addr, mdc, mdio, power)
+                self._wsSendCmd('HIDE-WAIT')
+            except :
+                self._wsSendCmd('HIDE-WAIT')
+                self._wsSendCmd('SHOW-ERROR', 'Unable to save Ethernet configuration.')
 
     # ------------------------------------------------------------------------
 
@@ -1334,11 +1376,26 @@ class Application :
                 else :
                     raise Exception()
                 if r :
+                    self._wsSendCmd('SHOW-ALERT', 'The MCU frequency has been set.')
                     self._sendSysInfo(False)
+                    self._wsSendCmd('MCU-SETTING-UPDATED')
                 else :
-                    self._wsSendCmd('SHOW-ERROR', 'This frequency is not supported by your device.')
+                    self._wsSendCmd('SHOW-ERROR', 'This new frequency is not supported by your device.')
             except :
                 self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+
+    def _saveMCUCfg(self, freq) :
+        if self._ableToUseDevice() :
+            self._wsSendCmd('SHOW-WAIT', 'Saving MCU configuration...')
+            try :
+                self.esp32Ctrl.SaveMCUCfg(freq)
+                self._wsSendCmd('HIDE-WAIT')
+                self._sendSysInfo(False)
+            except :
+                self._wsSendCmd('HIDE-WAIT')
+                self._wsSendCmd('SHOW-ERROR', 'Unable to save MCU configuration.')
 
     # ------------------------------------------------------------------------
 
@@ -1395,12 +1452,25 @@ class Application :
         if self._ableToUseDevice() :
             try :
                 if self.esp32Ctrl.MountSDCardFileSystem(mountPointName) :
+                    self._wsSendCmd('SHOW-ALERT', 'The SD card has been mounted.')
                     self._sendSDCardConf()
-                    self._wsSendCmd('SHOW-INFO', 'The SD card has been mounted.')
+                    self._wsSendCmd('SD-CARD-MOUNTED')
                 else :
                     self._wsSendCmd('SHOW-ERROR', 'The file system of the SD card cannot be mounted on the device.')
             except :
                 self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+
+    def _saveSDCardCfg(self, mountpt) :
+        if self._ableToUseDevice() :
+            self._wsSendCmd('SHOW-WAIT', 'Saving SD card configuration...')
+            try :
+                self.esp32Ctrl.SaveSDCardCfg(mountpt)
+                self._wsSendCmd('HIDE-WAIT')
+            except :
+                self._wsSendCmd('HIDE-WAIT')
+                self._wsSendCmd('SHOW-ERROR', 'Unable to save SD card configuration.')
 
     # ------------------------------------------------------------------------
 
@@ -1425,6 +1495,32 @@ class Application :
                     self._wsSendCmd('SHOW-ERROR', 'Unable to release the SD card.')
             except :
                 self._wsSendCmd('SHOW-ERROR', 'An error has occurred.')
+
+    # ------------------------------------------------------------------------
+    
+    def _removeBootConfig(self) :
+        if self._ableToUseDevice() :
+            self._wsSendCmd('SHOW-WAIT', 'Removing boot configuration...')
+            try :
+                self.esp32Ctrl.RemoveBootConfig()
+                self._wsSendCmd('HIDE-WAIT')
+                self._sendSysInfo(False)
+            except :
+                self._wsSendCmd('HIDE-WAIT')
+                self._wsSendCmd('SHOW-ERROR', 'Unable to remove boot configuration.')
+
+    # ------------------------------------------------------------------------
+
+    def _removeConfig(self, cfgName) :
+        if self._ableToUseDevice() :
+            self._wsSendCmd('SHOW-WAIT', 'Removing configuration...')
+            try :
+                self.esp32Ctrl.RemoveConfiguration(cfgName)
+                self._wsSendCmd('HIDE-WAIT')
+                self._sendSysInfo(False)
+            except :
+                self._wsSendCmd('HIDE-WAIT')
+                self._wsSendCmd('SHOW-ERROR', 'Unable to remove configuration.')
 
     # ------------------------------------------------------------------------
 

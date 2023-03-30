@@ -35,6 +35,8 @@ var showNetworksInfoPage      = false;
 var pinsList                  = { }
 var networkMiniInfos          = null
 
+var keepConfig                = { };
+
 var flashRootPath             = "";
 var browsePath                = "";
 var sdcardMountPoint          = null;
@@ -319,9 +321,6 @@ function onWSMessage(evt)
         case "WIFI-NETWORKS" :
             setWiFiNetworks(o.ARG);
             break;
-        case "WIFI-CONNECTED" :
-            wifiConnected(o.ARG["ssid"], o.ARG["key"]);
-            break;
         case "MODULES" :
             importModules(o.ARG);
             break;
@@ -330,6 +329,21 @@ function onWSMessage(evt)
             break;
         case "SDCARD-CONF" :
             setSDCardConf(o.ARG)
+            break;
+        case "MCU-SETTING-UPDATED" :
+            mcuSettingUpdated();
+            break;        
+        case "WIFI-CONNECTED" :
+            wifiConnected();
+            break;
+        case "WIFI-AP-OPENED" :
+            wifiAPOpened();
+            break;
+        case "ETH-INITIALIZED" :
+            ethInitialized();
+            break;
+        case "SD-CARD-MOUNTED" :
+            sdCardMounted();
             break;
         case "DEVICE-INFO" :
             setDeviceInfo(o.ARG);
@@ -485,9 +499,9 @@ function boxDialogList(title, text, itemsConf, onClickCallback) {
             closeBoxDialog(getElmById("box-dialog-list"));
             onClickCallback(e.currentTarget["ObjCB"]);
         } );
-        getSubElm(itemElm, "list-item-picto1").classList.add(itemsConf[i]["Picto1"]);
+        getSubElm(itemElm, "picto1").classList.add(itemsConf[i]["Picto1"]);
         getSubElm(itemElm, "list-item-text").innerHTML = textToHTML(itemsConf[i]["Text"]);
-        getSubElm(itemElm, "list-item-picto2").classList.add(itemsConf[i]["Picto2"]);
+        getSubElm(itemElm, "picto2").classList.add(itemsConf[i]["Picto2"]);
         itemElm.classList.remove("hide");
         list.appendChild(itemElm);
     }
@@ -713,7 +727,7 @@ function setPinsList(pList) {
         var right        = false;
         for (var pin in pinsList) {
             var s     = (pinsList[pin] ? "up" : "down");
-            var picto = newElm("div", null, ["list-item-picto1", "list-item-picto-pin-"+s]);
+            var picto = newElm("div", null, ["list-item-picto", "left", "list-item-picto-pin-"+s]);
             var text  = newElm("div", null, ["list-item-text-float"]);
             text.innerHTML   = "GPIO-<b>" + pin + "</b> " + s;
             text.style.float = "none";
@@ -1247,6 +1261,38 @@ function setSystemInfo(o) {
     setTextTag("label-sysnfo-spiram", (o.os.spiram ? "Yes" : "No"), o.os.spiram);
     getElmById("label-sysnfo-mpyver").innerText     = o.os.mpyver;
 
+    var bootCfgElm = getElmById("sysnfo-boot-config");
+    while (bootCfgElm.childElementCount > 0)
+        bootCfgElm.removeChild(bootCfgElm.lastChild);
+    for (var i in o.bootcfg) {
+        var desc = ( o.bootcfg[i] == "MCU" ? "Update system setting"             :
+                     o.bootcfg[i] == "STA" ? "Connect Wi-Fi (WLAN STA)"          :
+                     o.bootcfg[i] == "AP"  ? "Open Wi-Fi access point (WLAN AP)" :
+                     o.bootcfg[i] == "ETH" ? "Initialize Ethernet PHY (LAN)"     :
+                     o.bootcfg[i] == "SD"  ? "Mount SD card to file system"      :
+                     "" );
+        var elm  = newElm("div", null, ["prop-item"]);
+        var text = newElm("div", null, ["prop-item-text"]);
+        text.innerText = "▶️ " + desc;
+        elm.appendChild(text);
+        var btnElm   = newElm("div", "bootcfg-" + o.bootcfg[i], ["prop-item-picto", "prop-item-picto-btn", "right", "list-item-picto-remove"]);
+        btnElm.title = "Remove this setting";
+        btnElm["cfg"]  = o.bootcfg[i];
+        btnElm["desc"] = desc;
+        btnElm.addEventListener( "click", function(e) {
+            var target = getEventTarget(e);
+            boxDialogYesNo( "⚠️ REMOVE?",
+                            "<b>\" " + target.desc + " \"</b>\n" +
+                            "Are you sure you want to remove this setting from the boot of your device?",
+                            function(yes) {
+                                if (yes)
+                                    wsSendCmd("REMOVE-CFG", target.cfg);
+                            } );
+        } );
+        elm.appendChild(btnElm);
+        bootCfgElm.appendChild(elm);
+    }
+
     var partElm = getElmById("sysnfo-partitions");
     while (partElm.childElementCount > 1)
         partElm.removeChild(partElm.lastChild);
@@ -1293,6 +1339,8 @@ function setSystemInfo(o) {
 
 function setNetworksInfo(o) {
 
+    if (!o.wifiSTA.active)
+        hide("keepSTAConfigBtn");
     setTextTag("label-netnfo-wl-sta-active", (o.wifiSTA.active ? "Yes" : "No"), o.wifiSTA.active);
     if (o.wifiSTA.active) showInline("close-IF-STA"); else hide("close-IF-STA");
     getElmById("label-netnfo-wl-sta-mac").innerText     = o.wifiSTA.mac;
@@ -1302,6 +1350,8 @@ function setNetworksInfo(o) {
     getElmById("label-netnfo-wl-sta-gateway").innerText = o.wifiSTA.gateway;
     getElmById("label-netnfo-wl-sta-dns").innerText     = o.wifiSTA.dns;
 
+    if (!o.wifiAP.active)
+        hide("keepAPConfigBtn");
     setTextTag("label-netnfo-wl-ap-active", (o.wifiAP.active ? "Yes" : "No"), o.wifiAP.active);
     if (o.wifiAP.active) showInline("close-IF-AP"); else hide("close-IF-AP");
     getElmById("label-netnfo-wl-ap-mac").innerText      = o.wifiAP.mac;
@@ -1313,6 +1363,8 @@ function setNetworksInfo(o) {
     if (o.wifiAP.active) showInline("show-AP-cli-addr"); else hide("show-AP-cli-addr");
 
     var ok = (o.eth && o.eth.mac);
+    if (!ok)
+        hide("keepETHConfigBtn");
     setTextTag("label-netnfo-eth-active", ( !o.eth ? "Not supported"
                                             : !ok ? "No driver"
                                               : o.eth.enable ? "Yes" : "No" ),
@@ -1392,8 +1444,10 @@ function setWiFiNetworks(networks) {
                                             "",
                                             function(key) {
                                                 key = key.trim();
-                                                if (key != "")
-                                                    wsSendCmd("WIFI-CONNECT", { ssid: value.ssid, key: key });
+                                                if (key != "") {
+                                                    keepConfig.STA = { ssid: value.ssid, key: key };
+                                                    wsSendCmd("WIFI-CONNECT", keepConfig.STA);
+                                                }
                                                 else
                                                     showError("The authentication key is required.");
                                             },
@@ -1403,15 +1457,39 @@ function setWiFiNetworks(networks) {
                    } );
 }
 
-function wifiConnected(ssid, key) {
-    boxDialogYesNo( "😎 Wi-Fi Connected with success!",
-                    "The device is now connected to access point " + ssid + ".\n\n" +
-                    "💡 Do you want to save this Wi-Fi network on the device for a permanent connection even after reboot?.",
-                    function(yes) {
-                        if (yes)
-                            wsSendCmd("WIFI-SAVE", { ssid: ssid, key: key });
-                            wsSendCmd("GET-LIST-DIR", browsePath);
-                    } );
+function mcuSettingUpdated() {
+    show("keepMCUConfigBtn");
+    boxDialogAlert( "😎 System setting updated with success!",
+                    "The system setting of your device is now updated.\n" +
+                    "Afterwards, you can make this configuration persistent." );
+}
+
+function wifiConnected() {
+    show("keepSTAConfigBtn");
+    boxDialogAlert( "😎 Wi-Fi connected with success!",
+                    "The device is now connected to access point " + keepConfig.STA.ssid + ".\n" +
+                    "Afterwards, you can make this configuration persistent." );
+}
+
+function wifiAPOpened() {
+    show("keepAPConfigBtn");
+    boxDialogAlert( "😎 Wi-Fi AP opened with success!",
+                    "The device is now reachable on the access point " + keepConfig.AP.ssid + ".\n" +
+                    "Afterwards, you can make this configuration persistent." );
+}
+
+function ethInitialized() {
+    show("keepETHConfigBtn");
+    boxDialogAlert( "😎 Ethernet initialized with success!",
+                    "The Ethernet PHY interface is now initialized and can be activated.\n" +
+                    "Afterwards, you can make this configuration persistent." );
+}
+
+function sdCardMounted() {
+    show("keepSDConfigBtn");
+    boxDialogAlert( "😎 SD card mounted with success!",
+                    "The SD card is now mounted to the device's file system on " + keepConfig.SD.mountpt +".\n" +
+                    "Afterwards, you can make this configuration persistent." );
 }
 
 function showAPClientsAddr(cliAddr) {
@@ -1481,6 +1559,8 @@ function setSDCardConf(conf) {
     if (ok && conf.mountPoint == null) showInline("sdcard-format"); else hide("sdcard-format");
     getElmById("label-sdcard-size").innerText = (ok ? sizeToText(conf.size, "octets") : "Unavailable");
     ok = (ok && conf.mountPoint != null);
+    if (!ok)
+        hide("keepSDConfigBtn");
     setTextTag("label-sdcard-mounted", (ok ? "Yes" : "No"), ok);
     if (!ok && conf != null) showInline("sdcard-mount"); else hide("sdcard-mount");
     if (ok) showInline("sdcard-umount"); else hide("sdcard-umount");
@@ -1655,12 +1735,15 @@ function btnWiFiAPClick(e) {
                                   showError("The length of the key is too short.");
                               else if (isNaN(maxcli) || maxcli < 0 || maxcli > 10)
                                   showError("The maximum number of client connections is incorrect.");
-                              else
-                                  wsSendCmd( "WIFI-OPEN-AP", {
-                                                  "ssid"   : ssid,
-                                                  "auth"   : auth,
-                                                  "key"    : key,
-                                                  "maxcli" : maxcli } );
+                              else {
+                                  keepConfig.AP = {
+                                        ssid:   ssid,
+                                        auth:   auth,
+                                        key:    key,
+                                        maxcli: maxcli
+                                  }
+                                  wsSendCmd("WIFI-OPEN-AP", keepConfig.AP);
+                              }
                           } );
         getElmById("elm-AP-ssid").focus();
     }
@@ -1724,13 +1807,16 @@ function initETHDriverClick(e) {
                                   showError("You must choose a mdc GPIO.");
                               else if (isNaN(mdio))
                                   showError("You must choose a mdio GPIO.");
-                              else
-                                  wsSendCmd( "INIT_ETH_DRIVER", {
-                                                "driver" : driver,
-                                                "addr"   : addr,
-                                                "mdc"    : mdc,
-                                                "mdio"   : mdio,
-                                                "power"  : power } );
+                              else {
+                                   keepConfig.ETH = {
+                                        driver: driver,
+                                        addr:   addr,
+                                        mdc:    mdc,
+                                        mdio:   mdio,
+                                        power:  power
+                                   }
+                                   wsSendCmd("INIT_ETH_DRIVER", keepConfig.ETH);
+                              }
                           } );
         getElmById("elm-ETH-init-driver").focus();
     }
@@ -1744,6 +1830,59 @@ function enableInterfaceETHClick(e) {
 
 function disableInterfaceETHClick(e) {
     wsSendCmd("DISABLE_ETH_IF", null);
+}
+
+function keepConfigClick(e, configName) {
+    if (configName == "MCU" && keepConfig.MCU)
+        boxDialogYesNo( "💡 Keep system setting?",
+                        "Do you want to keep this system setting in your device\nso that it is set automatically at each boot?",
+                        function(yes) {
+                            if (yes) {
+                                hide("keepMCUConfigBtn");
+                                wsSendCmd("SAVE-MCU-CFG", keepConfig.MCU);
+                                wsSendCmd("GET-LIST-DIR", browsePath);
+                            }
+                        } );
+    else if (configName == "STA" && keepConfig.STA)
+        boxDialogYesNo( "💡 Keep Wi-Fi configuration?",
+                        "Do you want to keep this Wi-Fi configuration in your device\nso that it connects automatically at each boot?",
+                        function(yes) {
+                            if (yes) {
+                                hide("keepSTAConfigBtn");
+                                wsSendCmd("SAVE-WIFI-STA-CFG", keepConfig.STA);
+                                wsSendCmd("GET-LIST-DIR", browsePath);
+                            }
+                        } );
+    else if (configName == "AP" && keepConfig.AP)
+        boxDialogYesNo( "💡 Keep Wi-Fi AP configuration?",
+                        "Do you want to keep this Wi-Fi access point configuration in your device\nso that it opens automatically at each boot?",
+                        function(yes) {
+                            if (yes) {
+                                hide("keepAPConfigBtn");
+                                wsSendCmd("SAVE-WIFI-AP-CFG", keepConfig.AP);
+                                wsSendCmd("GET-LIST-DIR", browsePath);
+                            }
+                        } );
+    else if (configName == "ETH" && keepConfig.ETH)
+        boxDialogYesNo( "💡 Keep Ethernet configuration?",
+                        "Do you want to keep this Ethernet PHY configuration in your device\nso that it initialises automatically at each boot?",
+                        function(yes) {
+                            if (yes) {
+                                hide("keepETHConfigBtn");
+                                wsSendCmd("SAVE-ETH-CFG", keepConfig.ETH);
+                                wsSendCmd("GET-LIST-DIR", browsePath);
+                            }
+                        } );
+    else if (configName == "SD" && keepConfig.SD)
+        boxDialogYesNo( "💡 Keep SD card mounted?",
+                        "Do you want to keep the SD card mounted on your device\nto maintain access to the file system at every boot?",
+                        function(yes) {
+                            if (yes) {
+                                hide("keepSDConfigBtn");
+                                wsSendCmd("SAVE-SD-CARD-CFG", keepConfig.SD);
+                                wsSendCmd("GET-LIST-DIR", browsePath);
+                            }
+                        } );
 }
 
 function setPinoutInfoImg(name) {
@@ -1761,12 +1900,12 @@ function initSDCardClick(e) {
 
 function formatSDCardClick(e) {
     boxDialogYesNo( "⚠️ FORMAT?",
-    "Are you sure you want to format the SD card that is in the device?\n\n" +
-    "Be careful: All your files stored on it will be lost!",
-    function(yes) {
-        if (yes)
-            wsSendCmd("SDCARD-FORMAT", null);
-    } );
+                    "Are you sure you want to format the SD card that is in the device?\n\n" +
+                    "Be careful: All your files stored on it will be lost!",
+                    function(yes) {
+                        if (yes)
+                            wsSendCmd("SDCARD-FORMAT", null);
+                    } );
 }
 
 function mountSDCardClick(e) {
@@ -1778,8 +1917,10 @@ function mountSDCardClick(e) {
                         if (name != "") {
                             if (name[0] != "/")
                                 name = "/" + name;
-                            if (name.length > 1 && name.length < 256 && name.split("/").length-1 == 1)
+                            if (name.length > 1 && name.length < 256 && name.split("/").length-1 == 1) {
+                                keepConfig.SD = { mountpt: name };
                                 wsSendCmd("SDCARD-MOUNT", name);
+                            }
                             else
                                 showError("The name of this mount point is incorrect.");
                         }
@@ -1875,7 +2016,13 @@ function setConnectionState(connected) {
         hide("panel-connection");
         setListDirAndFiles("", { });
         setCurrentDirLabel(null);
-    }
+        hide("keepMCUConfigBtn");
+        hide("keepSTAConfigBtn");
+        hide("keepAPConfigBtn");
+        hide("keepETHConfigBtn");
+        hide("keepSDConfigBtn");
+        keepConfig = { };
+        }
 }
 
 function setSerialConnection(port) {
@@ -2431,8 +2578,10 @@ window.addEventListener( "load", function() {
         "Choose a frequency to set on your ESP32:",
         itemsConf,
         function(value) {
-            if (connectionState)
+            if (connectionState) {
+                keepConfig.MCU = { freq: value };
                 wsSendCmd("SET-MCU-FREQ", value);
+            }
             else
                 showError("The device must be connected first.");
         } );
