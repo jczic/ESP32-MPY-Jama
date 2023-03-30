@@ -2411,8 +2411,12 @@ window.addEventListener( "load", function() {
             if (k == "A" || k == "Z" || k == "Q")
                 e.preventDefault();
         }
+        if (e.key == "Escape") {
+            hideExistingBoxesDialog();
+            e.preventDefault();
+        }
     } );
-    
+
     getElmById("menubar-logo").addEventListener("click", function(e) {
         e.preventDefault();
         wsSendCmd("OPEN-URL", GITHUB_REPOSITORY_URL);
