@@ -510,7 +510,7 @@ function boxDialogList(title, text, itemsConf, onClickCallback) {
         } );
         getSubElm(itemElm, "picto1").classList.add(itemsConf[i]["Picto1"]);
         getSubElm(itemElm, "list-item-text").innerHTML = textToHTML(itemsConf[i]["Text"]);
-        getSubElm(itemElm, "picto2").classList.add(itemsConf[i]["Picto2"]);
+        getSubElm(itemElm, "picto2").classList.add(itemsConf[i]["Picto2"], "right");
         itemElm.classList.remove("hide");
         list.appendChild(itemElm);
     }
@@ -735,11 +735,10 @@ function setPinsList(pList) {
         var listRightElm = getElmById("sysnfo-pins-right");
         var right        = false;
         for (var pin in pinsList) {
-            var s     = (pinsList[pin] ? "up" : "down");
-            var picto = newElm("div", null, ["list-item-picto", "left", "list-item-picto-pin-"+s]);
-            var text  = newElm("div", null, ["list-item-text-float"]);
-            text.innerHTML   = "GPIO-<b>" + pin + "</b> " + s;
-            text.style.float = "none";
+            s = (pinsList[pin] ? "high" : "low")
+            var picto = newElm("div", null, ["prop-item-picto", "list-item-picto-pin-"+s]);
+            var text  = newElm("div", null, ["prop-item-text"]);
+            text.innerHTML   = "<b>" + pin.padStart(3, " ") + "</b>:" + s.toUpperCase();
             if (right) {
                 listRightElm.appendChild(picto);
                 listRightElm.appendChild(text);

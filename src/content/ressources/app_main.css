@@ -679,6 +679,7 @@ input[type=button].browse-button-actif {
 }
 
 .list-item-picto {
+    position: relative;
     width: 24px;
     height: 24px;
     margin: 4px 6px;
@@ -687,19 +688,12 @@ input[type=button].browse-button-actif {
 }
 
 .list-item-text {
-    position: absolute;
+    position: relative;
+    float: left;
     height: 32px;
-    left: 36px;
-    right: 0;
     text-align: left;
     line-height: 32px;
     word-break: break-all;
-    overflow: hidden;
-}
-
-.list-item-text-float {
-    float: left;
-    line-height: 32px;
     overflow: hidden;
 }
 
@@ -708,15 +702,20 @@ input[type=button].browse-button-actif {
 }
 
 .prop-item-picto {
-    margin: 3px 0;
+    clear: both;
+    position: relative;
+    float: left;
     width: 16px;
     height: 16px;
+    margin: 3px 0;
     background-position: center;
     background-size: 16px 16px;
     background-repeat: no-repeat;
 }
 
 .prop-item-picto-btn {
+    clear: none;
+    float: right;
     cursor: pointer;
 } .prop-item-picto-btn:hover {
     transform: scale(1.3);
@@ -724,9 +723,9 @@ input[type=button].browse-button-actif {
 }
 
 .prop-item-text {
+    position: relative;
     float: left;
     height: 22px;
-    margin: 0 5px;
     text-align: left;
     line-height: 22px;
     word-break: break-all;
@@ -748,8 +747,8 @@ input[type=button].browse-button-actif {
 .list-item-picto-python         { background-image: url('img/python.png'); }
 .list-item-picto-freq           { background-image: url('img/freq.png'); }
 .list-item-picto-pins           { background-image: url('img/pins.png'); }
-.list-item-picto-pin-up         { background-image: url('img/pin-up.png'); }
-.list-item-picto-pin-down       { background-image: url('img/pin-down.png'); }
+.list-item-picto-pin-high       { background-image: url('img/pin-high.png'); }
+.list-item-picto-pin-low        { background-image: url('img/pin-low.png'); }
 .list-item-picto-remove         { background-image: url('img/remove.png'); }
 
 input, select {
