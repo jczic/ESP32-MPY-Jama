@@ -667,6 +667,7 @@ input[type=button].browse-button-actif {
 }
 
 .list-item {
+    position: relative;
     height: 32px;
     border-bottom: 1px solid Silver;
     background-color: #e9f4fb;
@@ -688,9 +689,10 @@ input[type=button].browse-button-actif {
 }
 
 .list-item-text {
-    position: relative;
-    float: left;
-    height: 32px;
+    position: absolute;
+    height: 100%;
+    left: 35px;
+    right: 35px;
     text-align: left;
     line-height: 32px;
     word-break: break-all;
