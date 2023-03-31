@@ -16,6 +16,7 @@ def config() :
             except :
                 if not noneOk :
                     raise
+            return None
 
         def gInt(key, noneOk=False) :
             try :
@@ -23,6 +24,7 @@ def config() :
             except :
                 if not noneOk :
                     raise
+            return None
 
         # MCU,
         try :
@@ -71,7 +73,7 @@ def config() :
         try :
             ssid   = gStr('apssid')
             auth   = gInt('apauth')
-            key    = gStr('apkey')
+            key    = gStr('apkey', True)
             maxCli = gInt('apmaxcli')
             print('Opening Wi-Fi AP "%s"...' % ssid, end=' ')
             try :

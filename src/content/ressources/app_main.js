@@ -1464,9 +1464,11 @@ function setWiFiNetworks(networks) {
                                                 else
                                                     showError("The authentication key is required.");
                                             },
-                                            true )
-                        else
-                            wsSendCmd("WIFI-CONNECT", { ssid: value.ssid, key: null });
+                                            true );
+                        else {
+                            keepConfig.STA = { ssid: value.ssid, key: null };
+                            wsSendCmd("WIFI-CONNECT", keepConfig.STA);
+                        }
                    } );
 }
 
@@ -1740,7 +1742,7 @@ function btnWiFiAPClick(e) {
                           function() {
                               ssid   = getElmById("elm-AP-ssid").value.trim();
                               auth   = getElmById("elm-AP-auth").value;
-                              key    = (auth != "" ? getElmById("elm-AP-key").value : "");
+                              key    = (auth != "" ? getElmById("elm-AP-key").value : null);
                               maxcli = parseInt(getElmById("elm-AP-maxclients").value.trim());
                               if (ssid.length == 0)
                                   showError("The network name (SSID) cannot be empty.");
