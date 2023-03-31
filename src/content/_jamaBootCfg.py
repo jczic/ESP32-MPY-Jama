@@ -42,7 +42,7 @@ def config() :
         # WLAN STA,
         try :
             ssid = gStr('ssid')
-            key  = gStr('key')
+            key  = gStr('key', True)
             print('Connecting Wi-Fi to "%s"...' % ssid, end=' ')
             try :
                 import network, time
