@@ -52,8 +52,8 @@ class Application :
 
         self._splashScr = webview.create_window( '',
                                                  url        = self._localURL(conf.HTML_SPLASH_SCREEN_FILENAME),
-                                                 width      = 280,
-                                                 height     = 280,
+                                                 width      = 250,
+                                                 height     = 250,
                                                  resizable  = False,
                                                  frameless  = True,
                                                  on_top     = True )
