@@ -15,7 +15,7 @@ from   queue           import SimpleQueue
 from   hashlib         import sha256
 from   shutil          import copyfile
 from   pathlib         import Path
-from   time            import sleep
+from   time            import time, sleep
 from   _thread         import start_new_thread
 import webview
 import asyncio
@@ -23,6 +23,8 @@ import webbrowser
 import esptoolProc
 import json
 import conf
+import sys
+import getopt
 import os
 import gc
 
@@ -1550,6 +1552,17 @@ class Application :
     # ------------------------------------------------------------------------
     
     async def _asyncAppRun(self) :
+        maxTime = (time() + conf.START_GUI_AND_WS_TIMEOUT_SEC)
+        while self._splashScr :
+            sleep(0.030)
+            if time() > maxTime :
+                print( '\n' +
+                       'Application error :\n' +
+                       'Unable to initialize GUI...\n' +
+                       'You can try to force the web engine with following argument:\n' +
+                       '    python app.py -g gtk  (to use GTK on Linux)\n' +
+                       '    python app.py -g qt   (to use QT)\n' )
+                os._exit(1)
         while True :
             for i in range(conf.RECURRENT_TIMER_APP_SEC * 10) :
                 await asyncio.sleep(0.100)
@@ -1576,10 +1589,21 @@ class Application :
     # ------------------------------------------------------------------------
 
     def Start(self) :
+        forceGUI = None
+        args = sys.argv[1:]
+        try :
+            opts, args = getopt.getopt(args, 'g:', ['gui='])
+        except Exception as ex :
+            print(ex)
+            return
+        for opt, arg in opts :
+            if opt in ('-g', '--gui') :
+                forceGUI = arg
         self._webSrv.Start(threaded=True)
         webview.start( self._appRun,
                        localization = conf.PYWEBVIEW_LOCALIZATION,
-                       user_agent   = conf.APPLICATION_TITLE )
+                       user_agent   = conf.APPLICATION_TITLE,
+                       gui          = forceGUI )
         self._appRunning = False
 
 # ============================================================================
