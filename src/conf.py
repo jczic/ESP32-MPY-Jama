@@ -35,7 +35,7 @@ WEB_SRV_PATH                     = 'ressources/'
 HTML_SPLASH_SCREEN_FILENAME      = 'splash_scr.html'
 HTML_APP_MAIN_FILENAME           = 'app_main.html'
 
-START_GUI_AND_WS_TIMEOUT_SEC     = 3
+START_GUI_AND_WS_TIMEOUT_SEC     = 7
 
 if IS_MACOS :
     DIRECTORY_FILES              = Path('~/Library/Application Support').expanduser() / APPLICATION_BUNDLE_NAME

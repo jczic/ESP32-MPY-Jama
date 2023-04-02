@@ -66,8 +66,7 @@ class Application :
                                                height     = 700,
                                                resizable  = True,
                                                min_size   = (700, 550),
-                                               hidden     = not (conf.IS_WIN32 | conf.IS_LINUX),
-                                               minimized  = conf.IS_WIN32 )
+                                               hidden     = True )
         self._mainWin.events.closing += self._onMainWinClosing
         self._mainWin.events.closed  += self._onMainWinClosed
     
@@ -293,10 +292,7 @@ class Application :
         if self._splashScr :
             self._splashScr.destroy()
             self._splashScr = None
-            if conf.IS_WIN32 :
-                self._mainWin.restore()
-            else :
-                self._mainWin.show()
+            self._mainWin.show()
 
     # ------------------------------------------------------------------------
 
