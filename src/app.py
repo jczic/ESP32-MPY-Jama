@@ -1555,11 +1555,11 @@ class Application :
             if time() > maxTime :
                 if not conf.IS_WIN32 :
                     print( '\n' +
-                        'Application error :\n' +
-                        'Unable to initialize GUI...\n' +
-                        'You can try to force the web engine with following argument:\n' +
-                        '    python app.py -g gtk  (to use GTK on Linux)\n' +
-                        '    python app.py -g qt   (to use QT)\n' )
+                           'Application error :\n' +
+                           'Unable to initialize GUI...\n' +
+                           'You can try to force the web engine with following argument:\n' +
+                           '    python app.py -g gtk  (to use GTK on Linux)\n' +
+                           '    python app.py -g qt   (to use QT)\n' )
                 os._exit(1)
         while True :
             for i in range(conf.RECURRENT_TIMER_APP_SEC * 10) :
