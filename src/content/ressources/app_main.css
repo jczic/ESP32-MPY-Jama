@@ -263,6 +263,11 @@ input[type=button].menu-button {
     transition: transform 130ms ease-out;
 }
 
+#menu-panel-btns {
+    overflow-x: hidden;
+    overflow-y: auto;   
+}
+
 #browse-current-dir {
     position: absolute;
     top: 0;
@@ -393,10 +398,17 @@ input[type=button].browse-button-actif {
     border-bottom: 0;
 }
 
+@keyframes img-processing-anim {
+    0%   { transform: translateX(-37px); }
+    50%  { transform: translateX(37px); }
+    100% { transform: translateX(-37px); }
+}
+
 #img-processing {
     width: 75px;
     height: 75px;
     margin-top: 3px;
+    animation: img-processing-anim 1.5s ease-in-out 0s infinite normal;
 }
 
 #panel-connection {

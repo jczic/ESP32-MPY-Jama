@@ -60,10 +60,10 @@ class Application :
                                                  frameless  = True,
                                                  on_top     = True )
 
-        self._mainWin = webview.create_window( '%s (v%s)' % (conf.APPLICATION_TITLE, conf.APPLICATION_STR_VERSION),
+        self._mainWin = webview.create_window( '%s   v%s' % (conf.APPLICATION_TITLE, conf.APPLICATION_STR_VERSION),
                                                url        = self._localURL(conf.HTML_APP_MAIN_FILENAME),
                                                width      = 1030,
-                                               height     = 700,
+                                               height     = 710,
                                                resizable  = True,
                                                min_size   = (700, 550),
                                                hidden     = True )
@@ -669,7 +669,8 @@ class Application :
             if not silence :
                 self._wsSendCmd('SHOW-WAIT', 'Updating informations...')
             try :
-                o = dict( freq       = self.esp32Ctrl.GetMHzFreq(),
+                o = dict( uid        = self.esp32Ctrl.GetUniqueID(),
+                          freq       = self.esp32Ctrl.GetMHzFreq(),
                           flashSize  = self.esp32Ctrl.GetFlashSize(),
                           os         = self.esp32Ctrl.GetPlatformInfo(),
                           partitions = self.esp32Ctrl.GetPartitions(),
@@ -1552,12 +1553,13 @@ class Application :
         while self._splashScr :
             sleep(0.030)
             if time() > maxTime :
-                print( '\n' +
-                       'Application error :\n' +
-                       'Unable to initialize GUI...\n' +
-                       'You can try to force the web engine with following argument:\n' +
-                       '    python app.py -g gtk  (to use GTK on Linux)\n' +
-                       '    python app.py -g qt   (to use QT)\n' )
+                if not conf.IS_WIN32 :
+                    print( '\n' +
+                        'Application error :\n' +
+                        'Unable to initialize GUI...\n' +
+                        'You can try to force the web engine with following argument:\n' +
+                        '    python app.py -g gtk  (to use GTK on Linux)\n' +
+                        '    python app.py -g qt   (to use QT)\n' )
                 os._exit(1)
         while True :
             for i in range(conf.RECURRENT_TIMER_APP_SEC * 10) :
@@ -1590,15 +1592,19 @@ class Application :
         try :
             opts, args = getopt.getopt(args, 'g:', ['gui='])
         except Exception as ex :
-            print(ex)
+            if not conf.IS_WIN32 :
+                print(ex)
             return
         for opt, arg in opts :
             if opt in ('-g', '--gui') :
                 forceGUI = arg
+        if not conf.IS_WIN32 :
+            print('Starts %s v%s on %s' % (conf.APPLICATION_TITLE, conf.APPLICATION_STR_VERSION, conf.OS_NAME))
         self._webSrv.Start(threaded=True)
         webview.start( self._appRun,
                        localization = conf.PYWEBVIEW_LOCALIZATION,
                        user_agent   = conf.APPLICATION_TITLE,
+                       storage_path = (str(conf.DIRECTORY_FILES) if conf.IS_WIN32 else None),
                        gui          = forceGUI )
         self._appRunning = False
 
@@ -1620,9 +1626,11 @@ if __name__ == '__main__' :
         application = Application()
         application.Start()
     except KeyboardInterrupt :
-        print('!!! KEYBOARD INTERRUPT')
+        if not conf.IS_WIN32 :
+            print('!!! KEYBOARD INTERRUPT')
     except Exception as ex :
-        print('!!! INIT APP ERROR : %s' % ex)
+        if not conf.IS_WIN32 :
+            print('!!! INIT APP ERROR : %s' % ex)
 
 # ============================================================================
 # ============================================================================

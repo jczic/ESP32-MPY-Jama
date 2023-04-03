@@ -1259,6 +1259,7 @@ function endOfFileContentData() {
 
 function setSystemInfo(o) {
 
+    getElmById("label-sysnfo-uid").innerText        = o.uid;
     getElmById("label-sysnfo-freq").innerText       = o.freq + " MHz";
     getElmById("label-sysnfo-flash-size").innerText = sizeToText(o.flashSize, "Bytes");
     getElmById("label-sysnfo-platform").innerText   = o.os.platform;
@@ -2355,13 +2356,24 @@ function checkUpdate() {
         req.onload = function() {
             try {
                 var lastVer = JSON.parse(this.responseText).tag_name;
-                if (lastVer != undefined && lastVer != "v"+appVer)
-                    boxDialogYesNo( "🚀 Update?",
-                                    "A new version (" + lastVer + ") is available!\nDo you want to download it?",
-                                    function(yes) {
-                                        if (yes)
-                                            wsSendCmd("OPEN-URL", GITHUB_REPOSITORY_URL);
-                                    } );
+                if (lastVer != undefined) {
+                    var lastV = lastVer.substring(1).split(".");
+                    var appV  = appVer.split(".");
+                    if (lastV.length == appV.length)
+                        for (var i in lastV)
+                            if (lastV[i] == appV[i])
+                                continue;
+                            else {
+                                if (lastV[i] > appV[i])
+                                    boxDialogYesNo( "🚀 Update?",
+                                                    "A new version (" + lastVer + ") is available!\nDo you want to download it?",
+                                                    function(yes) {
+                                                        if (yes)
+                                                            wsSendCmd("OPEN-URL", GITHUB_REPOSITORY_URL);
+                                                    } );
+                                break;
+                            }
+                }
             } catch (ex) { }
         }
         req.open("get", GITHUB_LAST_RELEASE_URL, true);

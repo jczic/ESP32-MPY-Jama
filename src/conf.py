@@ -4,7 +4,6 @@
 Copyright © 2023 Jean-Christophe Bos (jczic.bos@gmail.com)
 """
 
-import os
 import sys
 from   pathlib import Path
 
@@ -13,7 +12,7 @@ from   pathlib import Path
 # ============================================================================
 
 APPLICATION_TITLE                = 'ESP32 MPY-Jama'
-APPLICATION_STR_VERSION          = '1.0.3'
+APPLICATION_STR_VERSION          = '1.2.0'
 
 APPLICATION_BUNDLE_NAME          = 'ESP32 MPY-Jama'
 
@@ -35,7 +34,7 @@ WEB_SRV_PATH                     = 'ressources/'
 HTML_SPLASH_SCREEN_FILENAME      = 'splash_scr.html'
 HTML_APP_MAIN_FILENAME           = 'app_main.html'
 
-START_GUI_AND_WS_TIMEOUT_SEC     = 7
+START_GUI_AND_WS_TIMEOUT_SEC     = 15
 
 if IS_MACOS :
     DIRECTORY_FILES              = Path('~/Library/Application Support').expanduser() / APPLICATION_BUNDLE_NAME

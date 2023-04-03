@@ -1547,6 +1547,20 @@ class ESP32Controller :
 
     # ---------------------------------------------------------------------------
 
+    def GetUniqueID(self) :
+        if not self._isConnected :
+            self._raiseConnectionError()
+        self._threadStopReading()
+        self._beginProcess()
+        try :
+            return self._exeCodeREPL( 'import machine, ubinascii\n' +
+                                      'print(repr(ubinascii.hexlify(machine.unique_id()).decode()))' )
+        finally :
+            self._endProcess()
+            self._threadStartReading()
+
+    # ---------------------------------------------------------------------------
+
     def GetMHzFreq(self) :
         if not self._isConnected :
             self._raiseConnectionError()
