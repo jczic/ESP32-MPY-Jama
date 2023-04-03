@@ -1551,7 +1551,7 @@ class Application :
     async def _asyncAppRun(self) :
         maxTime = (time() + conf.START_GUI_AND_WS_TIMEOUT_SEC)
         while self._splashScr :
-            sleep(0.030)
+            await asyncio.sleep(0.100)
             if time() > maxTime :
                 if not conf.IS_WIN32 :
                     print( '\n' +
