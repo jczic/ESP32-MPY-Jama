@@ -4,9 +4,9 @@
 ![MacOS Intel x86_64](https://img.shields.io/badge/MacOS_Intel_x86__64-Ok-green.svg)
 ![License](https://img.shields.io/github/license/jczic/ESP32-MPY-Jama?color=yellow)
 
-# <img src="/img/logo.png" width="45" valign="bottom">  ESP32 MPY-Jama, the dev tool for your favorite MCU
+# <img src="/img/logo.png" width="45" valign="bottom">  ESP32 MPY-Jama v1.2, the dev tool for your favorite MCU
 
-### <p align="justify">A powerful tool that easily connects to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, file manager, REPL, real-time dashboards and advanced features for efficient development on MacOS, Windows and Linux.</p>
+### <p align="justify">A powerful tool that easily connects to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, file manager, REPL, real time dashboards and advanced features for efficient development on MacOS, Windows and Linux.</p>
 
 <br />
 
