@@ -38,6 +38,7 @@ class Application :
 
         self._appRunning         = False
         self._ws                 = None
+        self._splashScr          = None
         self.esp32Ctrl           = None
         self._deviceReadyToCmd   = False
         self._wsMsgQueue         = SimpleQueue()
@@ -52,14 +53,15 @@ class Application :
         self._webSrv.WebSocketThreaded       = True
         self._webSrv.AcceptWebSocketCallback = self._wsAcceptCallback
 
-        self._splashScr = webview.create_window( '',
-                                                 url        = self._localURL(conf.HTML_SPLASH_SCREEN_FILENAME),
-                                                 width      = 250,
-                                                 height     = 250,
-                                                 resizable  = False,
-                                                 frameless  = True,
-                                                 on_top     = True )
-        self._splashScr.events.closed += self._onSplashScrClosed
+        if not conf.IS_LINUX :
+            self._splashScr = webview.create_window( '',
+                                                     url        = self._localURL(conf.HTML_SPLASH_SCREEN_FILENAME),
+                                                     width      = 250,
+                                                     height     = 250,
+                                                     resizable  = False,
+                                                     frameless  = True,
+                                                     on_top     = True )
+            self._splashScr.events.closed += self._onSplashScrClosed
 
         self._mainWin = webview.create_window( '%s   v%s' % (conf.APPLICATION_TITLE, conf.APPLICATION_STR_VERSION),
                                                url        = self._localURL(conf.HTML_APP_MAIN_FILENAME),
@@ -67,7 +69,7 @@ class Application :
                                                height     = 710,
                                                resizable  = True,
                                                min_size   = (700, 550),
-                                               hidden     = not conf.IS_LINUX )
+                                               hidden     = (self._splashScr is not None) )
         self._mainWin.events.closing += self._onMainWinClosing
         self._mainWin.events.closed  += self._onMainWinClosed
     
@@ -289,12 +291,13 @@ class Application :
     # ------------------------------------------------------------------------
 
     def _wsAcceptCallback(self, webSocket, httpClient) :
-        if not self._ws and self._splashScr :
+        if not self._ws :
             self._ws                   = webSocket
             webSocket.RecvTextCallback = self._wsRecvTextCallback
             webSocket.ClosedCallback   = self._wsClosedCallback
             self._sendAppInfo()
-            self._splashScr.destroy()
+            if self._splashScr :
+                self._splashScr.destroy()
         else :
             webSocket.Close()
 
@@ -1560,10 +1563,7 @@ class Application :
                 if not conf.IS_WIN32 :
                     print( '\n' +
                            'Application error :\n' +
-                           'Unable to initialize GUI...\n' +
-                           'You can try to force the web engine with following argument:\n' +
-                           '    python app.py -g gtk  (to use GTK on Linux)\n' +
-                           '    python app.py -g qt   (to use QT)\n' )
+                           'Exceeded time limit during initialization...\n' )
                 os._exit(1)
         while True :
             for i in range(conf.RECURRENT_TIMER_APP_SEC * 10) :
@@ -1604,12 +1604,29 @@ class Application :
                 forceGUI = arg
         if not conf.IS_WIN32 :
             print('Starts %s v%s on %s' % (conf.APPLICATION_TITLE, conf.APPLICATION_STR_VERSION, conf.OS_NAME))
-        self._webSrv.Start(threaded=True)
-        webview.start( self._appRun,
-                       localization = conf.PYWEBVIEW_LOCALIZATION,
-                       user_agent   = conf.APPLICATION_TITLE,
-                       storage_path = (str(conf.DIRECTORY_FILES) if conf.IS_WIN32 else None),
-                       gui          = forceGUI )
+        try :
+            self._webSrv.Start(threaded=True)
+            try :
+                webview.start( self._appRun,
+                               localization = conf.PYWEBVIEW_LOCALIZATION,
+                               user_agent   = conf.APPLICATION_TITLE,
+                               storage_path = (str(conf.DIRECTORY_FILES) if conf.IS_WIN32 else None),
+                               gui          = forceGUI )
+            except Exception as ex :
+                if not conf.IS_WIN32 :
+                    print( '\n' +
+                           'Application error:\n' +
+                           'Unable to initialize UI...\n' +
+                           '%s\n\n' % ex +
+                           'You can try to force the web engine with following argument:\n' +
+                           '    python app.py -g gtk  (to use GTK on Linux first)\n' +
+                           '    python app.py -g qt   (to use QT first)\n' )
+        except Exception as ex :
+            if not conf.IS_WIN32 :
+                print( '\n' +
+                       'Application error:\n' +
+                       'Unable to initialize internal Web server for UI...' +
+                       '%s\n' % ex )
         self._appRunning = False
 
 # ============================================================================
