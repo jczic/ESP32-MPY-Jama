@@ -59,6 +59,7 @@ class Application :
                                                  resizable  = False,
                                                  frameless  = True,
                                                  on_top     = True )
+        self._splashScr.events.closed += self._onSplashScrClosed
 
         self._mainWin = webview.create_window( '%s   v%s' % (conf.APPLICATION_TITLE, conf.APPLICATION_STR_VERSION),
                                                url        = self._localURL(conf.HTML_APP_MAIN_FILENAME),
@@ -66,7 +67,7 @@ class Application :
                                                height     = 710,
                                                resizable  = True,
                                                min_size   = (700, 550),
-                                               hidden     = True )
+                                               hidden     = not conf.IS_LINUX )
         self._mainWin.events.closing += self._onMainWinClosing
         self._mainWin.events.closed  += self._onMainWinClosed
     
@@ -98,6 +99,12 @@ class Application :
     def _fahrenheit2Celsius(f) :
         return (f - 32) * 5/9
     
+    # ------------------------------------------------------------------------
+
+    def _onSplashScrClosed(self) :
+        self._splashScr = None
+        self._mainWin.show()
+
     # ------------------------------------------------------------------------
 
     def _onMainWinClosing(self) :
@@ -282,17 +289,14 @@ class Application :
     # ------------------------------------------------------------------------
 
     def _wsAcceptCallback(self, webSocket, httpClient) :
-        if self._ws :
-            webSocket.Close()
-            return
-        self._ws                   = webSocket
-        webSocket.RecvTextCallback = self._wsRecvTextCallback
-        webSocket.ClosedCallback   = self._wsClosedCallback
-        self._sendAppInfo()
-        if self._splashScr :
+        if not self._ws and self._splashScr :
+            self._ws                   = webSocket
+            webSocket.RecvTextCallback = self._wsRecvTextCallback
+            webSocket.ClosedCallback   = self._wsClosedCallback
+            self._sendAppInfo()
             self._splashScr.destroy()
-            self._splashScr = None
-            self._mainWin.show()
+        else :
+            webSocket.Close()
 
     # ------------------------------------------------------------------------
 
