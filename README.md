@@ -1,22 +1,22 @@
+## <img src="/img/logo.png" width="45" valign="sub">  ESP32 MPY-Jama 1.2, the tool for your favorite MCU
+
 ![Release](https://img.shields.io/github/v/release/jczic/ESP32-MPY-Jama?include_prereleases&color=success)
 ![Windows 64bits](https://img.shields.io/badge/Windows_64bits-Ok-green.svg)
 ![MacOS ARM64](https://img.shields.io/badge/MacOS_ARM64-Ok-green.svg)
 ![MacOS Intel x86_64](https://img.shields.io/badge/MacOS_Intel_x86__64-Ok-green.svg)
 ![License](https://img.shields.io/github/license/jczic/ESP32-MPY-Jama?color=yellow)
 
-# <img src="/img/logo.png" width="45" valign="bottom">  ESP32 MPY-Jama v1.2, the dev tool for your favorite MCU
-
-### <p align="justify">A powerful tool that easily connects to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, file manager, REPL, real time dashboards and advanced features for efficient development on MacOS, Windows and Linux.</p>
-
-<br />
+### <p align="justify">A powerful and cross platform tool that easily connects to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, file manager, REPL, real time dashboards and advanced features for efficient development on MacOS, Windows and Linux.</p>
 
 <p align="center">
-    <img src="/img/screen-ide.png" width="700">
+    <img src="/img/screen-ide.png" width="850">
 </p>
+
+---
 
 <h4>
     <p align="center">
-        MacOS on arm64 / MacOS on Intel x86_64 / Windows 64-bits
+        MacOS on arm64   ▪️   MacOS on Intel x86_64   ▪️   Windows 64-bits
     </p>
 </h4>
 
@@ -25,11 +25,11 @@
     <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.2.0/ESP32.MPY-Jama.v1.2.0-win64.exe"><img src="/img/btn-download-win.png" width="250"></a>
 </p>
 
-<h5>
+<h4>
     <p align="center">
         To make it work under Linux :penguin: <a href="#linux">click here</a>!
     </p>
-</h5>
+</h4>
 
 ---
 
