@@ -6,7 +6,7 @@
 ![MacOS Intel x86_64](https://img.shields.io/badge/MacOS_Intel_x86__64-Ok-green.svg)
 ![License](https://img.shields.io/github/license/jczic/ESP32-MPY-Jama?color=yellow)
 
-### <p align="justify">A powerful and cross platform tool that easily connects to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, file manager, REPL, real time dashboards and advanced features for efficient development on MacOS, Windows and Linux.</p>
+### <p align="justify">A powerful and cross platform tool that easily connects to Espressif ESP32 with MicroPython, providing an IDE, file manager, REPL, real time dashboards and advanced features for efficient development on MacOS, Windows and Linux.</p>
 
 <p align="center">
     <img src="/img/screen-ide.png" width="850">
