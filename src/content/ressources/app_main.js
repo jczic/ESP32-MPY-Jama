@@ -391,12 +391,14 @@ function hideExistingBoxesDialog() {
 }
 
 function validateExistingBoxDialog() {
+    var btn = null;
     for (var box of document.getElementsByClassName("center-container-show")) {
         btn = getSubElm(box, "VALIDATE-BOX");
         break;
     }
     if (btn)
         btn.click();
+    return (btn != null);
 }
 
 function boxDialogAlert(title, text) {
@@ -2433,8 +2435,8 @@ window.addEventListener( "load", function() {
             e.preventDefault();
         }
         else if (e.key == "Enter") {
-            validateExistingBoxDialog();
-            e.preventDefault();
+            if (validateExistingBoxDialog())
+                e.preventDefault();
         }
         else if (e.key == "Tab")
             e.preventDefault();
