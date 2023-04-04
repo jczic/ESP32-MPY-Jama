@@ -22,7 +22,7 @@
 
 <p align="center">
     <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.2.0/ESP32.MPY-Jama.v1.2.0-macos-universal2.dmg"><img src="/img/btn-download-mac.png" width="250"></a>             
-    <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.2.0/ESP32.MPY-Jama.v1.2.0-win.exe"><img src="/img/btn-download-win.png" width="250"></a>
+    <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.2.0/ESP32.MPY-Jama.v1.2.0-win64.exe"><img src="/img/btn-download-win.png" width="250"></a>
 </p>
 
 <h5>
