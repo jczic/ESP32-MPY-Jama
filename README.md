@@ -8,10 +8,6 @@
 
 ### <p align="justify">A powerful tool that easily connects to Espressif ESP32 microcontrollers with MicroPython, providing an IDE, file manager, REPL, real-time dashboards and advanced features for efficient development on MacOS, Windows and Linux.</p>
 
-```diff
-+🎁 New release v1.2.0 very soon with surprises! 🎁+
-```
-
 <br />
 
 <p align="center">
@@ -25,8 +21,8 @@
 </h4>
 
 <p align="center">
-    <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.0.3/ESP32.MPY-Jama.v1.0.3-macos-universal2.dmg"><img src="/img/btn-download-mac.png" width="250"></a>             
-    <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.0.3/ESP32.MPY-Jama.v1.0.3-windows.exe"><img src="/img/btn-download-win.png" width="250"></a>
+    <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.2.0/ESP32.MPY-Jama.v1.2.0-macos-universal2.dmg"><img src="/img/btn-download-mac.png" width="250"></a>             
+    <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.2.0/ESP32.MPY-Jama.v1.2.0-win.exe"><img src="/img/btn-download-win.png" width="250"></a>
 </p>
 
 <h5>
