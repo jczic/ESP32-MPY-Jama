@@ -1,4 +1,6 @@
-## <img src="/img/logo.png" width="45" valign="sub">  ESP32 MPY-Jama 1.2, the tool for your favorite MCU
+# <img src="/img/logo.png" width="75" valign="middle">   ESP32 MPY-Jama v1.2
+
+#### <p align="justify">A powerful cross-platform tool that easily connects to and manages Espressif's ESP32 with MicroPython, providing a lightweight IDE, file manager, terminal, real-time dashboards, startup settings and customizable features for fast and efficient development on macOS, Windows, and Linux.</p>
 
 ![Release](https://img.shields.io/github/v/release/jczic/ESP32-MPY-Jama?include_prereleases&color=success)
 ![Windows 64bits](https://img.shields.io/badge/Windows_64bits-Ok-green.svg)
@@ -6,17 +8,14 @@
 ![MacOS Intel x86_64](https://img.shields.io/badge/MacOS_Intel_x86__64-Ok-green.svg)
 ![License](https://img.shields.io/github/license/jczic/ESP32-MPY-Jama?color=yellow)
 
-### <p align="justify">A powerful and cross platform tool that easily connects to Espressif ESP32 with MicroPython, providing an IDE, file manager, REPL, real time dashboards and advanced features for efficient development on MacOS, Windows and Linux.</p>
-
+<br />
 <p align="center">
     <img src="/img/screen-ide.png" width="850">
 </p>
 
----
-
 <h4>
     <p align="center">
-        MacOS on arm64   ▪️   MacOS on Intel x86_64   ▪️   Windows 64-bits
+        MacOS on arm64   ▪️   MacOS on Intel x86/64   ▪️   Windows 64-bits
     </p>
 </h4>
 
@@ -30,6 +29,7 @@
         To make it work under Linux :penguin: <a href="#linux">click here</a>!
     </p>
 </h4>
+<br />
 
 ---
 
