@@ -1,16 +1,32 @@
-# <img src="/img/logo.png" width="75" valign="middle">   ESP32 MPY-Jama v1.2
-
-#### <p align="justify">A powerful cross-platform tool that easily connects to and manages Espressif's ESP32 with MicroPython, providing a lightweight IDE, file manager, terminal, real-time dashboards, startup settings and customizable features for fast and efficient development on MacOS, Windows, and Linux.</p>
-
-![Release](https://img.shields.io/github/v/release/jczic/ESP32-MPY-Jama?include_prereleases&color=success)
-![Windows 64bits](https://img.shields.io/badge/Windows_64bits-Ok-green.svg)
-![MacOS ARM64](https://img.shields.io/badge/MacOS_ARM64-Ok-green.svg)
-![MacOS Intel x86_64](https://img.shields.io/badge/MacOS_Intel_x86__64-Ok-green.svg)
-![License](https://img.shields.io/github/license/jczic/ESP32-MPY-Jama?color=yellow)
-
 <br />
 <p align="center">
-    <img src="/img/screen-ide.png" width="850">
+    <img src="/img/logo.png" width="100" title="ESP32 MPY-Jama v1.2">
+</p>
+<h1>
+    <p align="center">
+        ESP32 MPY-Jama v1.2<br />
+        <br />
+    </p>
+</h1>
+
+<br />
+
+<p align="center">
+    <img src="https://img.shields.io/github/v/release/jczic/ESP32-MPY-Jama?include_prereleases&color=success" title="Release">
+    <img src="https://img.shields.io/badge/Windows_64bits-Ok-green.svg" title="Windows 64-bits">
+    <img src="https://img.shields.io/badge/MacOS_ARM64-Ok-green.svg" title="MacOS ARM64">
+    <img src="https://img.shields.io/badge/MacOS_Intel_x86__64-Ok-green.svg" title="MacOS Intel x86/64">
+    <img src="https://img.shields.io/github/license/jczic/ESP32-MPY-Jama?color=yellow" title="License">
+</p>
+
+<p align="justify">
+    Welcome to our powerful and versatile cross-platform tool, designed to simplify your development with Espressif's ESP32 microcontroller and MicroPython.<br />
+    The lightweight IDE, file manager, terminal, and real-time dashboards provide all the essential features you need to develop your IoT projects quickly and efficiently on MacOS, Windows, and Linux.<br />
+    With startup settings and customizable features, this tool can adapt to your workflow and preferences, making your coding experience seamless and enjoyable.
+</p>
+
+<p align="center">
+    <img src="/img/screen-ide.png" width="700" title="ESP32 MPY-Jama">
 </p>
 
 <h4>
@@ -20,57 +36,62 @@
 </h4>
 
 <p align="center">
-    <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.2.0/ESP32.MPY-Jama.v1.2.0-macos-universal2.dmg"><img src="/img/btn-download-mac.png" width="250"></a>             
-    <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.2.0/ESP32.MPY-Jama.v1.2.0-win64.exe"><img src="/img/btn-download-win.png" width="250"></a>
+    <a title="Download ESP32 MPY-Jama for MacOS" href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.2.0/ESP32.MPY-Jama.v1.2.0-macos-universal2.dmg"><img src="/img/btn-download-mac.png" width="250"></a>             
+    <a title="Download ESP32 MPY-Jama for Windows" href="https://github.com/jczic/ESP32-MPY-Jama/releases/download/v1.2.0/ESP32.MPY-Jama.v1.2.0-win64.exe"><img src="/img/btn-download-win.png" width="250"></a>
 </p>
 
 <h4>
     <p align="center">
-        To make it work under Linux :penguin: <a href="#linux">click here</a>!
+        To make it work under Linux :penguin: <a href="#linux" title="Instructions for Linux">click here</a>!
     </p>
 </h4>
+
+<br />
 <br />
 
----
-
+<a name="dashboards"></a>
 ## :cyclone: &nbsp;Access information dashboards instantly
 <p align="center">
-    <img src="/img/screen-networks.png" width="700">
+    <img src="/img/screen-system.png" width="700">
+    <img src="/img/screen-networks.png" width="700"><br />
 </p>
 
----
+<br />
 
+<a name="wifi"></a>
 ## :cyclone: &nbsp;Connect to a Wi-Fi and create an access point in 2 clicks
 <p align="center">
     <img src="/img/screen-wifi-sta.png" height="280">          
     <img src="/img/screen-wifi-ap.png" height="280">
 </p>
 
----
+<br />
 
+<a name="esptool"></a>
 ## :cyclone: &nbsp;Install a new firmware on the flash very easily.
 <p align="center">
     <img src="/img/screen-esptool.png" width="700">
 </p>
 
----
+<br />
 
+<a name="jama-funcs"></a>
 ## :cyclone: &nbsp;Embedded Jama Funcs
 
 Run Jama Funcs on your device, choose from the ones offered and customize them with adjustable settings.
 Develop and share yours with other users as well.
 Get the MicroPython template file by clicking on the "template" button in the interface or by using <a href="https://github.com/jczic/ESP32-MPY-Jama/blob/ef2cf1cfbc138dd81a4291fe262d21fccb6dc71a/src/content/Jama%20Funcs%20-%20Template.py">this link</a>.
 
-<p align="center">
-    <img src="/img/screen-jama-funcs.png" width="700"><br />
-    <br />
-    You are welcome to send me your Jama Funcs! 😉<br />
-    <br />
-</p>
+<h4>
+    <p align="center">
+        <img src="/img/screen-jama-funcs.png" width="700">
+    </p>
+</h4>
 
-### Available Jama Funcs
-| Name | Description |
-| ---- | ----------- |
+<br />
+
+| Jama Func | Description |
+| --------- | ----------- |
 |1-Wire Devices Scan|Initializes a 1-Wire bus on a single GPIO and finds all the family IDs and serial numbers of slave devices.|
 |ADC Reader| Simple level and voltage reader on a GPIO using an analog-to-digital converter (ADC). You can specify the dB applied attenuation and the bits resolution.|
 |BLE Scan|Initializes the Bluetooth Low Energy radio and scans BLE devices via advertising data.|
@@ -91,9 +112,15 @@ Get the MicroPython template file by clicking on the "template" button in the in
 |UART Test| Initializes an UART bus on two GPIO, sends or not a custom command and receives data from the bus. You can choose bus identifier, baud rate, bits per character, parity, stop bits and TX/RX GPIO|
 |Wi-Fi Scan|Performs a detailed scan of the wireless access points.|
 
----
+<h4>
+    <p align="center">
+        You are welcome to send me your Jama Funcs! 😉
+    </p>
+</h4>
 
-<a name="build and run"></a>
+<br />
+
+<a name="build-and-run"></a>
 ## :rocket: &nbsp;Build &amp; Run
 
 ### Required
@@ -116,7 +143,7 @@ Get the MicroPython template file by clicking on the "template" button in the in
     python SRC/app.py
     ```
 
----
+<br />
 
 <a name="linux"></a>
 
@@ -165,7 +192,7 @@ cd ESP32-MPY-Jama
 
 When the script finishes you should end up with a "esp32-mpy-jama" executable in the "dist" subfolder.
 
----
+<br />
 
 <a name="author"></a>
 ## :wink: &nbsp;Author
@@ -177,7 +204,8 @@ When the script finishes you should end up with a "esp32-mpy-jama" executable in
   - Music:  *[SoundCloud](https://soundcloud.com/jczic/sets/electro-pulse)*
             *[Spotify](https://open.spotify.com/album/5fUd57GcAIcdUn9NX3fviG)*
             *[YouTube](https://www.youtube.com/playlist?list=PL9CsGuMbcLaU02VKS7jtR6LaDNpq7MZEq)*
----
+
+<br />
 
 <a name="thanks"></a>
 ## :+1: &nbsp;Special thanks to 
@@ -185,7 +213,7 @@ When the script finishes you should end up with a "esp32-mpy-jama" executable in
   - **[rdagger](https://github.com/rdagger)** > [www.rototron.info](https://www.rototron.info)
   - **[happenpappen](https://github.com/happenpappen)** > [www.stop.pe](https://stop.pe)
 
----
+<br />
 
 <a name="license"></a>
 ## :eight_pointed_black_star: &nbsp;License
@@ -193,6 +221,9 @@ When the script finishes you should end up with a "esp32-mpy-jama" executable in
   - Copyright :copyright: 2023 [Jean-Christophe Bos](https://www.linkedin.com/in/jczic).
   - This project is [MIT](https://github.com/jczic/ESP32-MPY-Jama/blob/master/LICENSE.md) licensed.
 
----
-
 <br />
+<br />
+
+<p align="center">
+    <img src="/img/esp.png" width="200" title="Espressif ESP32">
+</p>
