@@ -24,11 +24,11 @@
 <br />
 
 <p align="justify">
-    Welcome to <b>ESP32 MPY-Jama</b>, a powerful and versatile <b>cross-platform</b> tool, designed to simplify your development with <b>Espressif's ESP32</b> microcontrollers and <b>MicroPython</b>.<br />
+    :small_orange_diamond: Welcome to <b>ESP32 MPY-Jama</b>, a powerful and versatile <b>cross-platform</b> tool, designed to simplify your development with <b>Espressif's ESP32</b> microcontrollers and <b>MicroPython</b>.<br />
     <br />
-    The <b>lightweight IDE</b>, <b>file manager</b>, <b>terminal</b>, and <b>real-time dashboards</b> provide all the essential features you need to develop your <b>IoT projects</b> quickly and efficiently on <b>MacOS</b>, <b>Windows</b>, and <b>Linux</b>.<br />
+    :small_orange_diamond: The <b>lightweight IDE</b>, <b>file manager</b>, <b>terminal</b>, and <b>real-time dashboards</b> provide all the essential features you need to develop your <b>IoT projects</b> quickly and efficiently on <b>MacOS</b>, <b>Windows</b>, and <b>Linux</b>.<br />
     <br />
-    With <b>startup settings</b> and <b>customizable features</b>, this tool can adapt to your workflow and preferences, making your coding experience seamless and enjoyable.
+    :small_orange_diamond: With <b>startup settings</b> and <b>customizable features</b>, this tool can adapt to your workflow and preferences, making your coding experience seamless and enjoyable.
 </p>
 
 <p align="center">
@@ -56,8 +56,28 @@
 
 ---
 
+# :bookmark_tabs: &nbsp;Table of contents
+
+- [**Real-time system dashboard**](#system-dashboard)
+- [**Real-time networks dashboard**](#networks-dashboard)
+- [**Wi-Fi in 2 clicks**](#wifi)
+- [**Lightweight integrated IDE**](#ide-gpio)
+- [**Embedded Jama Funcs**](#jama-funcs)
+  - [**Already included**](#jama-funcs-table)
+- [**SD card support**](#sd-card)
+- [**Firmware upgrade**](#esptool)
+- [**Build &amp; Run**](#build-and-run)
+- [**Linux version instructions**](#linux)
+- [**Author**](#author)
+- [**Special thanks to**](#thanks)
+- [**License**](#license)
+
+<br />
+
+---
+
 <a name="system-dashboard"></a>
-# :cyclone: &nbsp;Real-time system dashboard
+# :gear: &nbsp;Real-time system dashboard
 
 Access all important <b>system information</b>, adjust the <b>MCU frequency</b>, monitor the <b>current status</b> of the <b>set GPIOs</b>,
 check <b>startup configuration options</b> and display the <b>various partitions</b> of the flash memory.<br />
@@ -70,7 +90,7 @@ The <b>startup options</b> allow you to <b>save your configurations</b> on the b
 ---
 
 <a name="networks-dashboard"></a>
-# :cyclone: &nbsp;Real-time networks dashboard
+# :globe_with_meridians: &nbsp;Real-time networks dashboard
 
 Configure and display information about <b>Wi-Fi connection</b> and <b>access point interfaces</b>,
 set up a board with an integrated <b>Ethernet PHY interface</b> and verify that the <b>Internet connection</b> is available.<br />
@@ -83,7 +103,7 @@ It is also possible to <b>act on the state</b> of the network interfaces, includ
 ---
 
 <a name="wifi"></a>
-# :cyclone: &nbsp;Wi-Fi in 2 clicks
+# :satellite: &nbsp;Wi-Fi in 2 clicks
 
 Quickly <b>connect</b> your device to available <b>Wi-Fi networks</b> and set up an <b>access point</b> with ease.<br />
 The <b>authentication options</b> and the <b>maximum number of clients</b> are adjustable.<br />
@@ -99,7 +119,7 @@ The <b>authentication options</b> and the <b>maximum number of clients</b> are a
 ---
 
 <a name="ide-gpio"></a>
-# :cyclone: &nbsp;Lightweight integrated IDE
+# :desktop_computer: &nbsp;Lightweight integrated IDE
 
 <b>Develop your MicroPython</b> programs and libraries and <b>test them</b> directly using the <b>lightweight IDE</b>.<br />
 Also, <b>a terminal is usable</b> in the same window with the management of the <b>history of your commands</b> like a shell.<br />
@@ -123,7 +143,7 @@ Use <b>Espressif's pinout diagrams</b> for the <b>GPIOs</b>, which are available
 ---
 
 <a name="jama-funcs"></a>
-# :cyclone: &nbsp;Embedded Jama Funcs
+# :control_knobs: &nbsp;Embedded Jama Funcs
 
 <b>Jama Funcs</b> are small <b>dedicated functions</b> that run <b>on your device</b> to perform a <b>specific task</b>.<br />
 They can be used to <b>quickly test</b> the functionality of the <b>ESP32</b> or <b>external modules</b> and are designed to be <b>easily configured</b>.
@@ -148,6 +168,7 @@ It is of course possible to <b>develop your own Jama Funcs</b> in order to <b>im
 You can find a <b>full template</b> in <b>MicroPython</b> directly in the software or by clicking on
 <a href="https://github.com/jczic/ESP32-MPY-Jama/blob/ef2cf1cfbc138dd81a4291fe262d21fccb6dc71a/src/content/Jama%20Funcs%20-%20Template.py"><b>this link</b></a>.<br />
 <br />
+<a name="jama-funcs-table"></a>
 The following table lists all the <b>Jama Funcs</b> already <b>included in ESP32 MPY-Jama</b>:<br />
 <br />
 
@@ -186,7 +207,7 @@ The following table lists all the <b>Jama Funcs</b> already <b>included in ESP32
 ---
 
 <a name="sd-card"></a>
-# :cyclone: &nbsp;SD card support
+# :file_folder: &nbsp;SD card support
 
 If an <b>SD card</b> is available on the board, activate it and <b>mount</b> the corresponding <b>file system</b>.<br />
 A <b>reformatting</b> of all content is also possible.
@@ -198,7 +219,7 @@ A <b>reformatting</b> of all content is also possible.
 ---
 
 <a name="esptool"></a>
-# :cyclone: &nbsp;Firmware upgrade
+# :hammer_and_wrench: &nbsp;Firmware upgrade
 
 Take advantage of the <b>Espressif esptool</b> to connect the device in <b>bootloader mode</b> and easily <b>load new binary images</b>.<br />
 Additionally, the tool allows you to <b>completely erase the device</b> for a full reset.
@@ -239,7 +260,6 @@ Additionally, the tool allows you to <b>completely erase the device</b> for a fu
 ---
 
 <a name="linux"></a>
-
 # :penguin: &nbsp;Linux version instructions
 
 This describes how to clone the repository and how to run from source. In the third step you will find instructions how to create a binary from source. All st
@@ -307,7 +327,7 @@ eps have been tested on Ubuntu 22.04, but should work with little changes on sim
 ---
 
 <a name="thanks"></a>
-# :+1: &nbsp;Special thanks to 
+# :+1: &nbsp;Special thanks to
 
   - **[rdagger](https://github.com/rdagger)** > [www.rototron.info](https://www.rototron.info)
   - **[happenpappen](https://github.com/happenpappen)** > [www.stop.pe](https://stop.pe)
