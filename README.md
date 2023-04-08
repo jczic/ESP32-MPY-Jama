@@ -53,23 +53,24 @@
 </h4>
 
 <br />
-<br />
+
+---
 
 <a name="system-dashboard"></a>
-## :cyclone: &nbsp;Real-time system dashboard
+# :cyclone: &nbsp;Real-time system dashboard
 
 Access all important <b>system information</b>, adjust the <b>MCU frequency</b>, monitor the <b>current status</b> of the <b>set GPIOs</b>,
 check <b>startup configuration options</b> and display the <b>various partitions</b> of the flash memory.<br />
-The <b>boot options</b> allow you to boot the board <b>alone</b>, taking into account some of your configurations.
+The <b>startup options</b> allow you to <b>save your configurations</b> on the board, so that you can always <b>maintain them</b> after each reboot.
 
 <p align="center">
     <img src="/img/screen-system.png" width="700">
 </p>
 
-<br />
+---
 
 <a name="networks-dashboard"></a>
-## :cyclone: &nbsp;Real-time networks dashboard
+# :cyclone: &nbsp;Real-time networks dashboard
 
 Configure and display information about <b>Wi-Fi connection</b> and <b>access point interfaces</b>,
 set up a board with an integrated <b>Ethernet PHY interface</b> and verify that the <b>Internet connection</b> is available.<br />
@@ -79,73 +80,74 @@ It is also possible to <b>act on the state</b> of the network interfaces, includ
     <img src="/img/screen-networks.png" width="700">
 </p>
 
-<br />
+---
 
 <a name="wifi"></a>
-## :cyclone: &nbsp;Wi-Fi in two clicks
+# :cyclone: &nbsp;Wi-Fi in 2 clicks
 
 Quickly <b>connect</b> your device to available <b>Wi-Fi networks</b> and set up an <b>access point</b> with ease.<br />
 The <b>authentication options</b> and the <b>maximum number of clients</b> are adjustable.<br />
 <br />
 
 <p align="center">
-    <img src="/img/screen-wifi-sta.png" height="280">
+    <img src="/img/screen-wifi-sta.png" height="280">   
     <img src="/img/screen-wifi-ap.png" height="280">
 </p>
 
 <br />
-<br />
+
+---
 
 <a name="ide-gpio"></a>
-## :cyclone: &nbsp;Lightweight integrated IDE
+# :cyclone: &nbsp;Lightweight integrated IDE
 
-<b>Develop your MicroPython</b> programs and libraries using the lightweight <b>IDE</b> and test them directly.<br />
-<b>Manage and transfer content</b> from the device's <b>flash memory</b> or <b>SD card</b>.<br />
-Use <b>Espressif's pinout diagrams</b> for the GPIOs, which are available <b>on most boards</b>.<br />
+<b>Develop your MicroPython</b> programs and libraries and <b>test them</b> directly using the <b>lightweight IDE</b>.<br />
+Also, <b>a terminal is usable</b> in the same window with the management of the <b>history of your commands</b> like a shell.<br />
+<b>Manage and transfer content</b> from the device's <b>flash memory</b> or <b>SD card</b>.
 
 <p align="center">
-    <img src="/img/screen-coding.png" width="350">
-    <img src="/img/screen-gpio-pinout.png" width="350">
+    <img src="/img/screen-coding.png" width="700">
 </p>
 
 <br />
 
+In the code editor, <b>common keyboard shortcuts</b> such as <b>save</b>, <b>undo</b>, <b>search</b> or <b>move line blocks</b> are available.<br />
+<b>Tips</b>: leave the mouse on a file to display its full name and size, or double-click on the tab bar to create one more quickly.<br />
+<br />
+Use <b>Espressif's pinout diagrams</b> for the <b>GPIOs</b>, which are available <b>on most boards</b>:
+
+<p align="center">
+    <img src="/img/screen-gpio-pinout.png" width="700">
+</p>
+
+---
+
 <a name="jama-funcs"></a>
-## :cyclone: &nbsp;Embedded Jama Funcs
+# :cyclone: &nbsp;Embedded Jama Funcs
 
 <b>Jama Funcs</b> are small <b>dedicated functions</b> that run <b>on your device</b> to perform a <b>specific task</b>.<br />
-They can be used to <b>quickly test</b> the functionality of the <b>ESP32</b> or <b>external modules</b> and are designed to be <b>easily configured</b>.<br />
-<b>Choose a Jama Func</b> from those proposed, then configure its <b>parameters</b> directly <b>in the graphical interface</b> before executing it on your device.
+They can be used to <b>quickly test</b> the functionality of the <b>ESP32</b> or <b>external modules</b> and are designed to be <b>easily configured</b>.
 
-<h4>
-    <p align="center">
-        <img src="/img/screen-jama-funcs.png" width="700">
-    </p>
-</h4>
+<p align="center">
+    <img src="/img/screen-jama-funcs.png" width="700">
+</p>
 
-<br />
+<b>Choose a Jama Func</b> from those proposed, then <b>configure its parameters</b> directly <b>in the graphical interface</b> before executing it on your device:
+
+<p align="center">
+    <img src="/img/screen-jama-funcs-settings.png" width="700">
+</p>
+
+When <b>executing a Jama Func</b>, a window with a <b>terminal</b> opens up, allowing you to view <b>its output</b>:
+
+<p align="center">
+    <img src="/img/screen-jama-funcs-exec.png" width="700">
+</p>
 
 It is of course possible to <b>develop your own Jama Funcs</b> in order to <b>import them</b> into the interface and thus facilitate their use by implementing <b>integrated parameters</b>.<br />
-You can find a <b>full template</b> in <b>MicroPython</b> directly in the software or by clicking on <a href="https://github.com/jczic/ESP32-MPY-Jama/blob/ef2cf1cfbc138dd81a4291fe262d21fccb6dc71a/src/content/Jama%20Funcs%20-%20Template.py"><b>this link</b></a>.
-
-<h4>
-    <p align="center">
-        <img src="/img/screen-jama-funcs-settings.png" width="700">
-    </p>
-</h4>
-
+You can find a <b>full template</b> in <b>MicroPython</b> directly in the software or by clicking on
+<a href="https://github.com/jczic/ESP32-MPY-Jama/blob/ef2cf1cfbc138dd81a4291fe262d21fccb6dc71a/src/content/Jama%20Funcs%20-%20Template.py"><b>this link</b></a>.<br />
 <br />
-
-When <b>executing a Jama Func</b>, a window with a <b>terminal</b> opens up, allowing you to view <b>its output</b>.
-
-<h4>
-    <p align="center">
-        <img src="/img/screen-jama-funcs-exec.png" width="700">
-    </p>
-</h4>
-
-<br />
-
 The following table lists all the <b>Jama Funcs</b> already <b>included in ESP32 MPY-Jama</b>:<br />
 <br />
 
@@ -180,10 +182,11 @@ The following table lists all the <b>Jama Funcs</b> already <b>included in ESP32
 </h3>
 
 <br />
-<br />
+
+---
 
 <a name="sd-card"></a>
-## :cyclone: &nbsp;SD card support
+# :cyclone: &nbsp;SD card support
 
 If an <b>SD card</b> is available on the board, activate it and <b>mount</b> the corresponding <b>file system</b>.<br />
 A <b>reformatting</b> of all content is also possible.
@@ -192,10 +195,10 @@ A <b>reformatting</b> of all content is also possible.
     <img src="/img/screen-sdcard.png" width="700">
 </p>
 
-<br />
+---
 
 <a name="esptool"></a>
-## :cyclone: &nbsp;Firmware upgrade
+# :cyclone: &nbsp;Firmware upgrade
 
 Take advantage of the <b>Espressif esptool</b> to connect the device in <b>bootloader mode</b> and easily <b>load new binary images</b>.<br />
 Additionally, the tool allows you to <b>completely erase the device</b> for a full reset.
@@ -204,87 +207,92 @@ Additionally, the tool allows you to <b>completely erase the device</b> for a fu
     <img src="/img/screen-esptool.png" width="700">
 </p>
 
-<br />
+---
 
 <a name="build-and-run"></a>
-## :rocket: &nbsp;Build &amp; Run
+# :rocket: &nbsp;Build &amp; Run
 
-### Required
+- ### Required dependencies
 
-  - pyWebView ([Check out on GitHub](https://github.com/r0x0r/pywebview)):
-    ```console
-    python -m pip install pywebview
-    ```
-
-  - pySerial ([Check out on GitHub](https://github.com/pyserial/pyserial)):
-    ```console
-    python -m pip install pyserial
-    ```
-
-### Run
+  pyWebView ([Check out on GitHub](https://github.com/r0x0r/pywebview)):
   
-  - Just use python:
+  ```console
+  python -m pip install pywebview
+  ```
 
-    ```console
-    python SRC/app.py
-    ```
+  pySerial ([Check out on GitHub](https://github.com/pyserial/pyserial)):
+  
+  ```console
+  python -m pip install pyserial
+  ```
+
+- ### Run application
+  
+  Just use python:
+  
+  ```console
+  python src/app.py
+  ```
 
 <br />
-<br />
+
+---
 
 <a name="linux"></a>
 
-## :penguin: &nbsp;Linux version instructions
+# :penguin: &nbsp;Linux version instructions
 
 This describes how to clone the repository and how to run from source. In the third step you will find instructions how to create a binary from source. All st
 eps have been tested on Ubuntu 22.04, but should work with little changes on similar distributions as well.
 
-### Installation
+- ### Installation
 
-  - First, First, make sure you have all the required files:
-    ```bash
-    # clone the repository:
-    git clone https://github.com/jczic/ESP32-MPY-Jama
+  First, First, make sure you have all the required files:
 
-    # install python modules requirements:
-    sudo apt install libcairo2-dev libgirepository1.0-dev python3-pyqt5 python3-pyqt5.qtwebengine python3-pyqt5.qtwebchannel libqt5webkit5-dev gir1.2-webkit2-4.0
+  ```bash
+  # clone the repository:
+  git clone https://github.com/jczic/ESP32-MPY-Jama
 
-    # initialize python venv:
-    cd ESP32-MPY-Jama
-    python3 -m venv venv
+  # install python modules requirements:
+  sudo apt install libcairo2-dev libgirepository1.0-dev python3-pyqt5 python3-pyqt5.qtwebengine python3-pyqt5.qtwebchannel libqt5webkit5-dev gir1.2-webkit2-4.0
 
-    . venv/bin/activate
+  # initialize python venv:
+  cd ESP32-MPY-Jama
+  python3 -m venv venv
 
-    pip3 install wheel setuptools
-    pip3 install pyserial pywebview[qt] pycairo PyGObject pyinstaller
-    ```
+  . venv/bin/activate
 
-### Running from source
+  pip3 install wheel setuptools
+  pip3 install pyserial pywebview[qt] pycairo PyGObject pyinstaller
+  ```
 
-  - When you executed all steps listed under "Installation" you may run directly from sources by executing these steps:
+- ### Running from source
 
-    ```bash
-    cd ESP32-MPY-Jama
-    . venv/bin/activate
-    python3 src/app.py
-    ```
+  When you executed all steps listed under "Installation" you may run directly from sources by executing these steps:
 
-### Building executable
+  ```bash
+  cd ESP32-MPY-Jama
+  . venv/bin/activate
+  python3 src/app.py
+  ```
 
-  - Execute the steps listed under "Installation" and then continue like this:
+- ### Building executable
 
-    ```bash
-    cd ESP32-MPY-Jama
-    ./create_binary.sh
-    ```
+  Execute the steps listed under "Installation" and then continue like this:
 
-  - When the script finishes you should end up with a "esp32-mpy-jama" executable in the "dist" subfolder.
+  ```bash
+  cd ESP32-MPY-Jama
+  ./create_binary.sh
+  ```
+
+  When the script finishes you should end up with a "esp32-mpy-jama" executable in the "dist" subfolder.
 
 <br />
-<br />
+
+---
 
 <a name="author"></a>
-## :wink: &nbsp;Author
+# :wink: &nbsp;Author
 
   **Jean-Christophe Bos** (:fr:)
   - GitHub: *[@jczic](https://github.com/jczic)*
@@ -295,21 +303,21 @@ eps have been tested on Ubuntu 22.04, but should work with little changes on sim
             *[YouTube](https://www.youtube.com/playlist?list=PL9CsGuMbcLaU02VKS7jtR6LaDNpq7MZEq)*
 
 <br />
-<br />
+
+---
 
 <a name="thanks"></a>
-## :+1: &nbsp;Special thanks to 
+# :+1: &nbsp;Special thanks to 
 
   - **[rdagger](https://github.com/rdagger)** > [www.rototron.info](https://www.rototron.info)
   - **[happenpappen](https://github.com/happenpappen)** > [www.stop.pe](https://stop.pe)
 
 <br />
-<br />
+
+---
 
 <a name="license"></a>
-## :eight_pointed_black_star: &nbsp;License
+# :eight_pointed_black_star: &nbsp;License
 
   - Copyright :copyright: 2023 [Jean-Christophe Bos](https://www.linkedin.com/in/jczic).
   - This project is [MIT](https://github.com/jczic/ESP32-MPY-Jama/blob/master/LICENSE.md) licensed.
-
-<br />
