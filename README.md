@@ -10,7 +10,11 @@
     </p>
 </h1>
 
-<br />
+<h6>
+    <p align="right">
+        🔅 <a href="https://github.com/jczic/ESP32-MPY-Jama/releases/tag/v1.2.0" title="Version 1.2">What's new in version 1.2</a>
+    </p>
+</h6>
 
 <p align="center">
     <img src="https://img.shields.io/github/v/release/jczic/ESP32-MPY-Jama?style=flat-square" title="Release">
