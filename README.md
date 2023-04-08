@@ -174,25 +174,25 @@ The following table lists all the <b>Jama Funcs</b> already <b>included in ESP32
 
 |         Jama Func         | Description |
 | ------------------------- | ----------- |
-|1-Wire Devices Scan|Initializes a 1-Wire bus on a single GPIO and finds all the family IDs and serial numbers of slave devices.|
-|ADC Reader| Simple level and voltage reader on a GPIO using an analog-to-digital converter (ADC). You can specify the dB applied attenuation and the bits resolution.|
-|BLE Scan|Initializes the Bluetooth Low Energy radio and scans BLE devices via advertising data.|
-|BLE iBeacon|Initializes the Bluetooth Low Energy radio and simulates an Apple iBeacon object. The advertising message broadcasts an UUID corresponding to "B.JAMA-FUNC.TEST" in binary with the short name "MPY-Jama" while the iBeacon is the response to an active scanner. The iBeacon (Apple beacon format) data are: Major = 123  /  Minor = 456  /  TX at 1 meter = -55 dB|
-|DAC Output|Set a GPIO output to a specific voltage using digital-to-analog converter (DAC).|
-|GPIO Input| Simple reader of low/high voltage signals on a GPIO (pin) input. You can enable an internal pull resistor or not.|
-|GPIO Output|Set a GPIO (pin) output to ON or OFF.|
-|I2C Slaves Scan|Initializes an I2C bus on two GPIO and scans it to find all the addresses of I2C slaves. You can choose the bus identifier, the SCL and SDA GPIO as well as the frequency in MHz.|
-|KT403A MP3 Player|For MP3 modules based on KT403A chipset like DFPlayer, Grove-MP3 v2 and more. You will be able to connect your board via an UART bus, play all the sound files in loop from the intended storage source (microSD, USB, flash memory), adjust the volume but also choose an audio EQ effect (normal, pop, rock, jazz, classic, bass). Info: KT403A supports MP3 & WAV audio formats on FAT16 or FAT32 files system, 32 GB max for microSD.|
-|LEDs - DotStar RGB Strip|Try your DotStar RGB LEDs via SPI bus, compatible with strips APA102, SK9822, and more. You can choose the number of LEDs as well as the bus connectivity settings and the lighting in full power or in fading rainbow. The embedded library can be found via the link below.|
-|LEDs - NeoPixel RBG(+W/Y) Strip|Try your NeoPixel RGB(+W/Y) LEDs via only one GPIO, compatible with strips WS2812(B), SK6812, ADAxxxx, APA106, FLORA and more. You can choose the number as well as the type of LEDs like RGB or RGB+W/Y, the frequency, and the lighting in full power or in fading rainbow. The NeoPixel library was coded by Damien P. George.|
-|Magnet Sensor|Allows to test the hall sensor of the ESP32 chip with detection of the two magnetic poles after automatic calibration.|
-|Max Threads|Returns the maximum number of possible threads to create with the configurable stack size.|
-|Memory Check|This little tool simply allows you to allocate a maximum amount of memory on your chip in order to force the writing on almost all the available slots.|
-|NTP Time Sync| This tool synchronizes the UTC date and time from an NTP server. You can choose the NTP server host to connect to.|
-|PWM & Lighting|Uses a PWM on a GPIO and varies its duty cycle to make a led flash smoothly from 0 to 3.3V.|
-|PWM & Servo Motor| Uses a PWM on a GPIO and drives a servo motor by varying its duty cycle. Several options are available to configure the servo motor, such as pulse frequency, pulse width and rotation time.|
-|UART Test| Initializes an UART bus on two GPIO, sends or not a custom command and receives data from the bus. You can choose bus identifier, baud rate, bits per character, parity, stop bits and TX/RX GPIO|
-|Wi-Fi Scan|Performs a detailed scan of the wireless access points.|
+|**1-Wire Devices Scan**|Initializes a 1-Wire bus on a single GPIO and finds all the family IDs and serial numbers of slave devices.|
+|**ADC Reader**| Simple level and voltage reader on a GPIO using an analog-to-digital converter (ADC). You can specify the dB applied attenuation and the bits resolution.|
+|**BLE Scan**|Initializes the Bluetooth Low Energy radio and scans BLE devices via advertising data.|
+|**BLE iBeacon**|Initializes the Bluetooth Low Energy radio and simulates an Apple iBeacon object. The advertising message broadcasts an UUID corresponding to "B.JAMA-FUNC.TEST" in binary with the short name "MPY-Jama" while the iBeacon is the response to an active scanner. The iBeacon (Apple beacon format) data are: Major = 123  /  Minor = 456  /  TX at 1 meter = -55 dB|
+|**DAC Output**|Set a GPIO output to a specific voltage using digital-to-analog converter (DAC).|
+|**GPIO Input**| Simple reader of low/high voltage signals on a GPIO (pin) input. You can enable an internal pull resistor or not.|
+|**GPIO Output**|Set a GPIO (pin) output to ON or OFF.|
+|**I2C Slaves Scan**|Initializes an I2C bus on two GPIO and scans it to find all the addresses of I2C slaves. You can choose the bus identifier, the SCL and SDA GPIO as well as the frequency in MHz.|
+|**KT403A MP3 Player**|For MP3 modules based on KT403A chipset like DFPlayer, Grove-MP3 v2 and more. You will be able to connect your board via an UART bus, play all the sound files in loop from the intended storage source (microSD, USB, flash memory), adjust the volume but also choose an audio EQ effect (normal, pop, rock, jazz, classic, bass). Info: KT403A supports MP3 & WAV audio formats on FAT16 or FAT32 files system, 32 GB max for microSD.|
+|**LEDs - DotStar RGB Strip**|Try your DotStar RGB LEDs via SPI bus, compatible with strips APA102, SK9822, and more. You can choose the number of LEDs as well as the bus connectivity settings and the lighting in full power or in fading rainbow. The embedded library can be found via the link below.|
+|**LEDs - NeoPixel RBG(+W/Y) Strip**|Try your NeoPixel RGB(+W/Y) LEDs via only one GPIO, compatible with strips WS2812(B), SK6812, ADAxxxx, APA106, FLORA and more. You can choose the number as well as the type of LEDs like RGB or RGB+W/Y, the frequency, and the lighting in full power or in fading rainbow. The NeoPixel library was coded by Damien P. George.|
+|**Magnet Sensor**|Allows to test the hall sensor of the ESP32 chip with detection of the two magnetic poles after automatic calibration.|
+|**Max Threads**|Returns the maximum number of possible threads to create with the configurable stack size.|
+|**Memory Check**|This little tool simply allows you to allocate a maximum amount of memory on your chip in order to force the writing on almost all the available slots.|
+|**NTP Time Sync**| This tool synchronizes the UTC date and time from an NTP server. You can choose the NTP server host to connect to.|
+|**PWM & Lighting**|Uses a PWM on a GPIO and varies its duty cycle to make a led flash smoothly from 0 to 3.3V.|
+|**PWM & Servo Motor**| Uses a PWM on a GPIO and drives a servo motor by varying its duty cycle. Several options are available to configure the servo motor, such as pulse frequency, pulse width and rotation time.|
+|**UART Test**| Initializes an UART bus on two GPIO, sends or not a custom command and receives data from the bus. You can choose bus identifier, baud rate, bits per character, parity, stop bits and TX/RX GPIO|
+|**Wi-Fi Scan**|Performs a detailed scan of the wireless access points.|
 
 <br />
 
