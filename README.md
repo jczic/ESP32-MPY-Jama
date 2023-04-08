@@ -299,6 +299,13 @@ eps have been tested on Ubuntu 22.04, but should work with little changes on sim
   . venv/bin/activate
   python3 src/app.py
   ```
+  
+  In case of an issue with the initialization of the graphical user interface, it is possible to force the desired interface by using the argument `--gui` (or `-g`) followed by `qt` or `gtk`.
+
+  ```bash
+  # example:
+  python3 src/app.py -g gtk
+  ```
 
 - ### Building executable
 
