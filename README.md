@@ -62,6 +62,7 @@
 
 # :bookmark_tabs: &nbsp;Table of contents
 
+- [**Features**](#features)
 - [**Real-time system dashboard**](#system-dashboard)
 - [**Real-time networks dashboard**](#networks-dashboard)
 - [**Wi-Fi in 2 clicks**](#wifi)
@@ -75,6 +76,32 @@
 - [**Author**](#author)
 - [**Special thanks to**](#thanks)
 - [**License**](#license)
+
+<br />
+
+---
+
+<a name="features"></a>
+# :rocket: &nbsp;Features
+
+- User-friendly **graphical interface** for easy use
+- Connect to **multiple ESP32 board** types
+- **Lightweight IDE** for easy programming
+- **Terminal access** for streamlined command execution
+- **Pinout diagrams** for popular board types
+- Easy installation of **in-line modules** with **PIP** or **MIP**
+- Flash **file system browser** for easy file access
+- Native **file tranfers** and management
+- Real-time visualization of **GPIO states**
+- Access to important **system information**
+- Configuration of **Wi-Fi** and **Ethernet** network interfaces
+- **SD card** support for external storage
+- Simplified flash **firmware updates**
+- Advanced **external component testing** features
+- Control and manipulate peripherals such as **LEDs strips**, **MP3 players**, etc
+- Quick testing of **IOs** in **digital** or **analog** mode
+- **Customizable features** for an extensible development
+- **Persistent configurations** on boards if required
 
 <br />
 
@@ -223,7 +250,7 @@ A <b>reformatting</b> of all content is also possible.
 ---
 
 <a name="esptool"></a>
-# :hammer_and_wrench: &nbsp;Firmware upgrade
+# :zap: &nbsp;Firmware upgrade
 
 Take advantage of the <b>Espressif esptool</b> to connect the device in <b>bootloader mode</b> and easily <b>load new binary images</b>.<br />
 Additionally, the tool allows you to <b>completely erase the device</b> for a full reset.
@@ -235,7 +262,7 @@ Additionally, the tool allows you to <b>completely erase the device</b> for a fu
 ---
 
 <a name="build-and-run"></a>
-# :rocket: &nbsp;Build &amp; Run
+# :hammer_and_wrench: &nbsp;Build &amp; Run
 
 - ### Required dependencies
 
