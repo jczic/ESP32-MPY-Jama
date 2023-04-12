@@ -36,7 +36,7 @@
 </p>
 
 <p align="center">
-    <img src="/img/screen-ide.png" width="700" title="ESP32 MPY-Jama">
+    <img src="img/anim-esp32-mpy-jama.gif" width="630" title="ESP32 MPY-Jama">
 </p>
 
 <h4>
