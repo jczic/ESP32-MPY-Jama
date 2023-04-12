@@ -89,7 +89,7 @@
 - **Lightweight IDE** for easy programming
 - **Terminal access** for streamlined command execution
 - **Pinout diagrams** for popular board types
-- Easy installation of **in-line modules** with **PIP** or **MIP**
+- Easy installation of **in-line modules** with **PyPI** or **MIP**
 - Flash **file system browser** for easy file access
 - Native **file tranfers** and management
 - Real-time visualization of **GPIO states**
@@ -102,6 +102,7 @@
 - Quick testing of **IOs** in **digital** or **analog** mode
 - **Customizable features** for an extensible development
 - **Persistent configurations** on boards if required
+- Real-time **memory** and **temperature** monitoring
 
 <br />
 
