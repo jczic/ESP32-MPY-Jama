@@ -1,13 +1,8 @@
-<br />
 
-<p align="center">
-    <img src="/img/logo.png" width="100" title="ESP32 MPY-Jama">
-</p>
-<h1>
-    <p align="center">
-        ESP32 MPY-Jama<br />
-        <br />
-    </p>
+<h1 align="center">
+    <img src="/img/logo-anim.gif" width="100" title="ESP32 MPY-Jama"><br />
+    ESP32 MPY-Jama<br />
+    <br />
 </h1>
 
 <h6>
