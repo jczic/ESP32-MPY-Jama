@@ -175,6 +175,8 @@ class ESP32Controller :
             self._repl = Serial( port      = devicePort,
                                  baudrate  = baudrate,
                                  timeout   = None,
+                                 rtscts    = 0,
+                                 dsrdtr    = 0,
                                  xonxoff   = False,
                                  exclusive = True )
             self._isConnected = True
@@ -186,6 +188,8 @@ class ESP32Controller :
 
         try :
             self.InterruptProgram()
+            self._repl.rts = 0
+            self._repl.dtr = 0
             self._switchToRawMode(timeoutSec=connectTimeoutSec)
             machineNfo          = self._exeCodeREPL('import uos; [x.strip() for x in uos.uname().machine.split("with")]')
             self._machineModule = (machineNfo[0] if len(machineNfo) >= 1 else '')
